@@ -4,7 +4,7 @@ const fs = require('fs');
 
 async function takeScreenshot(page, url, outputPath) {
   await page.goto(url);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('load');
   await page.waitForTimeout(5000);
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   await page.screenshot({ path: outputPath, fullPage: true });
