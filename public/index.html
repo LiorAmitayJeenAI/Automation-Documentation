@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>אוטומציה לתיעוד</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(145deg, #f3f0ff 0%, #ede9fe 30%, #e0f2fe 100%);
+      min-height: 100vh;
+      padding: 40px 20px 60px;
+      color: #1e1b4b;
+    }
+
+    /* ── Page wrapper ─────────────────────────────── */
+    .page { max-width: 1140px; margin: 0 auto; }
+
+    /* ── Header ───────────────────────────────────── */
+    .page-header {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 28px;
+      text-align: right;
+    }
+
+    .header-icon {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, #7c3aed, #6366f1);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.25);
+    }
+
+    .page-header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #1e1b4b;
+      margin-bottom: 8px;
+    }
+
+    .page-header p {
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.65;
+      max-width: 560px;
+    }
+
+    .blob-link-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .blob-link-row a {
+      color: #7c3aed;
+      text-decoration: none;
+      font-weight: 500;
+      direction: ltr;
+      display: inline-block;
+      max-width: 520px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: bottom;
+    }
+    .blob-link-row a:hover { text-decoration: underline; }
+
+    /* ── Card ─────────────────────────────────────── */
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(99,102,241,0.1), 0 1px 4px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+
+    /* ── Card toolbar ─────────────────────────────── */
+    .card-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px 16px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .toolbar-right { display: flex; align-items: center; gap: 8px; }
+
+    .count-badge {
+      font-size: 13px;
+      color: #6b7280;
+    }
+    .count-badge strong { color: #7c3aed; }
+
+    .btn-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ede9fe;
+      color: #7c3aed;
+      border: none;
+      border-radius: 9px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-add:hover { background: #ddd6fe; }
+
+    /* ── Table ────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      padding: 12px 20px;
+      text-align: right;
+      font-size: 12px;
+      font-weight: 600;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: #fafafa;
+      border-bottom: 1px solid #f3f4f6;
+      white-space: nowrap;
+    }
+
+    .th-check { width: 56px; text-align: center; }
+
+    thead th .th-icon {
+      display: inline-block;
+      margin-left: 5px;
+      vertical-align: middle;
+      opacity: 0.7;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #f3f4f6;
+      transition: background 0.1s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #faf9ff; }
+
+    tbody td {
+      padding: 16px 20px;
+      font-size: 14px;
+      color: #374151;
+      vertical-align: middle;
+    }
+
+    .td-check { text-align: center; padding: 16px 0; }
+
+    /* ── Black circle checkbox ────────────────────── */
+    .circle-btn {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: 2px solid #d1d5db;
+      background: transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      outline: none;
+      flex-shrink: 0;
+    }
+    .circle-btn:hover { border-color: #7c3aed; }
+    .circle-btn.checked {
+      background: #1e1b4b;
+      border-color: #1e1b4b;
+    }
+    .circle-btn.checked::after {
+      content: '';
+      display: block;
+      width: 10px; height: 6px;
+      border-left: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      transform: rotate(-45deg) translateY(-1px);
+    }
+
+    /* ── Cell content ─────────────────────────────── */
+    .cell-url {
+      color: #4f46e5;
+      font-size: 13px;
+      display: block;
+      max-width: 520px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      direction: ltr;
+      text-align: left;
+    }
+
+    .cell-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #f3f4f6;
+      border-radius: 6px;
+      padding: 3px 9px;
+      font-size: 12px;
+      color: #6b7280;
+      max-width: 340px;
+    }
+    .cell-label.empty { background: transparent; color: #d1d5db; }
+
+    .cell-date { color: #9ca3af; font-size: 13px; white-space: nowrap; }
+
+    .td-del { width: 44px; text-align: center; }
+    .del-btn {
+      background: none; border: none;
+      color: #e5e7eb;
+      font-size: 18px; cursor: pointer;
+      border-radius: 6px; padding: 2px 7px;
+      visibility: hidden;
+      transition: color 0.15s, background 0.15s;
+    }
+    tr:hover .del-btn { visibility: visible; }
+    .del-btn:hover { color: #ef4444; background: #fee2e2; }
+
+    /* ── Empty state ──────────────────────────────── */
+    .empty-state {
+      padding: 56px 20px;
+      text-align: center;
+    }
+    .empty-icon {
+      width: 56px; height: 56px;
+      background: #f3f0ff;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+    }
+    .empty-state h3 { font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+    .empty-state p  { font-size: 13px; color: #9ca3af; }
+
+    /* ── Card footer / action bar ─────────────────── */
+    .card-footer {
+      border-top: 1px solid #f3f4f6;
+      background: #fafafa;
+    }
+
+    /* Options row */
+    .footer-options {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 14px 24px;
+      border-bottom: 1px solid #f3f4f6;
+      flex-wrap: wrap;
+    }
+
+    .option-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .option-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #9ca3af;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+
+    .option-sep {
+      width: 1px;
+      height: 26px;
+      background: #e5e7eb;
+      margin: 0 10px;
+    }
+
+    .seg-control {
+      display: inline-flex;
+      background: #ede9fe;
+      border-radius: 9px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .seg-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 13px;
+      border: none;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      color: #7c3aed;
+      background: transparent;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .seg-btn:hover { background: rgba(255,255,255,0.5); }
+    .seg-btn.active {
+      background: #fff;
+      color: #1e1b4b;
+      font-weight: 700;
+      box-shadow: 0 1px 4px rgba(124,58,237,0.15);
+    }
+
+    /* Actions row */
+    .footer-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 24px;
+    }
+
+    .btn-run {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: linear-gradient(135deg, #7c3aed, #6366f1);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(124,58,237,0.3);
+      transition: opacity 0.15s, box-shadow 0.15s;
+    }
+    .btn-run:disabled {
+      opacity: 0.4;
+      cursor: default;
+      box-shadow: none;
+    }
+    .btn-run:not(:disabled):hover {
+      opacity: 0.88;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+    }
+
+    .btn-ghost {
+      background: none;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #6b7280;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .btn-ghost:hover { background: #f3f4f6; }
+
+    .footer-left { display: flex; align-items: center; gap: 8px; }
+    .footer-right { margin-right: auto; }
+
+    .selection-info {
+      font-size: 13px;
+      color: #9ca3af;
+    }
+    .selection-info strong { color: #7c3aed; }
+
+    /* ── Results card ─────────────────────────────── */
+    #resultsCard { display: none; margin-top: 18px; }
+    #resultsCard.visible { display: block; }
+
+    .results-card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(99,102,241,0.08), 0 1px 4px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+
+    .results-title {
+      padding: 16px 24px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .result-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 24px;
+      border-bottom: 1px solid #f9fafb;
+      font-size: 13px;
+    }
+    .result-row:last-child { border-bottom: none; }
+
+    .rdot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .result-row.running .rdot { background: #f59e0b; animation: pulse 1.2s infinite; }
+    .result-row.done    .rdot { background: #10b981; }
+    .result-row.error   .rdot { background: #ef4444; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
+    }
+
+    .rurl  { flex: 1; color: #4f46e5; direction: ltr; text-align: left; word-break: break-all; }
+    .rmsg  { color: #9ca3af; font-size: 12px; white-space: nowrap; }
+    .result-row.done  .rmsg { color: #10b981; }
+    .result-row.error .rmsg { color: #ef4444; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ── Modal ────────────────────────────────────── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(30,27,75,0.25);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 300;
+    }
+    .overlay.open { display: flex; }
+
+    .modal {
+      background: #fff;
+      border-radius: 20px;
+      padding: 28px 28px 24px;
+      width: 440px;
+      max-width: 92vw;
+      box-shadow: 0 20px 60px rgba(30,27,75,0.18);
+      direction: rtl;
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .modal-header-icon {
+      width: 36px; height: 36px;
+      background: #ede9fe;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal h2 { font-size: 16px; font-weight: 700; color: #1e1b4b; }
+    .modal label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      margin-bottom: 5px;
+    }
+    .modal input {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 14px;
+      transition: border-color 0.15s;
+      direction: ltr;
+      text-align: left;
+    }
+    .modal input:focus { border-color: #7c3aed; }
+    .modal-actions { display: flex; justify-content: flex-start; gap: 8px; margin-top: 4px; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Page Header ── -->
+  <header class="page-header">
+    <div class="header-icon">
+      <svg width="26" height="26" fill="none" viewBox="0 0 24 24">
+        <path d="M9 12h6M9 16h6M9 8h3M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1>אוטומציה לתיעוד</h1>
+    <p>בחרו את הקישורים שלפיהם ייווצרו מצגות עבור כל חלק במערכת.<br/>הקבצים שנוצרים נשמרים אוטומטית ב-Blob, תחת התיקייה:</p>
+    <div class="blob-link-row">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="#7c3aed" stroke-width="2"/><path d="M3 7l9 6 9-6" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/></svg>
+      <a href="https://jeenai365.sharepoint.com/:f:/s/JEEN.AI/IgA6ONBl7nsMQ5s789yGxsfoAQsdk5RpNx7jUEoQWJm3NWA?e=m6cKgB" target="_blank" rel="noopener">
+        jeenai365.sharepoint.com / JEEN.AI / Blob
+      </a>
+    </div>
+  </header>
+
+  <!-- ── Main Card ── -->
+  <div class="card">
+
+    <!-- Toolbar -->
+    <div class="card-toolbar">
+      <div class="toolbar-right">
+        <button class="btn-add" onclick="openModal()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round"/></svg>
+          הוסף קישור
+        </button>
+      </div>
+      <div class="count-badge" id="countBadge"></div>
+    </div>
+
+    <!-- Table -->
+    <table>
+      <thead>
+        <tr>
+          <th class="th-check">
+            <button class="circle-btn" id="selectAllBtn" onclick="toggleSelectAll()" title="בחר הכל"></button>
+          </th>
+          <th>
+            <span class="th-icon">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+            קישור
+          </th>
+          <th>
+            <span class="th-icon">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M7 7h10M7 11h6M7 15h8" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+            תווית
+          </th>
+          <th>
+            <span class="th-icon">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#9ca3af" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+            תאריך הוספה
+          </th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="urlTable"></tbody>
+    </table>
+
+    <!-- Empty state -->
+    <div id="emptyState" class="empty-state" style="display:none">
+      <div class="empty-icon">
+        <svg width="26" height="26" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <h3>אין קישורים עדיין</h3>
+      <p>לחצו על "הוסף קישור" כדי להתחיל</p>
+    </div>
+
+    <!-- Card footer -->
+    <div class="card-footer">
+
+      <!-- Options row -->
+      <div class="footer-options">
+        <div class="option-group">
+          <span class="option-label">שפת המצגת</span>
+          <div class="seg-control" id="langSeg">
+            <button class="seg-btn active" onclick="setOption('lang','he',this,document.getElementById('langSeg'))">
+              🇮🇱 עברית
+            </button>
+            <button class="seg-btn" onclick="setOption('lang','en',this,document.getElementById('langSeg'))">
+              🇬🇧 English
+            </button>
+          </div>
+        </div>
+        <div class="option-sep"></div>
+        <div class="option-group">
+          <span class="option-label">סוג קישור</span>
+          <div class="seg-control" id="linkTypeSeg">
+            <button class="seg-btn active" onclick="setOption('linkType','regular',this,document.getElementById('linkTypeSeg'))">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              רגיל
+            </button>
+            <button class="seg-btn" onclick="setOption('linkType','admin',this,document.getElementById('linkTypeSeg'))">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              ניהול
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions row -->
+      <div class="footer-actions">
+        <div class="footer-left">
+          <button class="btn-run" id="runBtn" onclick="runSelected()" disabled>
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z" fill="#fff"/></svg>
+            הפעל על הנבחרים
+          </button>
+          <button class="btn-ghost" onclick="selectNone()">ביטול בחירה</button>
+        </div>
+        <div class="footer-right selection-info" id="selectionInfo"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Results Card ── -->
+  <div id="resultsCard">
+    <div class="results-card">
+      <div class="results-title">תוצאות הרצה</div>
+      <div id="resultsList"></div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- ── Add URL Modal ── -->
+<div class="overlay" id="overlay" onclick="bgClose(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-header-icon">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <h2>הוסף קישור</h2>
+    </div>
+    <label for="urlInput">כתובת URL</label>
+    <input type="url" id="urlInput" placeholder="https://example.com/page" />
+    <label for="labelInput">תווית <span style="font-weight:400;color:#d1d5db">(אופציונלי)</span></label>
+    <input type="text" id="labelInput" placeholder="לדוג׳: דף הבית" />
+    <div class="modal-actions">
+      <button class="btn-run" onclick="addUrl()">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
+        הוסף
+      </button>
+      <button class="btn-ghost" onclick="closeModal()">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let urls = [];
+  let selected = new Set();
+  let lang = 'he';
+  let linkType = 'regular';
+
+  function setOption(key, val, btn, seg) {
+    if (key === 'lang') lang = val;
+    else linkType = val;
+    seg.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  async function load() {
+    const res = await fetch('/api/urls');
+    urls = await res.json();
+    render();
+  }
+
+  function render() {
+    const tbody  = document.getElementById('urlTable');
+    const empty  = document.getElementById('emptyState');
+    const badge  = document.getElementById('countBadge');
+    const info   = document.getElementById('selectionInfo');
+
+    badge.innerHTML = urls.length
+      ? `סה"כ <strong>${urls.length}</strong> קישורים`
+      : '';
+
+    info.innerHTML = selected.size
+      ? `<strong>${selected.size}</strong> נבחרו`
+      : '';
+
+    if (!urls.length) {
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+      syncRunBtn();
+      return;
+    }
+    empty.style.display = 'none';
+
+    tbody.innerHTML = urls.map((item, i) => {
+      const checked = selected.has(i);
+      const date = new Date(item.addedAt).toLocaleDateString('he-IL', {
+        day: '2-digit', month: 'short', year: 'numeric'
+      });
+      const labelHtml = item.label
+        ? `<span class="cell-label">
+            <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/><circle cx="7" cy="7" r="1" fill="#9ca3af"/></svg>
+            ${esc(item.label)}
+           </span>`
+        : `<span class="cell-label empty">—</span>`;
+      return `
+        <tr>
+          <td class="td-check">
+            <button class="circle-btn ${checked ? 'checked' : ''}" onclick="toggle(${i})"></button>
+          </td>
+          <td><span class="cell-url" title="${esc(item.url)}">${esc(item.url)}</span></td>
+          <td>${labelHtml}</td>
+          <td class="cell-date">${date}</td>
+          <td class="td-del">
+            <button class="del-btn" onclick="del(${i})" title="הסר">×</button>
+          </td>
+        </tr>`;
+    }).join('');
+
+    const allBtn = document.getElementById('selectAllBtn');
+    if (urls.length && selected.size === urls.length) allBtn.classList.add('checked');
+    else allBtn.classList.remove('checked');
+
+    syncRunBtn();
+  }
+
+  function toggle(i) {
+    selected.has(i) ? selected.delete(i) : selected.add(i);
+    render();
+  }
+
+  function toggleSelectAll() {
+    if (selected.size === urls.length && urls.length) selected.clear();
+    else urls.forEach((_, i) => selected.add(i));
+    render();
+  }
+
+  function selectNone() { selected.clear(); render(); }
+  function syncRunBtn() {
+    document.getElementById('runBtn').disabled = selected.size === 0;
+  }
+
+  /* ── Modal ── */
+  function openModal() {
+    document.getElementById('overlay').classList.add('open');
+    setTimeout(() => document.getElementById('urlInput').focus(), 50);
+  }
+  function closeModal() {
+    document.getElementById('overlay').classList.remove('open');
+    document.getElementById('urlInput').value = '';
+    document.getElementById('labelInput').value = '';
+  }
+  function bgClose(e) {
+    if (e.target === document.getElementById('overlay')) closeModal();
+  }
+
+  async function addUrl() {
+    const url   = document.getElementById('urlInput').value.trim();
+    const label = document.getElementById('labelInput').value.trim();
+    if (!url) { document.getElementById('urlInput').focus(); return; }
+    await fetch('/api/urls', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, label }),
+    });
+    closeModal();
+    await load();
+  }
+
+  async function del(i) {
+    const reindexed = new Set();
+    selected.forEach(s => {
+      if (s < i) reindexed.add(s);
+      else if (s > i) reindexed.add(s - 1);
+    });
+    selected.clear();
+    reindexed.forEach(s => selected.add(s));
+    await fetch(`/api/urls/${i}`, { method: 'DELETE' });
+    await load();
+  }
+
+  /* ── Run ── */
+  async function runSelected() {
+    const toRun = [...selected].sort().map(i => urls[i].url);
+    if (!toRun.length) return;
+
+    const card = document.getElementById('resultsCard');
+    const list = document.getElementById('resultsList');
+    card.classList.add('visible');
+    list.innerHTML = '';
+
+    const ids = {};
+    toRun.forEach((url, i) => {
+      const id = 'r' + i;
+      ids[url] = id;
+      list.insertAdjacentHTML('beforeend', `
+        <div class="result-row running" id="${id}">
+          <div class="rdot"></div>
+          <span class="rurl">${esc(url)}</span>
+          <span class="rmsg">מריץ…</span>
+        </div>`);
+    });
+
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    document.getElementById('runBtn').disabled = true;
+
+    const res = await fetch('/api/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ urls: toRun, language: lang, linkType }),
+    });
+
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const msg = JSON.parse(line.slice(6));
+        if (msg.status === 'complete' || !msg.url) continue;
+        const el = document.getElementById(ids[msg.url]);
+        if (!el) continue;
+        if (msg.status === 'done') {
+          el.className = 'result-row done';
+          el.querySelector('.rmsg').textContent = 'הושלם ✓';
+        } else if (msg.status === 'error') {
+          el.className = 'result-row error';
+          el.querySelector('.rmsg').textContent = msg.error;
+        }
+      }
+    }
+
+    syncRunBtn();
+  }
+
+  function esc(s) {
+    return (s || '')
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('urlInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addUrl();
+    });
+    load();
+  });
+</script>
+</body>
+</html>
