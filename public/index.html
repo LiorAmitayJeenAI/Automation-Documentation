@@ -3,166 +3,251 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>אוטומציה לתיעוד</title>
+  <title>Automation Setup — JEEN.AI</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-      background: linear-gradient(145deg, #f3f0ff 0%, #ede9fe 30%, #e0f2fe 100%);
-      min-height: 100vh;
-      padding: 40px 20px 60px;
-      color: #1e1b4b;
+    :root {
+      --bg: #f5f4f9;
+      --bg-card: #ffffff;
+      --purple-50: #f5f3ff;
+      --purple-100: #ede9fe;
+      --purple-200: #ddd6fe;
+      --purple-500: #8b5cf6;
+      --purple-600: #7c3aed;
+      --purple-900: #1e1b4b;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --shadow-card: 0 1px 3px rgba(0,0,0,0.05), 0 8px 32px rgba(139,92,246,0.07);
+      --shadow-btn: 0 2px 8px rgba(124,58,237,0.28);
+      --radius-card: 20px;
+      --radius-pill: 999px;
     }
 
-    /* ── Page wrapper ─────────────────────────────── */
-    .page { max-width: 1140px; margin: 0 auto; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 52px 28px 96px;
+      color: var(--purple-900);
+    }
 
-    /* ── Header ───────────────────────────────────── */
+    .page { max-width: 1160px; margin: 0 auto; }
+
+    /* ── Page header ── */
     .page-header {
       display: flex;
-      flex-direction: column;
       align-items: flex-start;
-      margin-bottom: 28px;
-      text-align: right;
+      gap: 18px;
+      margin-bottom: 52px;
     }
 
     .header-icon {
-      width: 52px; height: 52px;
-      background: linear-gradient(135deg, #7c3aed, #6366f1);
-      border-radius: 14px;
+      width: 56px; height: 56px;
+      background: linear-gradient(135deg, var(--purple-600), #6366f1);
+      border-radius: 16px;
       display: flex; align-items: center; justify-content: center;
-      margin-bottom: 14px;
-      box-shadow: 0 4px 16px rgba(124,58,237,0.25);
+      flex-shrink: 0;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.3);
     }
 
-    .page-header h1 {
+    .header-text { display: flex; flex-direction: column; gap: 5px; }
+
+    .header-text h1 {
       font-size: 26px;
       font-weight: 700;
-      color: #1e1b4b;
-      margin-bottom: 8px;
+      color: var(--purple-900);
+      line-height: 1.25;
     }
 
-    .page-header p {
+    .header-text p {
       font-size: 14px;
-      color: #6b7280;
+      color: var(--gray-500);
       line-height: 1.65;
-      max-width: 560px;
     }
 
-    .blob-link-row {
-      display: flex;
+    .blob-link {
+      display: inline-flex;
       align-items: center;
       gap: 6px;
-      margin-top: 10px;
+      margin-top: 6px;
       font-size: 13px;
-      color: #6b7280;
-    }
-
-    .blob-link-row a {
-      color: #7c3aed;
+      color: var(--purple-600);
       text-decoration: none;
       font-weight: 500;
-      direction: ltr;
-      display: inline-block;
-      max-width: 520px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      vertical-align: bottom;
     }
-    .blob-link-row a:hover { text-decoration: underline; }
+    .blob-link:hover { text-decoration: underline; }
 
-    /* ── Card ─────────────────────────────────────── */
+    /* ── Section ── */
+    .section { margin-bottom: 60px; }
+
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .section-meta { display: flex; flex-direction: column; gap: 4px; }
+
+    .section-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--purple-500);
+    }
+
+    .section-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--purple-900);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 24px;
+      padding: 0 8px;
+      background: var(--purple-100);
+      color: var(--purple-600);
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .section-header p {
+      font-size: 13px;
+      color: var(--gray-400);
+    }
+
+    /* ── Card ── */
     .card {
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 4px 24px rgba(99,102,241,0.1), 0 1px 4px rgba(0,0,0,0.06);
+      background: var(--bg-card);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
       overflow: hidden;
     }
 
-    /* ── Card toolbar ─────────────────────────────── */
+    /* ── Card toolbar ── */
     .card-toolbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 18px 24px 16px;
-      border-bottom: 1px solid #f3f4f6;
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--gray-100);
     }
 
-    .toolbar-right { display: flex; align-items: center; gap: 8px; }
+    .count-badge { font-size: 13px; color: var(--gray-400); }
+    .count-badge strong { color: var(--purple-600); font-weight: 700; }
 
-    .count-badge {
-      font-size: 13px;
-      color: #6b7280;
-    }
-    .count-badge strong { color: #7c3aed; }
-
-    .btn-add {
+    /* ── Buttons ── */
+    .btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      background: #ede9fe;
-      color: #7c3aed;
+      gap: 7px;
       border: none;
-      border-radius: 9px;
-      padding: 8px 14px;
-      font-size: 13px;
-      font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s;
+      font-weight: 600;
+      transition: all 0.15s;
+      white-space: nowrap;
+      font-family: inherit;
     }
-    .btn-add:hover { background: #ddd6fe; }
 
-    /* ── Table ────────────────────────────────────── */
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    .btn-primary {
+      background: linear-gradient(135deg, var(--purple-600), #6366f1);
+      color: #fff;
+      border-radius: var(--radius-pill);
+      padding: 10px 22px;
+      font-size: 14px;
+      box-shadow: var(--shadow-btn);
     }
+    .btn-primary:hover:not(:disabled) { opacity: 0.88; box-shadow: 0 4px 18px rgba(124,58,237,0.4); }
+    .btn-primary:disabled { opacity: 0.35; cursor: default; box-shadow: none; }
+
+    .btn-soft {
+      background: var(--purple-100);
+      color: var(--purple-600);
+      border-radius: var(--radius-pill);
+      padding: 9px 18px;
+      font-size: 13px;
+    }
+    .btn-soft:hover { background: var(--purple-200); }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1.5px solid var(--gray-200);
+      color: var(--gray-500);
+      border-radius: var(--radius-pill);
+      padding: 9px 18px;
+      font-size: 13px;
+    }
+    .btn-ghost:hover { background: var(--gray-100); color: var(--gray-700); }
+
+    .btn-icon {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 6px;
+      color: var(--gray-300);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    tr:hover .btn-icon { color: var(--gray-400); }
+    .btn-icon:hover { background: #fee2e2 !important; color: #dc2626 !important; }
+
+    /* ── Table ── */
+    table { width: 100%; border-collapse: collapse; }
 
     thead th {
-      padding: 12px 20px;
+      padding: 12px 24px;
       text-align: right;
-      font-size: 12px;
-      font-weight: 600;
-      color: #9ca3af;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gray-400);
       text-transform: uppercase;
-      letter-spacing: 0.04em;
-      background: #fafafa;
-      border-bottom: 1px solid #f3f4f6;
-      white-space: nowrap;
+      letter-spacing: 0.07em;
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-100);
     }
-
-    .th-check { width: 56px; text-align: center; }
-
-    thead th .th-icon {
-      display: inline-block;
-      margin-left: 5px;
-      vertical-align: middle;
-      opacity: 0.7;
-    }
+    .th-check { width: 64px; text-align: center; }
 
     tbody tr {
-      border-bottom: 1px solid #f3f4f6;
+      border-bottom: 1px solid var(--gray-100);
       transition: background 0.1s;
     }
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover { background: #faf9ff; }
 
     tbody td {
-      padding: 16px 20px;
+      padding: 16px 24px;
       font-size: 14px;
-      color: #374151;
+      color: var(--gray-700);
       vertical-align: middle;
     }
-
     .td-check { text-align: center; padding: 16px 0; }
+    .td-del { width: 52px; text-align: center; }
 
-    /* ── Black circle checkbox ────────────────────── */
+    /* ── Circle checkbox ── */
     .circle-btn {
-      width: 26px; height: 26px;
+      width: 22px; height: 22px;
       border-radius: 50%;
-      border: 2px solid #d1d5db;
+      border: 2px solid var(--gray-200);
       background: transparent;
       cursor: pointer;
       display: inline-flex;
@@ -172,26 +257,23 @@
       outline: none;
       flex-shrink: 0;
     }
-    .circle-btn:hover { border-color: #7c3aed; }
-    .circle-btn.checked {
-      background: #1e1b4b;
-      border-color: #1e1b4b;
-    }
+    .circle-btn:hover { border-color: var(--purple-500); background: var(--purple-50); }
+    .circle-btn.checked { background: var(--purple-600); border-color: var(--purple-600); }
     .circle-btn.checked::after {
       content: '';
       display: block;
-      width: 10px; height: 6px;
+      width: 9px; height: 5px;
       border-left: 2px solid #fff;
       border-bottom: 2px solid #fff;
       transform: rotate(-45deg) translateY(-1px);
     }
 
-    /* ── Cell content ─────────────────────────────── */
+    /* ── Cell content ── */
     .cell-url {
       color: #4f46e5;
       font-size: 13px;
       display: block;
-      max-width: 520px;
+      max-width: 480px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -203,85 +285,67 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      background: #f3f4f6;
-      border-radius: 6px;
-      padding: 3px 9px;
+      background: var(--gray-100);
+      border-radius: var(--radius-pill);
+      padding: 4px 12px;
       font-size: 12px;
-      color: #6b7280;
-      max-width: 340px;
+      color: var(--gray-500);
     }
-    .cell-label.empty { background: transparent; color: #d1d5db; }
+    .cell-label.empty { background: transparent; color: var(--gray-300); }
 
-    .cell-date { color: #9ca3af; font-size: 13px; white-space: nowrap; }
+    .cell-date { color: var(--gray-400); font-size: 13px; white-space: nowrap; }
 
-    .td-del { width: 44px; text-align: center; }
-    .del-btn {
-      background: none; border: none;
-      color: #e5e7eb;
-      font-size: 18px; cursor: pointer;
-      border-radius: 6px; padding: 2px 7px;
-      visibility: hidden;
-      transition: color 0.15s, background 0.15s;
-    }
-    tr:hover .del-btn { visibility: visible; }
-    .del-btn:hover { color: #ef4444; background: #fee2e2; }
-
-    /* ── Empty state ──────────────────────────────── */
+    /* ── Empty state ── */
     .empty-state {
-      padding: 56px 20px;
+      padding: 72px 24px;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
     }
     .empty-icon {
-      width: 56px; height: 56px;
-      background: #f3f0ff;
-      border-radius: 16px;
+      width: 52px; height: 52px;
+      background: var(--purple-100);
+      border-radius: 14px;
       display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 14px;
+      margin-bottom: 4px;
     }
-    .empty-state h3 { font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 6px; }
-    .empty-state p  { font-size: 13px; color: #9ca3af; }
+    .empty-state h3 { font-size: 15px; font-weight: 600; color: var(--gray-700); }
+    .empty-state p  { font-size: 13px; color: var(--gray-400); }
 
-    /* ── Card footer / action bar ─────────────────── */
+    /* ── Card footer ── */
     .card-footer {
-      border-top: 1px solid #f3f4f6;
-      background: #fafafa;
+      border-top: 1px solid var(--gray-100);
+      background: var(--gray-50);
     }
 
-    /* Options row */
     .footer-options {
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 14px 24px;
-      border-bottom: 1px solid #f3f4f6;
+      padding: 16px 28px;
+      border-bottom: 1px solid var(--gray-100);
       flex-wrap: wrap;
-    }
-
-    .option-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
     }
 
     .option-label {
       font-size: 12px;
       font-weight: 600;
-      color: #9ca3af;
+      color: var(--gray-400);
       white-space: nowrap;
-      letter-spacing: 0.02em;
     }
 
     .option-sep {
-      width: 1px;
-      height: 26px;
-      background: #e5e7eb;
-      margin: 0 10px;
+      width: 1px; height: 22px;
+      background: var(--gray-200);
+      margin: 0 8px;
     }
 
     .seg-control {
       display: inline-flex;
-      background: #ede9fe;
-      border-radius: 9px;
+      background: var(--purple-100);
+      border-radius: var(--radius-pill);
       padding: 3px;
       gap: 2px;
     }
@@ -290,133 +354,242 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 6px 13px;
+      padding: 6px 14px;
       border: none;
-      border-radius: 7px;
-      font-size: 13px;
-      font-weight: 500;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 600;
       cursor: pointer;
-      color: #7c3aed;
+      color: var(--purple-600);
       background: transparent;
       transition: all 0.15s;
       white-space: nowrap;
+      font-family: inherit;
     }
-    .seg-btn:hover { background: rgba(255,255,255,0.5); }
+    .seg-btn:hover { background: rgba(255,255,255,0.55); }
     .seg-btn.active {
       background: #fff;
-      color: #1e1b4b;
-      font-weight: 700;
-      box-shadow: 0 1px 4px rgba(124,58,237,0.15);
+      color: var(--purple-900);
+      box-shadow: 0 1px 4px rgba(124,58,237,0.14);
     }
 
-    /* Actions row */
     .footer-actions {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 14px 24px;
+      padding: 16px 28px;
     }
 
-    .btn-run {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: linear-gradient(135deg, #7c3aed, #6366f1);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 11px 20px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 2px 10px rgba(124,58,237,0.3);
-      transition: opacity 0.15s, box-shadow 0.15s;
-    }
-    .btn-run:disabled {
-      opacity: 0.4;
-      cursor: default;
-      box-shadow: none;
-    }
-    .btn-run:not(:disabled):hover {
-      opacity: 0.88;
-      box-shadow: 0 4px 16px rgba(124,58,237,0.4);
-    }
-
-    .btn-ghost {
-      background: none;
-      border: 1.5px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 10px 16px;
-      font-size: 13px;
-      color: #6b7280;
-      cursor: pointer;
-      transition: background 0.12s;
-    }
-    .btn-ghost:hover { background: #f3f4f6; }
-
-    .footer-left { display: flex; align-items: center; gap: 8px; }
     .footer-right { margin-right: auto; }
+    .selection-info { font-size: 13px; color: var(--gray-400); }
+    .selection-info strong { color: var(--purple-600); }
 
-    .selection-info {
-      font-size: 13px;
-      color: #9ca3af;
-    }
-    .selection-info strong { color: #7c3aed; }
-
-    /* ── Results card ─────────────────────────────── */
-    #resultsCard { display: none; margin-top: 18px; }
+    /* ── Results card ── */
+    #resultsCard { display: none; margin-top: 14px; }
     #resultsCard.visible { display: block; }
 
     .results-card {
       background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 4px 24px rgba(99,102,241,0.08), 0 1px 4px rgba(0,0,0,0.05);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
       overflow: hidden;
     }
 
     .results-title {
-      padding: 16px 24px 14px;
-      font-size: 13px;
+      padding: 14px 28px;
+      font-size: 11px;
       font-weight: 700;
-      color: #6b7280;
+      color: var(--gray-400);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid #f3f4f6;
+      letter-spacing: 0.08em;
+      border-bottom: 1px solid var(--gray-100);
+      background: var(--gray-50);
     }
 
     .result-row {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 14px 24px;
-      border-bottom: 1px solid #f9fafb;
+      padding: 14px 28px;
+      border-bottom: 1px solid var(--gray-50);
       font-size: 13px;
     }
     .result-row:last-child { border-bottom: none; }
 
-    .rdot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+    .rdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
     .result-row.running .rdot { background: #f59e0b; animation: pulse 1.2s infinite; }
     .result-row.done    .rdot { background: #10b981; }
     .result-row.error   .rdot { background: #ef4444; }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
-    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    @keyframes spin   { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
     .rurl  { flex: 1; color: #4f46e5; direction: ltr; text-align: left; word-break: break-all; }
-    .rmsg  { color: #9ca3af; font-size: 12px; white-space: nowrap; }
+    .rmsg  { color: var(--gray-400); font-size: 12px; white-space: nowrap; }
     .result-row.done  .rmsg { color: #10b981; }
-    .result-row.error .rmsg { color: #ef4444; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+    .result-row.error .rmsg { color: #ef4444; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
 
-    /* ── Modal ────────────────────────────────────── */
+    /* ── Tutorials Library ── */
+    .lib-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .filter-pill {
+      padding: 7px 16px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid var(--gray-200);
+      background: transparent;
+      color: var(--gray-500);
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .filter-pill:hover { background: var(--gray-100); border-color: var(--gray-300); }
+    .filter-pill.active { background: var(--purple-600); border-color: var(--purple-600); color: #fff; }
+
+    .tutorials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+
+    .tutorial-card {
+      background: var(--bg-card);
+      border-radius: 18px;
+      box-shadow: var(--shadow-card);
+      padding: 22px 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: box-shadow 0.18s, transform 0.18s;
+    }
+    .tutorial-card:hover {
+      box-shadow: 0 4px 24px rgba(139,92,246,0.14), 0 1px 4px rgba(0,0,0,0.05);
+      transform: translateY(-2px);
+    }
+
+    .tutorial-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .tutorial-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--purple-900);
+      line-height: 1.35;
+    }
+    .tutorial-name.untitled { color: var(--gray-400); font-weight: 500; font-style: italic; }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 11px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .badge-done    { background: #d1fae5; color: #065f46; }
+    .badge-done    .badge-dot { background: #10b981; }
+    .badge-running { background: #fef3c7; color: #92400e; }
+    .badge-running .badge-dot { background: #f59e0b; animation: pulse 1.2s infinite; }
+    .badge-error   { background: #fee2e2; color: #991b1b; }
+    .badge-error   .badge-dot { background: #ef4444; }
+    .badge-pending { background: var(--gray-100); color: var(--gray-500); }
+    .badge-pending .badge-dot { background: var(--gray-400); }
+
+    .tutorial-url {
+      font-size: 12px;
+      color: var(--gray-400);
+      direction: ltr;
+      text-align: left;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: block;
+    }
+
+    .tutorial-error {
+      font-size: 12px;
+      color: #dc2626;
+      background: #fff1f2;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid #fecdd3;
+    }
+
+    .tutorial-divider { height: 1px; background: var(--gray-100); }
+
+    .tutorial-card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tutorial-date { font-size: 12px; color: var(--gray-400); }
+
+    .tutorial-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-tut {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 13px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 1.5px solid var(--gray-200);
+      background: transparent;
+      color: var(--gray-500);
+      text-decoration: none;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .btn-tut:hover { background: var(--gray-100); color: var(--gray-700); border-color: var(--gray-300); }
+    .btn-tut.gamma { background: var(--purple-100); border-color: var(--purple-200); color: var(--purple-600); }
+    .btn-tut.gamma:hover { background: var(--purple-200); }
+    .btn-tut.regen:hover { background: var(--purple-100); color: var(--purple-600); border-color: var(--purple-200); }
+    .btn-tut:disabled, .btn-tut.off { opacity: 0.38; cursor: default; pointer-events: none; }
+    .btn-tut.spinning svg { animation: spin 0.9s linear infinite; }
+
+    /* ── Library empty state ── */
+    .tutorials-empty {
+      grid-column: 1 / -1;
+      padding: 72px 24px;
+      text-align: center;
+      background: var(--bg-card);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ── Modal ── */
     .overlay {
       position: fixed; inset: 0;
-      background: rgba(30,27,75,0.25);
-      backdrop-filter: blur(3px);
+      background: rgba(30,27,75,0.18);
+      backdrop-filter: blur(5px);
       display: none;
       align-items: center;
       justify-content: center;
@@ -426,47 +599,61 @@
 
     .modal {
       background: #fff;
-      border-radius: 20px;
-      padding: 28px 28px 24px;
-      width: 440px;
+      border-radius: 24px;
+      padding: 32px;
+      width: 460px;
       max-width: 92vw;
-      box-shadow: 0 20px 60px rgba(30,27,75,0.18);
+      box-shadow: 0 24px 64px rgba(30,27,75,0.16);
       direction: rtl;
     }
+
     .modal-header {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
+      gap: 12px;
+      margin-bottom: 26px;
     }
-    .modal-header-icon {
-      width: 36px; height: 36px;
-      background: #ede9fe;
-      border-radius: 10px;
+
+    .modal-icon {
+      width: 40px; height: 40px;
+      background: var(--purple-100);
+      border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
     }
-    .modal h2 { font-size: 16px; font-weight: 700; color: #1e1b4b; }
-    .modal label {
+
+    .modal h2 { font-size: 18px; font-weight: 700; color: var(--purple-900); }
+
+    .form-field { margin-bottom: 18px; }
+
+    .form-label {
       display: block;
       font-size: 12px;
-      font-weight: 600;
-      color: #6b7280;
-      margin-bottom: 5px;
+      font-weight: 700;
+      color: var(--gray-500);
+      margin-bottom: 7px;
+      letter-spacing: 0.02em;
     }
-    .modal input {
+
+    .form-input {
       width: 100%;
-      padding: 10px 13px;
-      border: 1.5px solid #e5e7eb;
-      border-radius: 10px;
+      padding: 11px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 12px;
       font-size: 14px;
       outline: none;
-      margin-bottom: 14px;
-      transition: border-color 0.15s;
+      transition: border-color 0.15s, box-shadow 0.15s;
       direction: ltr;
       text-align: left;
+      color: var(--gray-700);
+      font-family: inherit;
     }
-    .modal input:focus { border-color: #7c3aed; }
-    .modal-actions { display: flex; justify-content: flex-start; gap: 8px; margin-top: 4px; }
+    .form-input:focus {
+      border-color: var(--purple-500);
+      box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+    }
+
+    .modal-actions { display: flex; gap: 10px; margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -475,128 +662,143 @@
   <!-- ── Page Header ── -->
   <header class="page-header">
     <div class="header-icon">
-      <svg width="26" height="26" fill="none" viewBox="0 0 24 24">
+      <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
         <path d="M9 12h6M9 16h6M9 8h3M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <h1>אוטומציה לתיעוד</h1>
-    <p>בחרו את הקישורים שלפיהם ייווצרו מצגות עבור כל חלק במערכת.<br/>הקבצים שנוצרים נשמרים אוטומטית ב-Blob, תחת התיקייה:</p>
-    <div class="blob-link-row">
-      <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="#7c3aed" stroke-width="2"/><path d="M3 7l9 6 9-6" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/></svg>
-      <a href="https://jeenai365.sharepoint.com/:f:/s/JEEN.AI/IgA6ONBl7nsMQ5s789yGxsfoAQsdk5RpNx7jUEoQWJm3NWA?e=m6cKgB" target="_blank" rel="noopener">
+    <div class="header-text">
+      <h1>אוטומציה לתיעוד</h1>
+      <p>בחרו את הקישורים שלפיהם ייווצרו מצגות עבור כל חלק במערכת.<br/>הקבצים נשמרים אוטומטית ב-SharePoint תחת:</p>
+      <a class="blob-link" href="https://jeenai365.sharepoint.com/:f:/s/JEEN.AI/IgA6ONBl7nsMQ5s789yGxsfoAQsdk5RpNx7jUEoQWJm3NWA?e=m6cKgB" target="_blank" rel="noopener">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" stroke-width="2"/><path d="M3 7l9 6 9-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         jeenai365.sharepoint.com / JEEN.AI / Blob
       </a>
     </div>
   </header>
 
-  <!-- ── Main Card ── -->
-  <div class="card">
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- Section 1 — Source URLs                        -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-meta">
+        <span class="section-eyebrow">הגדרת קלט</span>
+        <h2>קישורי מקור <span class="section-count" id="sourceCount" style="display:none">0</span></h2>
+        <p>הגדירו ממה לייצר תיעוד והפעילו את האוטומציה</p>
+      </div>
+    </div>
 
-    <!-- Toolbar -->
-    <div class="card-toolbar">
-      <div class="toolbar-right">
-        <button class="btn-add" onclick="openModal()">
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round"/></svg>
+    <div class="card">
+
+      <!-- Toolbar -->
+      <div class="card-toolbar">
+        <button class="btn btn-soft" onclick="openModal()">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
           הוסף קישור
         </button>
+        <div class="count-badge" id="countBadge"></div>
       </div>
-      <div class="count-badge" id="countBadge"></div>
-    </div>
 
-    <!-- Table -->
-    <table>
-      <thead>
-        <tr>
-          <th class="th-check">
-            <button class="circle-btn" id="selectAllBtn" onclick="toggleSelectAll()" title="בחר הכל"></button>
-          </th>
-          <th>
-            <span class="th-icon">
-              <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/></svg>
-            </span>
-            קישור
-          </th>
-          <th>
-            <span class="th-icon">
-              <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M7 7h10M7 11h6M7 15h8" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/></svg>
-            </span>
-            תווית
-          </th>
-          <th>
-            <span class="th-icon">
-              <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#9ca3af" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/></svg>
-            </span>
-            תאריך הוספה
-          </th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="urlTable"></tbody>
-    </table>
+      <!-- Table -->
+      <table>
+        <thead>
+          <tr>
+            <th class="th-check">
+              <button class="circle-btn" id="selectAllBtn" onclick="toggleSelectAll()" title="בחר הכל"></button>
+            </th>
+            <th>קישור</th>
+            <th>תווית</th>
+            <th>תאריך הוספה</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="urlTable"></tbody>
+      </table>
 
-    <!-- Empty state -->
-    <div id="emptyState" class="empty-state" style="display:none">
-      <div class="empty-icon">
-        <svg width="26" height="26" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/></svg>
+      <!-- Empty state -->
+      <div id="emptyState" class="empty-state" style="display:none">
+        <div class="empty-icon">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h3>אין קישורים עדיין</h3>
+        <p>לחצו על "הוסף קישור" כדי להתחיל</p>
       </div>
-      <h3>אין קישורים עדיין</h3>
-      <p>לחצו על "הוסף קישור" כדי להתחיל</p>
-    </div>
 
-    <!-- Card footer -->
-    <div class="card-footer">
+      <!-- Footer -->
+      <div class="card-footer">
 
-      <!-- Options row -->
-      <div class="footer-options">
-        <div class="option-group">
-          <span class="option-label">שפת המצגת</span>
-          <div class="seg-control" id="langSeg">
-            <button class="seg-btn active" onclick="setOption('lang','he',this,document.getElementById('langSeg'))">
-              🇮🇱 עברית
-            </button>
-            <button class="seg-btn" onclick="setOption('lang','en',this,document.getElementById('langSeg'))">
-              🇬🇧 English
-            </button>
+        <div class="footer-options">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="option-label">שפת המצגת</span>
+            <div class="seg-control" id="langSeg">
+              <button class="seg-btn active" onclick="setOption('lang','he',this,document.getElementById('langSeg'))">🇮🇱 עברית</button>
+              <button class="seg-btn" onclick="setOption('lang','en',this,document.getElementById('langSeg'))">🇬🇧 English</button>
+            </div>
+          </div>
+          <div class="option-sep"></div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="option-label">סוג קישור</span>
+            <div class="seg-control" id="linkTypeSeg">
+              <button class="seg-btn active" onclick="setOption('linkType','regular',this,document.getElementById('linkTypeSeg'))">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                רגיל
+              </button>
+              <button class="seg-btn" onclick="setOption('linkType','admin',this,document.getElementById('linkTypeSeg'))">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                ניהול
+              </button>
+            </div>
           </div>
         </div>
-        <div class="option-sep"></div>
-        <div class="option-group">
-          <span class="option-label">סוג קישור</span>
-          <div class="seg-control" id="linkTypeSeg">
-            <button class="seg-btn active" onclick="setOption('linkType','regular',this,document.getElementById('linkTypeSeg'))">
-              <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-              רגיל
-            </button>
-            <button class="seg-btn" onclick="setOption('linkType','admin',this,document.getElementById('linkTypeSeg'))">
-              <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-              ניהול
-            </button>
-          </div>
-        </div>
-      </div>
 
-      <!-- Actions row -->
-      <div class="footer-actions">
-        <div class="footer-left">
-          <button class="btn-run" id="runBtn" onclick="runSelected()" disabled>
-            <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z" fill="#fff"/></svg>
+        <div class="footer-actions">
+          <button class="btn btn-primary" id="runBtn" onclick="runSelected()" disabled>
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z" fill="#fff"/></svg>
             הפעל על הנבחרים
           </button>
-          <button class="btn-ghost" onclick="selectNone()">ביטול בחירה</button>
+          <button class="btn btn-ghost" onclick="selectNone()">ביטול בחירה</button>
+          <div class="footer-right selection-info" id="selectionInfo"></div>
         </div>
-        <div class="footer-right selection-info" id="selectionInfo"></div>
+
       </div>
-
     </div>
-  </div>
 
-  <!-- ── Results Card ── -->
-  <div id="resultsCard">
-    <div class="results-card">
-      <div class="results-title">תוצאות הרצה</div>
-      <div id="resultsList"></div>
+    <!-- Results card -->
+    <div id="resultsCard">
+      <div class="results-card">
+        <div class="results-title">תוצאות הרצה</div>
+        <div id="resultsList"></div>
+      </div>
     </div>
-  </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- Section 2 — Generated Tutorials Library        -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-meta">
+        <span class="section-eyebrow">ספריית תוכן</span>
+        <h2>מדריכים שנוצרו <span class="section-count" id="tutorialCount" style="display:none">0</span></h2>
+        <p>עיינו, פתחו ועדכנו את המדריכים שנוצרו אוטומטית</p>
+      </div>
+      <div class="lib-controls">
+        <button class="filter-pill active" onclick="filterTutorials('all',this)">הכל</button>
+        <button class="filter-pill" onclick="filterTutorials('done',this)">הושלמו</button>
+        <button class="filter-pill" onclick="filterTutorials('error',this)">שגיאות</button>
+      </div>
+    </div>
+
+    <div class="tutorials-grid" id="tutorialsGrid">
+      <div class="tutorials-empty">
+        <div class="empty-icon">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M9 8h3M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h3>טוען...</h3>
+        <p></p>
+      </div>
+    </div>
+  </section>
 
 </div><!-- /page -->
 
@@ -604,30 +806,36 @@
 <div class="overlay" id="overlay" onclick="bgClose(event)">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-header-icon">
-        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/></svg>
+      <div class="modal-icon">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/></svg>
       </div>
       <h2>הוסף קישור</h2>
     </div>
-    <label for="urlInput">כתובת URL</label>
-    <input type="url" id="urlInput" placeholder="https://example.com/page" />
-    <label for="labelInput">תווית <span style="font-weight:400;color:#d1d5db">(אופציונלי)</span></label>
-    <input type="text" id="labelInput" placeholder="לדוג׳: דף הבית" />
+    <div class="form-field">
+      <label class="form-label" for="urlInput">כתובת URL</label>
+      <input class="form-input" type="url" id="urlInput" placeholder="https://example.com/page" />
+    </div>
+    <div class="form-field">
+      <label class="form-label" for="labelInput">תווית <span style="font-weight:400;color:#d1d5db">(אופציונלי)</span></label>
+      <input class="form-input" type="text" id="labelInput" placeholder="לדוג׳: דף הבית" />
+    </div>
     <div class="modal-actions">
-      <button class="btn-run" onclick="addUrl()">
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
+      <button class="btn btn-primary" onclick="addUrl()">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
         הוסף
       </button>
-      <button class="btn-ghost" onclick="closeModal()">ביטול</button>
+      <button class="btn btn-ghost" onclick="closeModal()">ביטול</button>
     </div>
   </div>
 </div>
 
 <script>
   let urls = [];
+  let tutorials = [];
   let selected = new Set();
   let lang = 'he';
   let linkType = 'regular';
+  let tutorialFilter = 'all';
 
   function setOption(key, val, btn, seg) {
     if (key === 'lang') lang = val;
@@ -636,6 +844,14 @@
     btn.classList.add('active');
   }
 
+  function filterTutorials(filter, btn) {
+    tutorialFilter = filter;
+    document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTutorials();
+  }
+
+  /* ── URLs ── */
   async function load() {
     const res = await fetch('/api/urls');
     urls = await res.json();
@@ -643,22 +859,25 @@
   }
 
   function render() {
-    const tbody  = document.getElementById('urlTable');
-    const empty  = document.getElementById('emptyState');
-    const badge  = document.getElementById('countBadge');
-    const info   = document.getElementById('selectionInfo');
+    const tbody = document.getElementById('urlTable');
+    const empty = document.getElementById('emptyState');
+    const badge = document.getElementById('countBadge');
+    const info  = document.getElementById('selectionInfo');
+    const cnt   = document.getElementById('sourceCount');
 
-    badge.innerHTML = urls.length
-      ? `סה"כ <strong>${urls.length}</strong> קישורים`
-      : '';
+    badge.innerHTML = urls.length ? `סה"כ <strong>${urls.length}</strong> קישורים` : '';
+    info.innerHTML  = selected.size ? `<strong>${selected.size}</strong> נבחרו` : '';
 
-    info.innerHTML = selected.size
-      ? `<strong>${selected.size}</strong> נבחרו`
-      : '';
+    if (urls.length) {
+      cnt.textContent = urls.length;
+      cnt.style.display = '';
+    } else {
+      cnt.style.display = 'none';
+    }
 
     if (!urls.length) {
       tbody.innerHTML = '';
-      empty.style.display = 'block';
+      empty.style.display = 'flex';
       syncRunBtn();
       return;
     }
@@ -671,7 +890,7 @@
       });
       const labelHtml = item.label
         ? `<span class="cell-label">
-            <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/><circle cx="7" cy="7" r="1" fill="#9ca3af"/></svg>
+            <svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/></svg>
             ${esc(item.label)}
            </span>`
         : `<span class="cell-label empty">—</span>`;
@@ -684,7 +903,9 @@
           <td>${labelHtml}</td>
           <td class="cell-date">${date}</td>
           <td class="td-del">
-            <button class="del-btn" onclick="del(${i})" title="הסר">×</button>
+            <button class="btn-icon" onclick="del(${i})" title="הסר">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
           </td>
         </tr>`;
     }).join('');
@@ -809,14 +1030,159 @@
     }
 
     syncRunBtn();
+    await loadTutorials();
+  }
+
+  /* ── Tutorials Library ── */
+  async function loadTutorials() {
+    try {
+      const res = await fetch('/api/tutorials');
+      tutorials = await res.json();
+    } catch (e) {
+      tutorials = [];
+    }
+    renderTutorials();
+  }
+
+  function renderTutorials() {
+    const grid = document.getElementById('tutorialsGrid');
+    const cnt  = document.getElementById('tutorialCount');
+
+    const filtered = tutorialFilter === 'all'
+      ? tutorials
+      : tutorials.filter(t => t.status === tutorialFilter);
+
+    if (tutorials.length) {
+      cnt.textContent = tutorials.length;
+      cnt.style.display = '';
+    } else {
+      cnt.style.display = 'none';
+    }
+
+    if (!filtered.length) {
+      grid.innerHTML = `
+        <div class="tutorials-empty">
+          <div class="empty-icon">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M9 8h3M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <h3>${tutorialFilter === 'all' ? 'אין מדריכים עדיין' : 'אין מדריכים בסינון זה'}</h3>
+          <p>${tutorialFilter === 'all' ? 'הפעילו את האוטומציה על קישורים כדי לייצר מדריכים' : 'נסו לשנות את הסינון'}</p>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = filtered
+      .slice()
+      .sort((a, b) => new Date(b.lastUpdatedAt || b.createdAt) - new Date(a.lastUpdatedAt || a.createdAt))
+      .map(t => tutorialCardHtml(t))
+      .join('');
+  }
+
+  function tutorialCardHtml(t) {
+    const statusMap = {
+      done:    { label: 'הושלם',  cls: 'badge-done'    },
+      running: { label: 'מייצר…', cls: 'badge-running' },
+      error:   { label: 'שגיאה',  cls: 'badge-error'   },
+      pending: { label: 'ממתין',  cls: 'badge-pending' },
+    };
+    const st   = statusMap[t.status] || statusMap.pending;
+    const date = (t.lastUpdatedAt || t.createdAt)
+      ? new Date(t.lastUpdatedAt || t.createdAt).toLocaleDateString('he-IL', { day: '2-digit', month: 'short', year: 'numeric' })
+      : '—';
+
+    const gammaBtn = t.gammaUrl
+      ? `<a class="btn-tut gamma" href="${esc(t.gammaUrl)}" target="_blank" rel="noopener">
+           <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M15 3h6v6M10 14L21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+           Gamma
+         </a>`
+      : `<button class="btn-tut off" disabled>
+           <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M15 3h6v6M10 14L21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+           Gamma
+         </button>`;
+
+    const spBtn = t.sharepointUrl
+      ? `<a class="btn-tut" href="${esc(t.sharepointUrl)}" target="_blank" rel="noopener">
+           <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+           SharePoint
+         </a>`
+      : `<button class="btn-tut off" disabled>
+           <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+           SharePoint
+         </button>`;
+
+    const isRunning = t.status === 'running';
+    const regenBtn = `<button class="btn-tut regen${isRunning ? ' spinning' : ''}"
+        onclick="regenerate('${t.id}')"
+        ${isRunning ? 'disabled' : ''}
+        title="יצור מחדש">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M23 4v6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        יצור מחדש
+      </button>`;
+
+    const nameHtml = t.label
+      ? `<span class="tutorial-name">${esc(t.label)}</span>`
+      : `<span class="tutorial-name untitled">ללא שם</span>`;
+
+    const errorHtml = t.error
+      ? `<div class="tutorial-error">${esc(t.error)}</div>`
+      : '';
+
+    return `
+      <div class="tutorial-card" data-id="${t.id}">
+        <div class="tutorial-card-top">
+          ${nameHtml}
+          <span class="badge ${st.cls}"><span class="badge-dot"></span>${st.label}</span>
+        </div>
+        <span class="tutorial-url" title="${esc(t.url)}">${esc(t.url)}</span>
+        ${errorHtml}
+        <div class="tutorial-divider"></div>
+        <div class="tutorial-card-bottom">
+          <span class="tutorial-date">עודכן ${date}</span>
+          <div class="tutorial-actions">
+            ${gammaBtn}
+            ${spBtn}
+            ${regenBtn}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  async function regenerate(id) {
+    const t = tutorials.find(t => t.id === id);
+    if (t) { t.status = 'running'; renderTutorials(); }
+
+    const res = await fetch(`/api/tutorials/${id}/regenerate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ language: lang, linkType }),
+    });
+
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const msg = JSON.parse(line.slice(6));
+        if (msg.status === 'done' || msg.status === 'error') {
+          await loadTutorials();
+        }
+      }
+    }
   }
 
   function esc(s) {
     return (s || '')
-      .replace(/&/g,'&amp;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;');
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -824,6 +1190,7 @@
       if (e.key === 'Enter') addUrl();
     });
     load();
+    loadTutorials();
   });
 </script>
 </body>
