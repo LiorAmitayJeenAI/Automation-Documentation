@@ -1,0 +1,58 @@
+[
+  {
+    "path": "/",
+    "description": "Main chat workspace — chat input area with the assistant, also has 'history' and 'last activity' buttons that open a sidebar (URL stays the same)"
+  },
+  {
+    "path": "/chat",
+    "description": "Active conversation thread with the AI assistant — message bubbles and input box"
+  },
+  {
+    "path": "/agents",
+    "description": "Agents main page — list of all user agents with a 'צור סוכן' (create agent) button that opens 3 agent type options (NOT a single agent's edit page)"
+  },
+  {
+    "path": "/agent-configuration/b6f06945-ba74-4c86-8950-be90547055cb",
+    "description": "Edit a Spark agent — configuration and settings page for a Spark-type agent"
+  },
+  {
+    "path": "/agent-configuration/d66e45bd-85de-40cf-a81a-ed8466d09c50",
+    "description": "Edit a Cortex agent — configuration and settings page for a Cortex-type agent"
+  },
+  {
+    "path": "/workflow/flow/05e7f241-7528-4417-a5c6-4a2774ea0d9e",
+    "description": "Edit a Workflow agent — visual flow builder for a workflow-type agent"
+  },
+  {
+    "path": "/agent-configuration/new",
+    "description": "Create a new Spark agent via chat — interactive chat-based agent creation flow"
+  },
+  {
+    "path": "/skills",
+    "description": "Skills library page — list of available skills/tools the assistant can use"
+  },
+  {
+    "path": "/triggers",
+    "description": "Triggers configuration page — automations that start flows based on events"
+  },
+  {
+    "path": "/knowledge",
+    "description": "Knowledge base page — ingested documents and folders, upload and management UI"
+  },
+  {
+    "path": "/history",
+    "description": "Conversation history list — past conversations with timestamps"
+  },
+  {
+    "path": "/analytics",
+    "description": "Usage analytics dashboard — charts and metrics about platform usage"
+  },
+  {
+    "path": "/support",
+    "description": "Support / help center home page"
+  },
+  {
+    "path": "/integrations/connect",
+    "description": "Integrations and connectors page — MCPs, external services, API connections"
+  }
+]

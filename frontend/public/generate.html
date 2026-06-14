@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generate Tutorials - Jeen</title>
+  <link rel="icon" type="image/png" href="/assets/jeen-symbol.png" />
+  <link rel="apple-touch-icon" href="/assets/jeen-symbol.png" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <div class="navbar-wrap">
+      <header class="navbar">
+        <a class="brand" href="/" aria-label="Jeen home">
+          <img src="/assets/jeen-logo.png" alt="Jeen" />
+        </a>
+        <nav class="nav-links">
+          <a class="nav-item" href="/">Tutorials Library</a>
+          <a class="nav-item active" href="/generate">Generate Tutorials</a>
+        </nav>
+        <div class="navbar-right">
+          <span class="avatar">LA</span>
+        </div>
+      </header>
+    </div>
+
+    <main class="main">
+      <div class="content">
+        <header class="topbar">
+          <div class="page-title">
+            <h1>Generate Tutorials</h1>
+            <p>Add Confluence pages, select the content to generate, and publish assets back into the library.</p>
+          </div>
+          <div class="top-actions">
+            <a class="btn btn-ghost" href="/">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              Back to Library
+            </a>
+          </div>
+        </header>
+
+        <div class="search" style="margin-bottom: 18px">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input id="sourceSearch" class="input" type="text" placeholder="Search sources..." />
+        </div>
+
+        <div class="form-grid">
+          <section class="panel form-card">
+            <!-- Folder list -->
+            <div class="filters-row" style="justify-content: space-between; margin-bottom: 14px">
+              <div style="display: flex; align-items: center; gap: 10px">
+                <h2 style="margin: 0; font-size: 1rem">Sources</h2>
+                <button id="selectAllBtn" class="btn btn-ghost btn-sm" type="button">Select all</button>
+                <span id="sourceSummary" class="pill">0 sources</span>
+              </div>
+              <button id="newUrlBtn" class="btn btn-primary" type="button">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                New
+              </button>
+            </div>
+
+            <div id="folderList" class="folder-list"></div>
+          </section>
+
+          <aside class="run-bar">
+            <div class="run-bar-toggles">
+              <div class="toggle-group">
+                <span class="toggle-label">Language</span>
+                <div class="segmented" id="langSegment">
+                  <button type="button" class="active" data-value="he">HE</button>
+                  <button type="button" data-value="en">EN</button>
+                </div>
+              </div>
+              <div class="toggle-group">
+                <input type="checkbox" id="updateRoutesCheck" class="route-check" />
+                <label class="toggle-label" for="updateRoutesCheck">Update Routes</label>
+              </div>
+            </div>
+            <div class="run-bar-actions">
+              <button id="runBtn" class="btn btn-primary" type="button" disabled>
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z" fill="currentColor"/></svg>
+                Run Generation
+              </button>
+              <button id="stopBtn" class="btn btn-danger hidden" type="button">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg>
+                Stop All
+              </button>
+            </div>
+            <div id="successNotice" class="notice">
+              Generation completed. New and updated records are now available in the Tutorials Library.
+              <a class="text-link" href="/">Open library</a>
+            </div>
+            <div id="results" class="results"></div>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Page Modal -->
+  <div id="addPageModal" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-head">
+        <h2>Add Page</h2>
+        <button class="icon-btn" onclick="closeAddModal()" aria-label="Close">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <p style="margin: 0 0 18px; color: var(--muted); font-size: 13px;">Add individual Confluence pages to a specific folder.</p>
+      <div class="field">
+        <label for="urlInput">Confluence URL</label>
+        <input id="urlInput" class="input" type="url" placeholder="https://example.atlassian.net/wiki/..." />
+      </div>
+      <div class="field-row" style="margin-bottom: 16px">
+        <div class="field" style="flex: 1; margin-bottom: 0">
+          <label for="labelInput">Tutorial title</label>
+          <input id="labelInput" class="input" type="text" placeholder="Workflow Agent" />
+        </div>
+        <div class="field" style="flex: 1; margin-bottom: 0">
+          <label for="folderSelect">Folder</label>
+          <select id="folderSelect" class="select"></select>
+        </div>
+      </div>
+      <div id="newFolderRow" class="field" style="display: none; margin-bottom: 16px">
+        <label for="newFolderInput">New folder name</label>
+        <input id="newFolderInput" class="input" type="text" placeholder="e.g. Workspace, Agent..." />
+      </div>
+      <button id="addUrlBtn" class="btn btn-primary" type="button" style="width: 100%">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        Add Page
+      </button>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+  <script src="/generate.js"></script>
+</body>
+</html>

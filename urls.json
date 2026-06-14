@@ -1,17 +1,49 @@
-[
-  {
-    "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/430145537/Part+1+-+Why+and+when+to+use+jeen",
-    "label": "Overview - Part 1 - Why and when to use jeen?",
-    "addedAt": "2026-06-09T12:04:44.289Z"
-  },
-  {
-    "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/429457411/Part+2-+Get+Better+Results+from+AI",
-    "label": "Overview Part 2- Get Better Results from AI",
-    "addedAt": "2026-06-09T12:05:23.048Z"
-  },
-  {
-    "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382337056/Part+1+-+Introduction+to+Workspace",
-    "label": "Workspace Part 1 - Introduction to Workspace",
-    "addedAt": "2026-06-09T12:06:05.062Z"
-  }
-]
+{
+  "folders": [
+    {
+      "id": "folder-uncategorized",
+      "name": "Uncategorized",
+      "confluencePageId": null,
+      "confluenceUrl": null,
+      "pages": [
+        {
+          "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/430145537/Part+1+-+Why+and+when+to+use+jeen",
+          "label": "Overview - Part 1 - Why and when to use jeen?",
+          "pageId": null,
+          "addedAt": "2026-06-09T12:04:44.289Z"
+        },
+        {
+          "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/429457411/Part+2-+Get+Better+Results+from+AI",
+          "label": "Overview Part 2- Get Better Results from AI",
+          "pageId": null,
+          "addedAt": "2026-06-09T12:05:23.048Z"
+        },
+        {
+          "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382337056/Part+1+-+Introduction+to+Workspace",
+          "label": "Workspace Part 1 - Introduction to Workspace",
+          "pageId": null,
+          "addedAt": "2026-06-09T12:06:05.062Z"
+        },
+        {
+          "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/384270339/Part+3+-+Cortex+Agent",
+          "label": "Agent Part 3 - Cortex Agent",
+          "pageId": null,
+          "addedAt": "2026-06-10T09:32:38.830Z"
+        },
+        {
+          "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383287348/Part+4+-+Workflow+Agent",
+          "label": "Part 4 - Workflow Agent",
+          "pageId": "383287348",
+          "addedAt": "2026-06-10T12:04:11.705Z"
+        },
+        {
+          "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/384172040/Part+1+-+MCPs+Connectors",
+          "label": "APIs & Platform Interfaces Part 1 - MCPs & Connectors",
+          "pageId": "384172040",
+          "addedAt": "2026-06-10T12:30:34.991Z"
+        }
+      ]
+    }
+  ],
+  "lastSyncedAt": null
+}

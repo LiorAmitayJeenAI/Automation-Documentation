@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+httpx
+openai
+playwright
+python-dotenv
+sse-starlette
+markdownify
