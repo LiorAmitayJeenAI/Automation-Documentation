@@ -81,7 +81,12 @@ async def run_pipeline(
     # ── Step 2: LLM formats the document ──
     yield PipelineEvent("llm", "running", "Formatting document with AI...")
     try:
-        formatted = await llm.format_document(markdown_content, language=language, base_url=base_url)
+        formatted = await llm.format_document(
+            markdown_content,
+            language=language,
+            base_url=base_url,
+            link_type=link_type,
+        )
         presentation_content = formatted["presentation_content"]
         screenshot_script = formatted.get("screenshot_script", [])
         presentation_title = llm.extract_title(presentation_content)
@@ -103,7 +108,9 @@ async def run_pipeline(
     if screenshot_script:
         yield PipelineEvent("screenshots", "running", f"Taking {len(screenshot_script)} screenshots...")
         try:
-            screenshot_results = await screenshots.take_screenshots(screenshot_script, base_url=base_url)
+            screenshot_results = await screenshots.take_screenshots(
+                screenshot_script, base_url=base_url, link_type=link_type,
+            )
             saved_paths = [r["path"] for r in screenshot_results]
             yield PipelineEvent(
                 "screenshots", "done",

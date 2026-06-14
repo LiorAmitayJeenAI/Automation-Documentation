@@ -3,12 +3,14 @@ require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 const express = require('express');
 const fs = require('fs');
 const XLSX = require('xlsx');
+const { EventEmitter } = require('events');
 
 const app = express();
 const EXCEL_FILE     = path.join(__dirname, '..', 'data', 'pages.xlsx');
 const TUTORIALS_FILE = path.join(__dirname, '..', 'tutorials.json');
 const PORT = process.env.PORT || 3000;
 const activeSessions = new Map();
+const activeRuns = new Map();
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -437,64 +439,56 @@ app.post('/api/discover-routes', async (req, res) => {
 });
 
 /* ══════════════════════════════════════════════════
-   Run selected URLs — SSE stream
+   Background run execution (decoupled from SSE)
 ══════════════════════════════════════════════════ */
-app.post('/api/run', async (req, res) => {
-  const { urls, items, language = 'he', linkType = 'regular' } = req.body;
-  const runItems = normalizeRunItems({ items, urls, linkType });
-  if (!runItems.length) return res.status(400).json({ error: 'No URLs provided' });
 
-  const runId = makeSessionId('run');
-  const runController = new AbortController();
-  const runSessionIds = new Set();
-
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.flushHeaders();
-
-  res.on('close', () => {
-    if (!runController.signal.aborted) {
-      runController.abort();
-      for (const sid of runSessionIds) {
-        const session = activeSessions.get(sid);
-        if (session) session.controller.abort();
-      }
-    }
-  });
-
-  const writeEvent = payload => {
-    if (runController.signal.aborted || res.destroyed) return false;
-    try {
-      res.write(`data: ${JSON.stringify(payload)}\n\n`);
-      return true;
-    } catch { return false; }
+function subscribeSSE(res, emitter) {
+  const handler = payload => {
+    if (res.destroyed) return;
+    try { res.write(`data: ${JSON.stringify(payload)}\n\n`); } catch {}
   };
+  emitter.on('event', handler);
+  res.on('close', () => emitter.removeListener('event', handler));
+}
+
+async function executeRun(runId, runItems, language) {
+  const run = activeRuns.get(runId);
+  if (!run) return;
+
+  for (const item of runItems) {
+    run.itemStates.set(item.url, { status: 'queued' });
+    upsertTutorial(item.url, { status: 'queued', language, error: null }, { appendHistory: false });
+  }
 
   for (const item of runItems) {
     const { url, linkType: itemLinkType } = item;
 
-    if (runController.signal.aborted) {
+    if (run.controller.signal.aborted) {
+      run.itemStates.set(url, { status: 'stopped', error: 'Generation stopped by user' });
       upsertTutorial(url, {
         status: 'pending',
         language,
         error: 'Generation stopped by user',
       }, { appendHistory: true });
-      writeEvent({ url, status: 'stopped', error: 'Generation stopped by user' });
+      run.emitter.emit('event', { url, status: 'stopped', error: 'Generation stopped by user' });
       continue;
     }
 
     const sessionId = makeSessionId('tutorial-run');
     const sessionController = new AbortController();
-    runSessionIds.add(sessionId);
+    run.sessionIds.add(sessionId);
     activeSessions.set(sessionId, { controller: sessionController, url, linkType: itemLinkType });
 
-    runController.signal.addEventListener('abort', () => sessionController.abort(), { once: true });
+    run.controller.signal.addEventListener('abort', () => sessionController.abort(), { once: true });
 
+    run.itemStates.set(url, { status: 'running', sessionId });
     upsertTutorial(url, { status: 'running', language, sessionId, error: null }, { appendHistory: true });
-    writeEvent({ url, status: 'running', sessionId, linkType: itemLinkType });
+    run.emitter.emit('event', { url, status: 'running', sessionId, linkType: itemLinkType });
+
     try {
       const result = await runPipeline(url, language, itemLinkType, sessionController.signal, sessionId);
       const { gammaUrl, sharepointUrl } = extractGeneratedUrls(result);
+      run.itemStates.set(url, { status: 'done', sessionId });
       upsertTutorial(url, {
         status: 'done',
         language,
@@ -504,30 +498,171 @@ app.post('/api/run', async (req, res) => {
         lastGeneratedAt: new Date().toISOString(),
         error: null,
       }, { appendHistory: true });
-      writeEvent({ url, status: 'done', sessionId, linkType: itemLinkType, result });
+      run.emitter.emit('event', { url, status: 'done', sessionId, linkType: itemLinkType, result });
     } catch (err) {
       if (sessionController.signal.aborted || err.name === 'AbortError') {
+        run.itemStates.set(url, { status: 'stopped', sessionId, error: 'Generation stopped by user' });
         upsertTutorial(url, {
           status: 'pending',
           language,
           sessionId,
           error: 'Generation stopped by user',
         }, { appendHistory: true });
-        writeEvent({ url, status: 'stopped', sessionId, linkType: itemLinkType, error: 'Generation stopped by user' });
+        run.emitter.emit('event', { url, status: 'stopped', sessionId, linkType: itemLinkType, error: 'Generation stopped by user' });
         continue;
       }
+      run.itemStates.set(url, { status: 'error', sessionId, error: err.message });
       upsertTutorial(url, { status: 'error', language, sessionId, error: err.message }, { appendHistory: true });
-      writeEvent({ url, status: 'error', sessionId, linkType: itemLinkType, error: err.message });
+      run.emitter.emit('event', { url, status: 'error', sessionId, linkType: itemLinkType, error: err.message });
     } finally {
       activeSessions.delete(sessionId);
-      runSessionIds.delete(sessionId);
+      run.sessionIds.delete(sessionId);
     }
   }
 
-  writeEvent({ status: 'complete' });
-  if (!res.destroyed) {
-    try { res.end(); } catch {}
+  run.emitter.emit('event', { status: 'complete' });
+  activeRuns.delete(runId);
+}
+
+async function executeRegenerate(runId, tutorialUrl, language, linkType) {
+  const run = activeRuns.get(runId);
+  if (!run) return;
+
+  const sessionId = makeSessionId('tutorial-regenerate');
+  const sessionController = new AbortController();
+  run.sessionIds.add(sessionId);
+  activeSessions.set(sessionId, { controller: sessionController, url: tutorialUrl, linkType });
+
+  run.controller.signal.addEventListener('abort', () => sessionController.abort(), { once: true });
+
+  run.itemStates.set(tutorialUrl, { status: 'running', sessionId });
+  upsertTutorial(tutorialUrl, { status: 'running', language, sessionId, error: null }, { appendHistory: true });
+  run.emitter.emit('event', { status: 'running', sessionId });
+
+  try {
+    const result = await runPipeline(tutorialUrl, language, linkType, sessionController.signal, sessionId);
+    const { gammaUrl, sharepointUrl } = extractGeneratedUrls(result);
+    run.itemStates.set(tutorialUrl, { status: 'done', sessionId });
+    upsertTutorial(tutorialUrl, {
+      status: 'done',
+      language,
+      sessionId,
+      gammaUrl,
+      sharepointUrl,
+      lastGeneratedAt: new Date().toISOString(),
+      error: null,
+    }, { appendHistory: true });
+    run.emitter.emit('event', { status: 'done', sessionId, gammaUrl, sharepointUrl });
+  } catch (err) {
+    if (sessionController.signal.aborted || err.name === 'AbortError') {
+      run.itemStates.set(tutorialUrl, { status: 'stopped', sessionId, error: 'Generation stopped by user' });
+      upsertTutorial(tutorialUrl, {
+        status: 'pending',
+        language,
+        sessionId,
+        error: 'Generation stopped by user',
+      }, { appendHistory: true });
+      run.emitter.emit('event', { status: 'stopped', sessionId, error: 'Generation stopped by user' });
+    } else {
+      run.itemStates.set(tutorialUrl, { status: 'error', sessionId, error: err.message });
+      upsertTutorial(tutorialUrl, { status: 'error', language, sessionId, error: err.message }, { appendHistory: true });
+      run.emitter.emit('event', { status: 'error', sessionId, error: err.message });
+    }
+  } finally {
+    activeSessions.delete(sessionId);
+    run.sessionIds.delete(sessionId);
   }
+
+  run.emitter.emit('event', { status: 'complete', sessionId });
+  activeRuns.delete(runId);
+}
+
+/* ══════════════════════════════════════════════════
+   Run selected URLs — background execution + SSE view
+══════════════════════════════════════════════════ */
+app.post('/api/run', (req, res) => {
+  const { urls, items, language = 'he', linkType = 'regular' } = req.body;
+  const runItems = normalizeRunItems({ items, urls, linkType });
+  if (!runItems.length) return res.status(400).json({ error: 'No URLs provided' });
+
+  const runId = makeSessionId('run');
+  const emitter = new EventEmitter();
+  const run = {
+    runId,
+    emitter,
+    controller: new AbortController(),
+    items: runItems,
+    language,
+    itemStates: new Map(),
+    sessionIds: new Set(),
+    startedAt: new Date().toISOString(),
+  };
+  activeRuns.set(runId, run);
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.flushHeaders();
+
+  res.write(`data: ${JSON.stringify({ status: 'started', runId })}\n\n`);
+  subscribeSSE(res, emitter);
+
+  emitter.on('event', payload => {
+    if (payload.status === 'complete') {
+      if (!res.destroyed) { try { res.end(); } catch {} }
+    }
+  });
+
+  executeRun(runId, runItems, language);
+});
+
+/* ── Reconnect to an active run's event stream ── */
+app.get('/api/runs/:runId/events', (req, res) => {
+  const run = activeRuns.get(req.params.runId);
+  if (!run) return res.status(404).json({ error: 'Run not found or already completed' });
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.flushHeaders();
+
+  const snapshot = run.items.map(item => {
+    const state = run.itemStates.get(item.url);
+    return { url: item.url, linkType: item.linkType, ...(state || { status: 'pending' }) };
+  });
+  res.write(`data: ${JSON.stringify({ status: 'snapshot', runId: run.runId, items: snapshot })}\n\n`);
+
+  subscribeSSE(res, run.emitter);
+
+  run.emitter.on('event', payload => {
+    if (payload.status === 'complete') {
+      if (!res.destroyed) { try { res.end(); } catch {} }
+    }
+  });
+});
+
+/* ── List active runs ── */
+app.get('/api/runs/active', (req, res) => {
+  const runs = [];
+  for (const [runId, run] of activeRuns) {
+    const items = run.items.map(item => {
+      const state = run.itemStates.get(item.url);
+      return { url: item.url, linkType: item.linkType, ...(state || { status: 'pending' }) };
+    });
+    runs.push({ runId, language: run.language, startedAt: run.startedAt, items });
+  }
+  res.json({ runs });
+});
+
+/* ── Stop a run ── */
+app.post('/api/runs/:runId/stop', (req, res) => {
+  const run = activeRuns.get(req.params.runId);
+  if (!run) return res.status(404).json({ error: 'Run not found or already completed' });
+
+  run.controller.abort();
+  for (const sid of run.sessionIds) {
+    const session = activeSessions.get(sid);
+    if (session) session.controller.abort();
+  }
+  res.json({ stopped: true, runId: req.params.runId });
 });
 
 app.post('/api/sessions/:sessionId/stop', (req, res) => {
@@ -556,41 +691,40 @@ app.delete('/api/tutorials/:id', (req, res) => {
   res.json({ deleted: true, tutorials: next });
 });
 
-app.post('/api/tutorials/:id/regenerate', async (req, res) => {
+app.post('/api/tutorials/:id/regenerate', (req, res) => {
   const list = loadTutorials();
   const tutorial = list.find(t => t.id === req.params.id);
   if (!tutorial) return res.status(404).json({ error: 'Tutorial not found' });
 
   const { language = 'he', linkType = 'regular' } = req.body || {};
-  const sessionId = makeSessionId('tutorial-regenerate');
+  const runId = makeSessionId('regen');
+  const emitter = new EventEmitter();
+  const run = {
+    runId,
+    emitter,
+    controller: new AbortController(),
+    items: [{ url: tutorial.url, linkType }],
+    language,
+    itemStates: new Map(),
+    sessionIds: new Set(),
+    startedAt: new Date().toISOString(),
+  };
+  activeRuns.set(runId, run);
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.flushHeaders();
 
-  upsertTutorial(tutorial.url, { status: 'running', language, sessionId, error: null }, { appendHistory: true });
-  res.write(`data: ${JSON.stringify({ status: 'running', sessionId })}\n\n`);
+  res.write(`data: ${JSON.stringify({ status: 'started', runId })}\n\n`);
+  subscribeSSE(res, emitter);
 
-  try {
-    const result = await runPipeline(tutorial.url, language, linkType, undefined, sessionId);
-    const { gammaUrl, sharepointUrl } = extractGeneratedUrls(result);
-    upsertTutorial(tutorial.url, {
-      status: 'done',
-      language,
-      sessionId,
-      gammaUrl,
-      sharepointUrl,
-      lastGeneratedAt: new Date().toISOString(),
-      error: null,
-    }, { appendHistory: true });
-    res.write(`data: ${JSON.stringify({ status: 'done', sessionId, gammaUrl, sharepointUrl })}\n\n`);
-  } catch (err) {
-    upsertTutorial(tutorial.url, { status: 'error', language, sessionId, error: err.message }, { appendHistory: true });
-    res.write(`data: ${JSON.stringify({ status: 'error', sessionId, error: err.message })}\n\n`);
-  }
+  emitter.on('event', payload => {
+    if (payload.status === 'complete') {
+      if (!res.destroyed) { try { res.end(); } catch {} }
+    }
+  });
 
-  res.write(`data: ${JSON.stringify({ status: 'complete', sessionId })}\n\n`);
-  res.end();
+  executeRegenerate(runId, tutorial.url, language, linkType);
 });
 
 app.get('/generate', (req, res) => {

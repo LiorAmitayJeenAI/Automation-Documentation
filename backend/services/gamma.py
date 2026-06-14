@@ -108,11 +108,9 @@ async def generate_presentation(
             lines.append("")
         full_prompt += "\n".join(lines)
 
-    image_source = "noImages" if (embedded and use_provided_images) else "aiGenerated"
-
     logger.info(
-        "Gamma image config — embedded: %d, use_provided_images: %s, source: %s",
-        len(embedded), use_provided_images, image_source,
+        "Gamma image config — embedded: %d, use_provided_images: %s, source: aiGenerated",
+        len(embedded), use_provided_images,
     )
     if embedded:
         urls = [url for _, url in embedded]
@@ -123,7 +121,7 @@ async def generate_presentation(
         "\n\nThe input text contains screenshot image URLs with placement instructions. "
         "Each screenshot specifies which slide it belongs to (via 'Slide: ...'). "
         "Place each screenshot ONLY on the slide indicated in its caption. "
-        "Use only the provided screenshots; do not invent or generate other images."
+        "For all other slides that do not have a provided screenshot, use AI-generated images."
         if (embedded and use_provided_images) else (
             "\n\nThe input text may contain screenshot image URLs. If any are "
             "accessible, prefer embedding them over generated images."
@@ -132,16 +130,13 @@ async def generate_presentation(
     )
     final_instructions = f"{additional_instructions}{image_placement}\n\n{lang_formatting}"
 
-    if image_source == "noImages":
-        image_options: dict[str, Any] = {"source": "noImages"}
-    else:
-        image_options = {
-            "source": "aiGenerated",
-            "model": "gpt-image-2", 
-            "style": (
-                "Natural office photo of people interacting casually, soft daylight, genuine expressions, clean modern workspace, blurred background, no screens or phones or robots."
-            ),
-        }
+    image_options: dict[str, Any] = {
+        "source": "aiGenerated",
+        "model": "gpt-image-2",
+        "style": (
+            "Natural office photo of people interacting casually, soft daylight, genuine expressions, clean modern workspace, blurred background, no screens or phones or robots."
+        ),
+    }
 
     payload: dict[str, Any] = {
         "textMode": "generate",

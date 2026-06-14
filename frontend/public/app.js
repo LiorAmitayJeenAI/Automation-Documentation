@@ -29,6 +29,7 @@ function getSourceUrl(tutorial) {
 function normalizeStatus(status) {
   if (status === 'done' || status === 'up-to-date') return 'up-to-date';
   if (status === 'running' || status === 'processing') return 'processing';
+  if (status === 'queued') return 'queued';
   if (status === 'error' || status === 'failed') return 'failed';
   return 'needs-update';
 }
@@ -38,6 +39,7 @@ function statusMeta(status) {
   const map = {
     'up-to-date': { label: 'Up To Date', className: 'up-to-date' },
     processing: { label: 'Processing', className: 'processing' },
+    queued: { label: 'Queued', className: 'queued' },
     failed: { label: 'Failed', className: 'failed' },
     'needs-update': { label: 'Needs Update', className: 'needs-update' },
   };

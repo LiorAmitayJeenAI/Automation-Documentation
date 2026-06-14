@@ -1,23 +1,328 @@
 [
   {
     "path": "/",
-    "description": "Main chat workspace — chat input area with the assistant, also has 'history' and 'last activity' buttons that open a sidebar (URL stays the same)"
+    "description": "Main chat workspace — chat input area with the assistant, also has 'history' and 'last activity' buttons that open a sidebar (URL stays the same)",
+    "clickable_elements": [
+      {
+        "variants": [
+          "GPT 5.1 - Azure OpenAI",
+          "dropdown-trigger"
+        ]
+      },
+      {
+        "variants": [
+          "Brain",
+          "Menu"
+        ]
+      },
+      {
+        "variants": [
+          "dropdown-trigger"
+        ]
+      },
+      {
+        "variants": [
+          "Open search",
+          "פתח חיפוש"
+        ]
+      },
+      {
+        "variants": [
+          "Menu",
+          "תפריט"
+        ]
+      },
+      {
+        "variants": [
+          "Upload Files",
+          "העלאת קבצים"
+        ]
+      },
+      {
+        "variants": [
+          "record-meeting-button"
+        ]
+      },
+      {
+        "variants": [
+          "Voice input",
+          "קלט קולי"
+        ]
+      },
+      {
+        "variants": [
+          "Submit",
+          "שלח"
+        ]
+      }
+    ]
   },
   {
     "path": "/chat",
-    "description": "Active conversation thread with the AI assistant — message bubbles and input box"
+    "description": "Active conversation thread with the AI assistant — message bubbles and input box",
+    "clickable_elements": [
+      {
+        "variants": [
+          "GPT 5.1 - Azure OpenAI",
+          "dropdown-trigger"
+        ]
+      },
+      {
+        "variants": [
+          "Brain",
+          "Menu"
+        ]
+      },
+      {
+        "variants": [
+          "Menu",
+          "תפריט"
+        ]
+      },
+      {
+        "variants": [
+          "Upload Files",
+          "העלאת קבצים"
+        ]
+      },
+      {
+        "variants": [
+          "record-meeting-button"
+        ]
+      },
+      {
+        "variants": [
+          "Voice input",
+          "קלט קולי"
+        ]
+      },
+      {
+        "variants": [
+          "Submit",
+          "שלח"
+        ]
+      }
+    ]
   },
   {
     "path": "/agents",
-    "description": "Agents main page — list of all user agents with a 'צור סוכן' (create agent) button that opens 3 agent type options (NOT a single agent's edit page)"
+    "description": "Agents main page — list of all user agents with a 'צור סוכן' (create agent) button that opens 3 agent type options (NOT a single agent's edit page)",
+    "clickable_elements": [
+      {
+        "variants": [
+          "בית",
+          "Home"
+        ]
+      },
+      {
+        "variants": [
+          "הסוכנים שלי",
+          "My agents"
+        ]
+      },
+      {
+        "variants": [
+          "שותף איתי",
+          "Shared with me"
+        ]
+      },
+      {
+        "variants": [
+          "משותף על ידי הארגון",
+          "Shared by the organization"
+        ]
+      },
+      {
+        "variants": [
+          "צור סוכן",
+          "agents-page-primary-action-add",
+          "Create agent"
+        ]
+      },
+      {
+        "variants": [
+          "צור תיקייה",
+          "agents-page-primary-action-create-folder",
+          "Create folder"
+        ]
+      },
+      {
+        "variants": [
+          "Open search",
+          "פתח חיפוש"
+        ]
+      },
+      {
+        "variants": [
+          "Menu",
+          "תפריט"
+        ]
+      },
+      {
+        "variants": [
+          "Select all rows",
+          "בחר את כל השורות"
+        ]
+      }
+    ]
   },
   {
     "path": "/agent-configuration/b6f06945-ba74-4c86-8950-be90547055cb",
-    "description": "Edit a Spark agent — configuration and settings page for a Spark-type agent"
+    "description": "Edit a Spark agent — configuration and settings page for a Spark-type agent",
+    "clickable_elements": [
+      {
+        "variants": [
+          "המר ל Cortex",
+          "Convert to Cortex"
+        ]
+      },
+      {
+        "variants": [
+          "פעיל",
+          "dropdown-trigger",
+          "Active"
+        ]
+      },
+      {
+        "variants": [
+          "העתקת מזהה",
+          "Copy ID"
+        ]
+      },
+      {
+        "variants": [
+          "שמור",
+          "Save"
+        ]
+      },
+      {
+        "variants": [
+          "תוכל לעזור לי לבנות תרחישי בדיקה?",
+          "Can you help me build test scenarios?"
+        ]
+      },
+      {
+        "variants": [
+          "איך לנסח באג בצורה מדויקת?",
+          "How do I write a precise bug report?"
+        ]
+      },
+      {
+        "variants": [
+          "מהם סוגי הבדיקות שכדאי לבצע למוצר חדש?",
+          "What types of tests should be performed for a new product?"
+        ]
+      },
+      {
+        "variants": [
+          "האם תוכל לנתח עבורי בדיקות קיימות?",
+          "Can you analyze existing tests for me?"
+        ]
+      },
+      {
+        "variants": [
+          "Brain",
+          "Menu"
+        ]
+      },
+      {
+        "variants": [
+          "שיחה",
+          "Chat"
+        ]
+      },
+      {
+        "variants": [
+          "הגדרות",
+          "Settings"
+        ]
+      },
+      {
+        "variants": [
+          "העלאת תמונה",
+          "Upload image"
+        ]
+      }
+    ]
   },
   {
     "path": "/agent-configuration/d66e45bd-85de-40cf-a81a-ed8466d09c50",
-    "description": "Edit a Cortex agent — configuration and settings page for a Cortex-type agent"
+    "description": "Edit a Cortex agent — configuration and settings page for a Cortex-type agent",
+    "clickable_elements": [
+      {
+        "variants": [
+          "פעיל",
+          "dropdown-trigger",
+          "Active"
+        ]
+      },
+      {
+        "variants": [
+          "העתקת מזהה",
+          "Copy ID"
+        ]
+      },
+      {
+        "variants": [
+          "שמור",
+          "Save"
+        ]
+      },
+      {
+        "variants": [
+          "תוכל לעזור לי לבנות תרחישי בדיקה?",
+          "Can you help me build test scenarios?"
+        ]
+      },
+      {
+        "variants": [
+          "איך לנסח באג בצורה מדויקת?",
+          "How do I write a precise bug report?"
+        ]
+      },
+      {
+        "variants": [
+          "מהם סוגי הבדיקות שכדאי לבצע למוצר חדש?",
+          "What types of tests should be performed for a new product?"
+        ]
+      },
+      {
+        "variants": [
+          "האם תוכל לנתח עבורי בדיקות קיימות?",
+          "Can you analyze existing tests for me?"
+        ]
+      },
+      {
+        "variants": [
+          "Brain",
+          "Menu"
+        ]
+      },
+      {
+        "variants": [
+          "העלאת תמונה",
+          "Upload image"
+        ]
+      },
+      {
+        "variants": [
+          "הסרה",
+          "Remove"
+        ]
+      },
+      {
+        "variants": [
+          "בחר תהליכים",
+          "Select processes"
+        ]
+      },
+      {
+        "variants": [
+          "ערוך פתיחי שיחה",
+          "Edit conversation starters"
+        ]
+      }
+    ]
   },
   {
     "path": "/workflow/flow/05e7f241-7528-4417-a5c6-4a2774ea0d9e",
@@ -25,27 +330,235 @@
   },
   {
     "path": "/agent-configuration/new",
-    "description": "Create a new Spark agent via chat — interactive chat-based agent creation flow"
+    "description": "Create a new Spark agent via chat — interactive chat-based agent creation flow",
+    "clickable_elements": [
+      {
+        "variants": [
+          "דלג",
+          "Skip"
+        ]
+      },
+      {
+        "variants": [
+          "תבניות נוספות",
+          "More templates"
+        ]
+      },
+      {
+        "variants": [
+          "Voice input",
+          "קלט קולי"
+        ]
+      },
+      {
+        "variants": [
+          "Submit",
+          "שלח"
+        ]
+      }
+    ]
   },
   {
     "path": "/skills",
-    "description": "Skills library page — list of available skills/tools the assistant can use"
+    "description": "Skills library page — list of available skills/tools the assistant can use",
+    "clickable_elements": [
+      {
+        "variants": [
+          "בית",
+          "Home"
+        ]
+      },
+      {
+        "variants": [
+          "הSkills שלי",
+          "My Skills"
+        ]
+      },
+      {
+        "variants": [
+          "שותפו איתי",
+          "Shared with me"
+        ]
+      },
+      {
+        "variants": [
+          "Skills של הארגון",
+          "Organization Skills"
+        ]
+      },
+      {
+        "variants": [
+          "צור Skill",
+          "skills-page-primary-action-create",
+          "Create Skill"
+        ]
+      },
+      {
+        "variants": [
+          "ייבא Skill",
+          "skills-page-primary-action-upload",
+          "Import Skill"
+        ]
+      },
+      {
+        "variants": [
+          "Open search",
+          "פתח חיפוש"
+        ]
+      },
+      {
+        "variants": [
+          "Menu",
+          "תפריט"
+        ]
+      }
+    ]
   },
   {
     "path": "/triggers",
-    "description": "Triggers configuration page — automations that start flows based on events"
+    "description": "Triggers configuration page — automations that start flows based on events",
+    "clickable_elements": [
+      {
+        "variants": [
+          "בית",
+          "Home"
+        ]
+      },
+      {
+        "variants": [
+          "התזמונים שלי",
+          "My schedules"
+        ]
+      },
+      {
+        "variants": [
+          "צור תזמון",
+          "triggers-page-primary-action-create",
+          "Create schedule"
+        ]
+      },
+      {
+        "variants": [
+          "Open search",
+          "פתח חיפוש"
+        ]
+      },
+      {
+        "variants": [
+          "Select all rows",
+          "בחר את כל השורות"
+        ]
+      }
+    ]
   },
   {
     "path": "/knowledge",
-    "description": "Knowledge base page — ingested documents and folders, upload and management UI"
+    "description": "Knowledge base page — ingested documents and folders, upload and management UI",
+    "clickable_elements": [
+      {
+        "variants": [
+          "דף הבית",
+          "Home"
+        ]
+      },
+      {
+        "variants": [
+          "הקבצים שלי",
+          "My files"
+        ]
+      },
+      {
+        "variants": [
+          "שותף איתי",
+          "Shared with me"
+        ]
+      },
+      {
+        "variants": [
+          "העלה או גרור",
+          "sources-page-primary-action-upload",
+          "Upload or drag"
+        ]
+      },
+      {
+        "variants": [
+          "צור תיקייה",
+          "Create folder"
+        ]
+      },
+      {
+        "variants": [
+          "סנכרן",
+          "sources-page-primary-action-sync",
+          "Sync"
+        ]
+      },
+      {
+        "variants": [
+          "Open search",
+          "פתח חיפוש"
+        ]
+      },
+      {
+        "variants": [
+          "Menu",
+          "תפריט"
+        ]
+      },
+      {
+        "variants": [
+          "Select all rows",
+          "בחר את כל השורות"
+        ]
+      }
+    ]
   },
   {
     "path": "/history",
-    "description": "Conversation history list — past conversations with timestamps"
+    "description": "Conversation history list — past conversations with timestamps",
+    "clickable_elements": [
+      {
+        "variants": [
+          "filter-tags"
+        ]
+      }
+    ]
   },
   {
     "path": "/analytics",
-    "description": "Usage analytics dashboard — charts and metrics about platform usage"
+    "description": "Usage analytics dashboard — charts and metrics about platform usage",
+    "clickable_elements": [
+      {
+        "variants": [
+          "סקירה כללית",
+          "Overview"
+        ]
+      },
+      {
+        "variants": [
+          "שיחות",
+          "Chats"
+        ]
+      },
+      {
+        "variants": [
+          "סוכנים",
+          "Agents"
+        ]
+      },
+      {
+        "variants": [
+          "מודלים",
+          "Models"
+        ]
+      },
+      {
+        "variants": [
+          "כלים",
+          "Tools"
+        ]
+      }
+    ]
   },
   {
     "path": "/support",
@@ -53,6 +566,221 @@
   },
   {
     "path": "/integrations/connect",
-    "description": "Integrations and connectors page — MCPs, external services, API connections"
+    "description": "Integrations and connectors page — MCPs, external services, API connections",
+    "clickable_elements": [
+      {
+        "variants": [
+          "GPT 5.1 - Azure OpenAI",
+          "dropdown-trigger"
+        ]
+      },
+      {
+        "variants": [
+          "Brain",
+          "Menu"
+        ]
+      },
+      {
+        "variants": [
+          "dropdown-trigger"
+        ]
+      },
+      {
+        "variants": [
+          "Open search",
+          "פתח חיפוש"
+        ]
+      },
+      {
+        "variants": [
+          "Menu",
+          "תפריט"
+        ]
+      },
+      {
+        "variants": [
+          "Upload Files",
+          "העלאת קבצים"
+        ]
+      },
+      {
+        "variants": [
+          "record-meeting-button"
+        ]
+      },
+      {
+        "variants": [
+          "Voice input",
+          "קלט קולי"
+        ]
+      },
+      {
+        "variants": [
+          "Submit",
+          "שלח"
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/support/workspace/introduction",
+    "description": "Product documentation article — introduction to the Workspace structure, core tools, and chat interaction basics. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/workspace/user-profile",
+    "description": "Product documentation article — explains the User Profile area, including language settings, support options, and profile preferences. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/workspace/side-menu",
+    "description": "Product documentation article — describes the Side Menu and its quick links to new chat, knowledge, agents, skills, schedules, activity, history, and support. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/workspace/basic-chat-usage",
+    "description": "Product documentation article — covers basic chat usage, prompts, language models, and core AI interaction concepts. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/workspace/chat-workspace-overview",
+    "description": "Product documentation article — overview of the main chat workspace and actions such as selecting agents, using models, and creating Spark agents. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/workspace/agent-in-workspace",
+    "description": "Product documentation article — explains what agents are, how they appear in the workspace, and how users activate or use shared/built-in agents. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/workspace/scheduler-and-notifications",
+    "description": "Product documentation article — explains automated scheduled tasks, recurring agent runs, and in-app completion notifications. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/agent/introduction",
+    "description": "Product documentation article — introduction to Jeen AI agents, their purpose, types, creation, configuration, and operation. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/agent/workflow-components",
+    "description": "Product documentation article — explains workflow components as modular no-code blocks for building process flows. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/agent/spark-agent",
+    "description": "Product documentation article — describes Spark Agents for fast prompt-based text tasks and document attachment options. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/agent/cortex-agent",
+    "description": "Product documentation article — explains Cortex Agent creation and advanced structured settings for detailed agent behavior control. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/agent/workflow-agent",
+    "description": "Product documentation article — describes Workflow Agents and how visual connected components define structured automation logic. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/agent/workflow-testing",
+    "description": "Product documentation article — explains testing workflow flows in the Playground and monitoring sessions for validation and debugging. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/skills/skills-tab",
+    "description": "Product documentation article — overview of Skills as reusable packaged capabilities for consistent instructions, logic, and domain behavior. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/knowledge-and-sources/uploading-and-processing",
+    "description": "Product documentation article — guide for uploading documents and controlling processing/conversion options for knowledge sources. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/knowledge-and-sources/rag-mechanism",
+    "description": "Product documentation article — explains the RAG mechanism used to retrieve information from uploaded organizational documents for AI responses. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/knowledge-and-sources/excel-files",
+    "description": "Product documentation article — explains uploading Excel/CSV files with chunking so large datasets can be processed efficiently. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/apis-and-platform-interfaces/connectors",
+    "description": "Product documentation article — explains connectors and MCP for connecting the chat to external organizational systems like Outlook, Jira, and Monday. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/apis-and-platform-interfaces/mcps-and-connectors",
+    "description": "Product documentation article — overview of MCP apps/connectors that let agents perform external tool actions directly from chat. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/initial-setup-guidelines",
+    "description": "Product documentation article — admin setup checklist covering resource allocation, token limits, user permissions, and initial platform configuration. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/roles-management",
+    "description": "Product documentation article — explains admin role management, hierarchical permissions, and access control for features and modules. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/design",
+    "description": "Product documentation article — describes design management for organization branding, themes, and default visual appearance. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/organization-system-prompt",
+    "description": "Product documentation article — explains viewing and editing the organization-wide system prompt that defines the assistant’s base behavior. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/analytics",
+    "description": "Product documentation article — describes the admin analytics dashboard with activity metrics, KPIs, graphs, filters, and engagement trends. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/guardrails",
+    "description": "Product documentation article — explains input and output guardrails for enforcing ethical and organizational AI usage policies. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/organization-settings",
+    "description": "Product documentation article — covers organization settings for defaults such as name, language, available agents, models, templates, and platform behavior. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/users-groups-tokens",
+    "description": "Product documentation article — explains managing users, groups, identity provider sync, and token limits across the organization. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/audit-logs",
+    "description": "Product documentation article — describes audit logs for tracking administrative actions, system changes, filtering, searching, and exporting logs. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/finops/finops-overview",
+    "description": "Product documentation article — overview of Jeen.ai FinOps for AI cost governance, budget management, and usage oversight across users, agents, workflows, and vendors. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "link_type": "admin",
+    "path": "/login",
+    "description": "Jeen Admin login page — email-based sign-in screen with an email field and Continue button, plus a top Menu button and Language selector."
+  },
+  {
+    "link_type": "admin",
+    "path": "/roles-management",
+    "description": "Admin roles management page — shows default and custom account roles, default role settings, and a permissions editor. Includes role cards such as Company Admin, Unit Admin and Builder plus an \"Edit role\" button and collapsible admin sidebar."
+  },
+  {
+    "link_type": "admin",
+    "path": "/design-management",
+    "description": "Admin design management page — create and manage UI themes with theme list, active/default status, color and logo settings, and a live preview. Includes actions like create theme, rename, delete theme, remove logo, and logo upload drop zone without changing the URL."
+  },
+  {
+    "link_type": "admin",
+    "path": "/system-prompts",
+    "description": "Admin system prompts page — configure the main system instruction used for AI interactions and assign or edit prompt content. Includes cancel/save controls and a close action within the editor area."
+  },
+  {
+    "link_type": "admin",
+    "path": "/skills",
+    "description": "Admin skills library page — manage organization skill packages, showing an empty-state when no skills are found. Includes upload, create skill, status filter, cancel and save changes controls."
+  },
+  {
+    "link_type": "admin",
+    "path": "/audit-logs",
+    "description": "Admin audit logs page — table of administrative and system changes with timestamp, category, action, entity, scope and actor columns. Includes CSV export plus date range, category and action type filters."
+  },
+  {
+    "link_type": "admin",
+    "path": "/analytics",
+    "description": "Admin analytics dashboard — tracks platform usage, engagement, performance and agent metrics with charts and KPI cards. Includes in-page tabs for reports, user activity, performance/errors and agents, plus filters for date range, users and model."
+  },
+  {
+    "link_type": "admin",
+    "path": "/organization-assets",
+    "description": "Admin organization assets page — lists user-created agents, skills and triggers across the organization with owner, visibility and status details. Includes in-page tabs for agents, skills and triggers plus filters such as owner, group and status."
+  },
+  {
+    "link_type": "admin",
+    "path": "/organization-settings",
+    "description": "Admin organization settings page — configure organization defaults such as profile, memory, help center, languages, default role and token limits. Includes in-page tabs for general, agents, templates and models, with cancel/save changes controls for unsaved settings."
   }
 ]

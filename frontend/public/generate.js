@@ -1,9 +1,10 @@
 let foldersData = { folders: [], lastSyncedAt: null };
 let selected = new Set(); // stores "folderId:pageIndex" keys
 let language = 'he';
-let currentRunController = null;
+let currentRunId = null;
 let isRunning = false;
 let collapsedFolders = new Set();
+let rowIds = {};
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('addUrlBtn').addEventListener('click', addUrl);
@@ -21,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   bindSegment('langSegment', value => { language = value; });
   loadFolders();
+  checkActiveRuns();
 });
 
 function bindSegment(id, onChange) {
@@ -277,6 +279,131 @@ async function deleteFolder(folderId) {
   await loadFolders();
 }
 
+/* ── Check for active runs on page load ── */
+async function checkActiveRuns() {
+  try {
+    const res = await fetch('/api/runs/active');
+    const data = await res.json();
+    if (!data.runs || !data.runs.length) return;
+
+    const run = data.runs[0];
+    currentRunId = run.runId;
+    isRunning = true;
+    rowIds = {};
+
+    const results = document.getElementById('results');
+    const notice = document.getElementById('successNotice');
+    notice.classList.remove('visible');
+    results.classList.add('visible');
+    results.innerHTML = '';
+
+    run.items.forEach((item, index) => {
+      const id = `result-${index}`;
+      rowIds[item.url] = id;
+
+      let className = 'running';
+      let msg = 'Pending...';
+      if (item.status === 'done') { className = 'done'; msg = 'Completed'; }
+      else if (item.status === 'error') { className = 'error'; msg = item.error || 'Failed'; }
+      else if (item.status === 'stopped') { className = 'error'; msg = 'Stopped'; }
+      else if (item.status === 'running') { msg = 'Processing...'; }
+
+      results.insertAdjacentHTML('beforeend', `
+        <div id="${id}" class="result-row ${className}" data-session-id="${esc(item.sessionId || '')}">
+          <span class="result-dot"></span>
+          <span class="result-url" title="${esc(item.url)}">${esc(item.url)}</span>
+          <span class="result-msg">${msg}</span>
+          <button class="session-stop" type="button" onclick="stopSession('${id}')" ${item.status === 'running' ? '' : 'disabled'}>Stop</button>
+        </div>`);
+    });
+
+    syncRunButton();
+    connectToRunEvents(run.runId);
+  } catch {}
+}
+
+/* ── Connect to an active run's SSE event stream ── */
+function connectToRunEvents(runId) {
+  const controller = new AbortController();
+
+  fetch(`/api/runs/${encodeURIComponent(runId)}/events`, { signal: controller.signal })
+    .then(response => {
+      const reader = response.body.getReader();
+      let buffer = '';
+
+      function pump() {
+        reader.read().then(({ done, value }) => {
+          if (done) {
+            finishRun();
+            return;
+          }
+          buffer = parseServerSentEvents(buffer, value, handleRunMessage);
+          pump();
+        }).catch(() => {
+          finishRun();
+        });
+      }
+
+      pump();
+    })
+    .catch(() => {
+      finishRun();
+    });
+}
+
+function handleRunMessage(message) {
+  if (message.status === 'snapshot') return;
+
+  if (message.status === 'complete') {
+    finishRun();
+    return;
+  }
+
+  if (message.status === 'started') return;
+
+  const row = document.getElementById(rowIds[message.url]);
+  if (!row) return;
+
+  if (message.sessionId) {
+    row.dataset.sessionId = message.sessionId;
+    const stopBtn = row.querySelector('.session-stop');
+    if (stopBtn && message.status === 'running') stopBtn.disabled = false;
+  }
+
+  if (message.status === 'running') {
+    row.className = 'result-row running';
+    row.querySelector('.result-msg').textContent = 'Processing...';
+  }
+
+  if (message.status === 'done') {
+    row.className = 'result-row done';
+    row.querySelector('.result-msg').textContent = 'Completed';
+    disableSessionStop(row);
+  }
+
+  if (message.status === 'error') {
+    row.className = 'result-row error';
+    row.querySelector('.result-msg').textContent = message.error || 'Failed';
+    disableSessionStop(row);
+  }
+
+  if (message.status === 'stopped') {
+    row.className = 'result-row error';
+    row.querySelector('.result-msg').textContent = 'Stopped';
+    disableSessionStop(row);
+  }
+}
+
+function finishRun() {
+  if (!isRunning) return;
+  const notice = document.getElementById('successNotice');
+  const hasSuccess = document.querySelectorAll('.result-row.done').length > 0;
+  if (hasSuccess) notice.classList.add('visible');
+  isRunning = false;
+  currentRunId = null;
+  syncRunButton();
+}
+
 /* ── Run generation ── */
 function getLinkTypeForFolder(folderName) {
   return String(folderName).toLowerCase().includes('admin') ? 'admin' : 'regular';
@@ -327,7 +454,7 @@ async function runSelected() {
 
   const results = document.getElementById('results');
   const notice = document.getElementById('successNotice');
-  const rowIds = {};
+  rowIds = {};
 
   notice.classList.remove('visible');
   results.classList.add('visible');
@@ -341,20 +468,18 @@ async function runSelected() {
       <div id="${id}" class="result-row running">
         <span class="result-dot"></span>
         <span class="result-url" title="${esc(url)}">${esc(url)}</span>
-        <span class="result-msg">Processing...</span>
+        <span class="result-msg">Pending...</span>
         <button class="session-stop" type="button" onclick="stopSession('${id}')" disabled>Stop</button>
       </div>`);
   });
 
   isRunning = true;
-  currentRunController = new AbortController();
   syncRunButton();
 
   if (document.getElementById('updateRoutesCheck').checked) {
     const discoverProceeded = await runRouteDiscovery(getSelectedLinkTypes(toRun));
     if (!discoverProceeded) {
       isRunning = false;
-      currentRunController = null;
       syncRunButton();
       return;
     }
@@ -363,7 +488,6 @@ async function runSelected() {
   try {
     const response = await fetch('/api/run', {
       method: 'POST',
-      signal: currentRunController.signal,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ items: toRun, language }),
     });
@@ -375,42 +499,17 @@ async function runSelected() {
       const { done, value } = await reader.read();
       if (done) break;
       buffer = parseServerSentEvents(buffer, value, message => {
-        if (message.status === 'complete' || (message.status === 'stopped' && !message.url)) return;
-        const row = document.getElementById(rowIds[message.url]);
-        if (!row) return;
-
-        if (message.sessionId) {
-          row.dataset.sessionId = message.sessionId;
-          const stopBtn = row.querySelector('.session-stop');
-          if (stopBtn && message.status === 'running') stopBtn.disabled = false;
+        if (message.status === 'started' && message.runId) {
+          currentRunId = message.runId;
+          return;
         }
-
-        if (message.status === 'done') {
-          row.className = 'result-row done';
-          row.querySelector('.result-msg').textContent = 'Completed';
-          disableSessionStop(row);
-        }
-
-        if (message.status === 'error') {
-          row.className = 'result-row error';
-          row.querySelector('.result-msg').textContent = message.error || 'Failed';
-          disableSessionStop(row);
-        }
-
-        if (message.status === 'stopped') {
-          row.className = 'result-row error';
-          row.querySelector('.result-msg').textContent = 'Stopped';
-          disableSessionStop(row);
-        }
+        handleRunMessage(message);
       });
     }
 
-    if (isRunning) notice.classList.add('visible');
+    finishRun();
   } catch (error) {
-    if (error.name === 'AbortError') {
-      markPendingRowsStopped(rowIds);
-      return;
-    }
+    if (currentRunId) return;
 
     results.insertAdjacentHTML('beforeend', `
       <div class="result-row error">
@@ -418,9 +517,8 @@ async function runSelected() {
         <span class="result-url">Generation failed</span>
         <span class="result-msg">${esc(error.message)}</span>
       </div>`);
-  } finally {
     isRunning = false;
-    currentRunController = null;
+    currentRunId = null;
     syncRunButton();
   }
 }
@@ -441,7 +539,6 @@ async function runRouteDiscovery(linkTypes) {
   try {
     const res = await fetch('/api/discover-routes', {
       method: 'POST',
-      signal: currentRunController.signal,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ linkTypes }),
     });
@@ -451,7 +548,7 @@ async function runRouteDiscovery(linkTypes) {
     if (!res.ok) {
       row.className = 'result-row error';
       row.querySelector('.result-msg').textContent = data.error || 'Route discovery failed';
-      return true; // continue with generation anyway
+      return true;
     }
 
     const added = Array.isArray(data.added) ? data.added.length : 0;
@@ -460,28 +557,18 @@ async function runRouteDiscovery(linkTypes) {
       added > 0 ? `Found ${added} new route${added !== 1 ? 's' : ''}` : 'Routes up to date';
     return true;
   } catch (error) {
-    if (error.name === 'AbortError') {
-      row.className = 'result-row error';
-      row.querySelector('.result-msg').textContent = 'Stopped';
-      return false;
-    }
     row.className = 'result-row error';
     row.querySelector('.result-msg').textContent = error.message || 'Route discovery failed';
-    return true; // continue with generation anyway
+    return true;
   }
 }
 
-function stopGeneration() {
-  if (!currentRunController) return;
+async function stopGeneration() {
+  if (!currentRunId) return;
 
-  document.querySelectorAll('.result-row.running').forEach(row => {
-    const sessionId = row.dataset.sessionId;
-    if (sessionId) {
-      fetch(`/api/sessions/${encodeURIComponent(sessionId)}/stop`, { method: 'POST' }).catch(() => {});
-    }
-  });
-
-  currentRunController.abort();
+  try {
+    await fetch(`/api/runs/${encodeURIComponent(currentRunId)}/stop`, { method: 'POST' });
+  } catch {}
 }
 
 async function stopSession(rowId) {
@@ -503,16 +590,6 @@ async function stopSession(rowId) {
       stopBtn.textContent = 'Stop';
     }
   }
-}
-
-function markPendingRowsStopped(rowIds) {
-  Object.values(rowIds).forEach(id => {
-    const row = document.getElementById(id);
-    if (!row || !row.classList.contains('running')) return;
-    row.className = 'result-row error';
-    row.querySelector('.result-msg').textContent = 'Stopped';
-    disableSessionStop(row);
-  });
 }
 
 function disableSessionStop(row) {

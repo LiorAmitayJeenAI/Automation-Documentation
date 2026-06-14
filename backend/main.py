@@ -64,7 +64,7 @@ async def discover_routes(req: DiscoverRoutesRequest):
     """
     base_url = ADMIN_URL if req.link_type == "admin" else REGULAR_URL
     try:
-        result = await route_crawler.discover_and_merge(base_url)
+        result = await route_crawler.discover_and_merge(base_url, req.link_type)
         return result
     except Exception as exc:
         logger.error("Route discovery failed: %s", exc)

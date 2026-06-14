@@ -4,6 +4,7 @@ let urlToTutorial = new Map();
 let searchTerm = '';
 let activeFilter = 'all';
 let collapsedFolders = new Set();
+let pollTimer = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('searchInput').addEventListener('input', event => {
@@ -59,6 +60,20 @@ async function loadTutorials() {
     tutorials = [];
   }
   renderLibrary();
+  schedulePollIfNeeded();
+}
+
+function schedulePollIfNeeded() {
+  if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+
+  const hasActive = tutorials.some(t => {
+    const s = normalizeStatus(t.status);
+    return s === 'queued' || s === 'processing';
+  });
+
+  if (hasActive) {
+    pollTimer = setTimeout(() => loadTutorials(), 4000);
+  }
 }
 
 function rowMatchesFilters(page, tutorial, folder) {
@@ -139,7 +154,7 @@ function renderLibrary() {
             const title = page.label || 'Untitled';
             const language = tutorial?.language ? tutorial.language.toUpperCase() : '-';
             const lastGenerated = tutorial ? formatDate(tutorial.lastGeneratedAt || tutorial.lastUpdatedAt, true) : '-';
-            const isProcessing = tutorial && normalizeStatus(tutorial.status) === 'processing';
+            const isProcessing = tutorial && (normalizeStatus(tutorial.status) === 'processing' || normalizeStatus(tutorial.status) === 'queued');
 
             return `
               <article class="lib-item">

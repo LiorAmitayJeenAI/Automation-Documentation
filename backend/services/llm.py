@@ -34,18 +34,76 @@ _client = AsyncAzureOpenAI(
 )
 
 
-def _load_allowed_routes() -> list[dict]:
+def _normalize_link_type(value: str | None) -> str:
+    return "admin" if value == "admin" else "regular"
+
+
+def _route_link_type(route: dict) -> str:
+    return _normalize_link_type(route.get("link_type"))
+
+
+def _load_allowed_routes(link_type: str = "regular") -> list[dict]:
     """Load the curated list of valid product routes used to constrain screenshots."""
+    normalized_link_type = _normalize_link_type(link_type)
     try:
         with open(_ROUTES_MAP_PATH, encoding="utf-8") as f:
             routes = json.load(f)
         if isinstance(routes, list):
-            return [r for r in routes if isinstance(r, dict) and r.get("path")]
+            return [
+                r
+                for r in routes
+                if (
+                    isinstance(r, dict)
+                    and r.get("path")
+                    and _route_link_type(r) == normalized_link_type
+                    and not r["path"].startswith("/support/")
+                    and r["path"] != "/chat"
+                )
+            ]
     except FileNotFoundError:
         logger.warning("routes_map.json not found at %s — screenshots unconstrained", _ROUTES_MAP_PATH)
     except (json.JSONDecodeError, OSError) as exc:
         logger.warning("Failed to load routes_map.json: %s", exc)
     return []
+
+
+def _element_variants(el) -> list[str]:
+    """Return the label variants (e.g. Hebrew + English) for one clickable element.
+
+    Supports the grouped form ({"variants": [...]}), the {text, aria} form, and
+    the legacy bare-string form.
+    """
+    if isinstance(el, dict) and "variants" in el:
+        candidates = el.get("variants") or []
+    elif isinstance(el, dict):
+        candidates = [el.get("text", ""), el.get("aria", "")]
+    else:
+        candidates = [el]
+
+    variants: list[str] = []
+    seen: set[str] = set()
+    for c in candidates:
+        label = str(c).strip()
+        if label and label.lower() not in seen:
+            seen.add(label.lower())
+            variants.append(label)
+    return variants
+
+
+def _format_clickable_elements(route: dict) -> str:
+    """Render a route's verified clickable buttons for the prompt.
+
+    Each on-page button is shown with all of its label variants (Hebrew /
+    English) joined by " / ", and buttons are separated by commas. Used to
+    constrain the LLM's interaction click steps to real, on-page buttons.
+    Returns an empty string when the route has no recorded clickable elements.
+    """
+    buttons: list[str] = []
+    for el in route.get("clickable_elements") or []:
+        variants = _element_variants(el)
+        if variants:
+            buttons.append(" / ".join(f'"{v}"' for v in variants))
+    return ", ".join(buttons)
 
 
 def _format_allowed_routes(routes: list[dict], base_url: str) -> str:
@@ -59,6 +117,9 @@ def _format_allowed_routes(routes: list[dict], base_url: str) -> str:
             path = "/" + path
         desc = str(r.get("description", "")).strip()
         lines.append(f"- {base}{path} — {desc}" if desc else f"- {base}{path}")
+        clickable = _format_clickable_elements(r)
+        if clickable:
+            lines.append(f"    clickable buttons: {clickable}")
     return "\n".join(lines)
 
 
@@ -78,6 +139,7 @@ async def format_document(
     markdown_content: str,
     language: str = "he",
     base_url: str = "https://jeenai.app",
+    link_type: str = "regular",
 ) -> dict:
     """
     Send Confluence markdown to Azure OpenAI and get back structured JSON:
@@ -87,7 +149,7 @@ async def format_document(
     }
     """
     language_name = "Hebrew" if language == "he" else "English"
-    allowed_routes = _format_allowed_routes(_load_allowed_routes(), base_url)
+    allowed_routes = _format_allowed_routes(_load_allowed_routes(link_type), base_url)
     system_prompt = DOCUMENT_FORMATTER_PROMPT.format(
         language_name=language_name,
         base_url=base_url,
