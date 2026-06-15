@@ -4,6 +4,7 @@ let urlToTutorials = new Map();
 let searchTerm = '';
 let activeFilter = 'all';
 let collapsedFolders = new Set();
+let knownFolderIds = new Set();
 let expandedPartId = null;
 let pollTimer = null;
 
@@ -52,6 +53,7 @@ async function loadTutorials() {
     ]);
     tutorials = await tutorialsRes.json();
     foldersData = await foldersRes.json();
+    syncCollapsedFolders(foldersData.folders);
 
     urlToTutorials = new Map();
     for (const t of tutorials) {
@@ -64,6 +66,15 @@ async function loadTutorials() {
   }
   renderLibrary();
   schedulePollIfNeeded();
+}
+
+function syncCollapsedFolders(folders = []) {
+  for (const folder of folders) {
+    if (!knownFolderIds.has(folder.id)) {
+      knownFolderIds.add(folder.id);
+      collapsedFolders.add(folder.id);
+    }
+  }
 }
 
 function schedulePollIfNeeded() {
@@ -144,13 +155,12 @@ function parsePartLabel(title) {
 function getLanguageMeta(language) {
   const normalized = (language || '').toLowerCase();
   const map = {
-    en: { code: 'en', flag: '🇺🇸', label: 'English' },
-    he: { code: 'he', flag: '🇮🇱', label: 'Hebrew' },
+    en: { code: 'en', label: 'English' },
+    he: { code: 'he', label: 'Hebrew' },
   };
 
   return map[normalized] || {
     code: normalized || 'unknown',
-    flag: '🌐',
     label: normalized ? normalized.toUpperCase() : 'Unknown',
   };
 }
@@ -167,11 +177,21 @@ function isTutorialProcessing(tutorial) {
 }
 
 function renderStatusPill(tutorial) {
-  if (!tutorial) return '<span class="pill muted">Not generated</span>';
+  if (!tutorial) return '';
   const status = statusMeta(tutorial.status);
-  return status.className !== 'up-to-date'
+  return status.className === 'processing' || status.className === 'queued'
     ? `<span class="badge ${status.className}">${status.label}</span>`
-    : '<span class="pill success">Up To Date</span>';
+    : '';
+}
+
+function renderActiveStatusSummary(tutorials) {
+  const statuses = tutorials.map(tutorial => statusMeta(tutorial.status));
+  const activeStatus = statuses.find(status => status.className === 'processing')
+    || statuses.find(status => status.className === 'queued');
+
+  return activeStatus
+    ? `<span class="badge ${activeStatus.className}">${activeStatus.label}</span>`
+    : '';
 }
 
 function assetIcon(type) {
@@ -206,10 +226,9 @@ function renderLanguageSection(page, tutorial, language) {
   const lastGenerated = tutorial ? formatDate(tutorial.lastGeneratedAt || tutorial.lastUpdatedAt, true) : '-';
 
   return `
-    <section class="language-panel ${meta.code === 'he' ? 'rtl' : ''}">
+    <section class="language-panel">
       <div class="language-panel-head">
         <div class="language-title">
-          <span class="language-flag">${meta.flag}</span>
           <strong>${esc(meta.label)}</strong>
         </div>
         <div class="language-actions">
@@ -249,8 +268,7 @@ function renderPartCard(card, isExpanded) {
   const languageKeys = Array.from(tutorialsByLanguage.keys());
   const languageOrder = getLanguageOrder(languageKeys);
   const visibleLanguageOrder = languageOrder.filter(lang => activeFilter === 'all' || lang === activeFilter);
-  const statuses = cardTutorials.map(tutorial => statusMeta(tutorial.status));
-  const hasNonCurrent = statuses.some(status => status.className !== 'up-to-date');
+  const activeStatusSummary = renderActiveStatusSummary(cardTutorials);
   const latestDate = cardTutorials
     .map(tutorial => tutorial.lastGeneratedAt || tutorial.lastUpdatedAt || tutorial.createdAt)
     .filter(Boolean)
@@ -269,7 +287,7 @@ function renderPartCard(card, isExpanded) {
           <span>${cardTutorials.length} asset set${cardTutorials.length !== 1 ? 's' : ''}${latestDate ? ` · Updated ${formatDate(latestDate, true)}` : ''}</span>
         </span>
         <span class="part-summary">
-          ${hasNonCurrent ? '<span class="badge needs-update">Attention</span>' : '<span class="pill success">Ready</span>'}
+          ${activeStatusSummary}
         </span>
       </button>
       <div class="part-card-body">

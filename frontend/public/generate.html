@@ -64,28 +64,35 @@
           </section>
 
           <aside class="run-bar">
-            <div class="run-bar-toggles">
-              <div class="toggle-group">
-                <span class="toggle-label">Language</span>
+            <div class="generation-toolbar">
+              <div class="toolbar-control language-control">
+                <span class="toolbar-icon" aria-hidden="true">
+                  <svg width="17" height="17" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M3 12h18M12 3c2.2 2.4 3.4 5.4 3.4 9s-1.2 6.6-3.4 9M12 3c-2.2 2.4-3.4 5.4-3.4 9s1.2 6.6 3.4 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </span>
+                <span class="toolbar-label">Language</span>
                 <div class="segmented" id="langSegment">
                   <button type="button" class="active" data-value="he">HE</button>
                   <button type="button" data-value="en">EN</button>
                 </div>
               </div>
-              <div class="toggle-group">
-                <input type="checkbox" id="updateRoutesCheck" class="route-check" />
-                <label class="toggle-label" for="updateRoutesCheck">Update Routes</label>
+              <div class="toolbar-divider" aria-hidden="true"></div>
+              <div class="toolbar-control routes-control">
+                <label class="switch-control" for="updateRoutesCheck">
+                  <input type="checkbox" id="updateRoutesCheck" class="route-check" />
+                  <span class="switch-track" aria-hidden="true"></span>
+                  <span class="toolbar-label">Update Routes</span>
+                </label>
               </div>
-            </div>
-            <div class="run-bar-actions">
-              <button id="runBtn" class="btn btn-primary" type="button" disabled>
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z" fill="currentColor"/></svg>
-                Run Generation
-              </button>
-              <button id="stopBtn" class="btn btn-danger hidden" type="button">
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg>
-                Stop All
-              </button>
+              <div class="run-bar-actions">
+                <button id="runBtn" class="btn btn-primary" type="button" disabled>
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z" fill="currentColor"/></svg>
+                  Run Generation
+                </button>
+                <button id="stopBtn" class="btn btn-danger hidden" type="button">
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg>
+                  Stop All
+                </button>
+              </div>
             </div>
             <div id="successNotice" class="notice">
               Generation completed. New and updated records are now available in the Tutorials Library.

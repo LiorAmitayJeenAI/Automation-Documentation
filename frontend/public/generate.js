@@ -4,6 +4,7 @@ let language = 'he';
 let currentRunId = null;
 let isRunning = false;
 let collapsedFolders = new Set();
+let knownFolderIds = new Set();
 let rowIds = {};
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -57,6 +58,7 @@ async function loadFolders() {
   try {
     const res = await fetch('/api/folders');
     foldersData = await res.json();
+    syncCollapsedFolders(foldersData.folders);
   } catch {
     foldersData = { folders: [], lastSyncedAt: null };
   }
@@ -64,6 +66,15 @@ async function loadFolders() {
   selected = new Set([...selected].filter(k => allKeys.has(k)));
   renderFolders();
   renderFolderSelect();
+}
+
+function syncCollapsedFolders(folders = []) {
+  for (const folder of folders) {
+    if (!knownFolderIds.has(folder.id)) {
+      knownFolderIds.add(folder.id);
+      collapsedFolders.add(folder.id);
+    }
+  }
 }
 
 function renderFolderSelect() {
