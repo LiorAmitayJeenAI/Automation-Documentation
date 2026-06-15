@@ -1,10 +1,12 @@
 """
 Presentation style instructions passed to Gamma as additional_instructions.
 
-Extracted verbatim from Langflow Prompt Template (Prompt Template-rwYSh).
+Extracted verbatim from Langflow Prompt Template (Prompt Template-rwYSh),
+then split into language-specific variants so English presentations do not
+receive Hebrew RTL / word-order rules.
 """
 
-PRESENTATION_STYLE_PROMPT = """\
+_SHARED_PREAMBLE = """\
 Create a clear, friendly, and professional customer-facing product training presentation for non-technical users.
 
 Presentation purpose:
@@ -21,6 +23,9 @@ Content handling:
 * Break complex topics into smaller understandable sections.
 * Prefer workflow-oriented explanations over abstract descriptions.
 
+"""
+
+_LANGUAGE_SECTION_HE = """\
 Language and formatting:
 * Use formatting, alignment, and reading direction appropriate for the selected presentation language.
 * The presentation language determines the layout direction for ALL slides — never switch alignment because of English technical terms.
@@ -33,6 +38,19 @@ Language and formatting:
   - Nested and indented lists
   - Tables — column headers and cell content must be right-aligned, reading direction right to left
 
+"""
+
+_LANGUAGE_SECTION_EN = """\
+Language and formatting:
+* The presentation must be written entirely in English using standard LTR (left-to-right) layout.
+* All text — titles, subtitles, bullet points, and body text — must be left-aligned.
+* Maintain consistent left-to-right formatting and alignment across all slides.
+* Keep titles, subtitles, and bullet points consistently aligned and visually balanced.
+* Use natural English sentence structure and presentation conventions.
+
+"""
+
+_SHARED_SUFFIX = """\
 Slide readability:
 * Keep slides concise, visually clean, and easy to follow.
 * Avoid overcrowding slides with excessive text.
@@ -60,3 +78,9 @@ Screenshots and visual assets:
 * Place screenshots near the related explanation on the most relevant slide.
 * Do not force all screenshots — only use what genuinely improves understanding.
 * Maintain a professional and visually balanced layout when incorporating screenshots."""
+
+
+def get_presentation_style_prompt(language: str = "he") -> str:
+    """Return the full presentation style prompt for the given language."""
+    lang_section = _LANGUAGE_SECTION_HE if language == "he" else _LANGUAGE_SECTION_EN
+    return f"{_SHARED_PREAMBLE}{lang_section}{_SHARED_SUFFIX}"

@@ -27,7 +27,7 @@ from backend.config import (
     PUBLIC_BASE_URL,
     IMGBB_API_KEY,
 )
-from backend.prompts.presentation_style import PRESENTATION_STYLE_PROMPT
+from backend.prompts.presentation_style import get_presentation_style_prompt
 from backend.services import confluence, llm, screenshots, gamma, sharepoint, imgbb
 
 logger = logging.getLogger(__name__)
@@ -199,7 +199,7 @@ async def run_pipeline(
             title=presentation_title,
             prompt=presentation_content,
             language=language,
-            additional_instructions=PRESENTATION_STYLE_PROMPT,
+            additional_instructions=get_presentation_style_prompt(language),
             images=image_list,
             use_provided_images=images_publicly_accessible,
         )

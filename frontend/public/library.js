@@ -1,9 +1,10 @@
 let tutorials = [];
 let foldersData = { folders: [] };
-let urlToTutorial = new Map();
+let urlToTutorials = new Map();
 let searchTerm = '';
 let activeFilter = 'all';
 let collapsedFolders = new Set();
+let expandedPartId = null;
 let pollTimer = null;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -52,9 +53,11 @@ async function loadTutorials() {
     tutorials = await tutorialsRes.json();
     foldersData = await foldersRes.json();
 
-    urlToTutorial = new Map();
+    urlToTutorials = new Map();
     for (const t of tutorials) {
-      urlToTutorial.set(getSourceUrl(t), t);
+      const key = getSourceUrl(t);
+      if (!urlToTutorials.has(key)) urlToTutorials.set(key, []);
+      urlToTutorials.get(key).push(t);
     }
   } catch {
     tutorials = [];
@@ -98,20 +101,189 @@ function getVisibleRows() {
   const rows = [];
   for (const folder of foldersData.folders) {
     for (const page of folder.pages) {
-      const tutorial = urlToTutorial.get(page.url);
-      if (rowMatchesFilters(page, tutorial, folder)) {
-        rows.push({ folderName: folder.name, page, tutorial });
+      const pageTutorials = urlToTutorials.get(page.url) || [];
+      for (const tutorial of pageTutorials) {
+        if (rowMatchesFilters(page, tutorial, folder)) {
+          rows.push({ folderName: folder.name, page, tutorial });
+        }
       }
     }
   }
   return rows;
 }
 
+function getPartKey(folder, page) {
+  return `${folder.id}:${page.url}`;
+}
+
+function jsString(value) {
+  return String(value || '')
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r');
+}
+
+function parsePartLabel(title) {
+  const match = String(title || '').match(/^Part\s*(\d+)\s*[-–—]?\s*(.*)$/i);
+  if (!match) {
+    return {
+      badge: String(title || 'U').trim().charAt(0).toUpperCase() || 'U',
+      title: title || 'Untitled',
+      heading: title || 'Untitled',
+    };
+  }
+
+  return {
+    badge: match[1],
+    title: match[2].trim() || `Part ${match[1]}`,
+    heading: `Part ${match[1]} - ${match[2].trim() || `Part ${match[1]}`}`,
+  };
+}
+
+function getLanguageMeta(language) {
+  const normalized = (language || '').toLowerCase();
+  const map = {
+    en: { code: 'en', flag: '🇺🇸', label: 'English' },
+    he: { code: 'he', flag: '🇮🇱', label: 'Hebrew' },
+  };
+
+  return map[normalized] || {
+    code: normalized || 'unknown',
+    flag: '🌐',
+    label: normalized ? normalized.toUpperCase() : 'Unknown',
+  };
+}
+
+function getLanguageOrder(languageKeys) {
+  const preferred = activeFilter === 'all' ? ['en', 'he'] : [activeFilter];
+  const extras = languageKeys.filter(lang => !preferred.includes(lang)).sort();
+  return [...preferred, ...extras];
+}
+
+function isTutorialProcessing(tutorial) {
+  const status = normalizeStatus(tutorial?.status);
+  return status === 'processing' || status === 'queued';
+}
+
+function renderStatusPill(tutorial) {
+  if (!tutorial) return '<span class="pill muted">Not generated</span>';
+  const status = statusMeta(tutorial.status);
+  return status.className !== 'up-to-date'
+    ? `<span class="badge ${status.className}">${status.label}</span>`
+    : '<span class="pill success">Up To Date</span>';
+}
+
+function assetIcon(type) {
+  const icons = {
+    confluence: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M7.5 7.5h9v9h-9zM4 4h7m2 0h7M4 20h7m2 0h7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    gamma: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3zM12 12l8-4.5M12 12v9M12 12L4 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    pdf: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM14 3v5h5M8 15h8M8 18h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  };
+  return icons[type] || '';
+}
+
+function externalIcon() {
+  return '<svg class="asset-external" width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M20 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+
+function assetButton(url, type, label) {
+  const className = `asset-btn ${type}`;
+  if (!url) {
+    return `<span class="${className} off">${assetIcon(type)}<span>${esc(label)}</span></span>`;
+  }
+
+  return `
+    <a class="${className}" href="${esc(url)}" target="_blank" rel="noopener">
+      ${assetIcon(type)}
+      <span>${esc(label)}</span>
+      ${externalIcon()}
+    </a>`;
+}
+
+function renderLanguageSection(page, tutorial, language) {
+  const meta = getLanguageMeta(language);
+  const lastGenerated = tutorial ? formatDate(tutorial.lastGeneratedAt || tutorial.lastUpdatedAt, true) : '-';
+
+  return `
+    <section class="language-panel ${meta.code === 'he' ? 'rtl' : ''}">
+      <div class="language-panel-head">
+        <div class="language-title">
+          <span class="language-flag">${meta.flag}</span>
+          <strong>${esc(meta.label)}</strong>
+        </div>
+        <div class="language-actions">
+          ${tutorial ? `
+            <button class="icon-btn" onclick="event.stopPropagation(); showHistory('${esc(jsString(tutorial.id))}')" title="View generation history">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v6h6M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <button class="icon-btn danger" onclick="event.stopPropagation(); deleteTutorial('${esc(jsString(tutorial.id))}')" ${isTutorialProcessing(tutorial) ? 'disabled' : ''} title="Delete from library">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+          ` : ''}
+        </div>
+      </div>
+      <div class="language-meta">
+        ${renderStatusPill(tutorial)}
+        <span class="lib-date">${lastGenerated}</span>
+      </div>
+      <div class="asset-actions">
+        ${assetButton(page.url, 'confluence', 'Confluence')}
+        ${assetButton(tutorial?.gammaUrl, 'gamma', 'Gamma')}
+        ${assetButton(tutorial?.sharepointUrl, 'pdf', 'PDF')}
+      </div>
+    </section>`;
+}
+
+function renderPartCard(card, isExpanded) {
+  const { page, tutorials: cardTutorials, key } = card;
+  const title = page.label || 'Untitled';
+  const part = parsePartLabel(title);
+  const tutorialsByLanguage = new Map();
+
+  for (const tutorial of cardTutorials) {
+    const lang = (tutorial.language || 'unknown').toLowerCase();
+    if (!tutorialsByLanguage.has(lang)) tutorialsByLanguage.set(lang, tutorial);
+  }
+
+  const languageKeys = Array.from(tutorialsByLanguage.keys());
+  const languageOrder = getLanguageOrder(languageKeys);
+  const visibleLanguageOrder = languageOrder.filter(lang => activeFilter === 'all' || lang === activeFilter);
+  const statuses = cardTutorials.map(tutorial => statusMeta(tutorial.status));
+  const hasNonCurrent = statuses.some(status => status.className !== 'up-to-date');
+  const latestDate = cardTutorials
+    .map(tutorial => tutorial.lastGeneratedAt || tutorial.lastUpdatedAt || tutorial.createdAt)
+    .filter(Boolean)
+    .sort()
+    .pop();
+
+  return `
+    <article class="part-card${isExpanded ? ' expanded' : ''}">
+      <button class="part-card-header" type="button" onclick="togglePartCard('${esc(jsString(key))}')">
+        <span class="part-chevron">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="part-badge">${esc(part.badge)}</span>
+        <span class="part-heading">
+          <strong>${esc(part.heading)}</strong>
+          <span>${cardTutorials.length} asset set${cardTutorials.length !== 1 ? 's' : ''}${latestDate ? ` · Updated ${formatDate(latestDate, true)}` : ''}</span>
+        </span>
+        <span class="part-summary">
+          ${hasNonCurrent ? '<span class="badge needs-update">Attention</span>' : '<span class="pill success">Ready</span>'}
+        </span>
+      </button>
+      <div class="part-card-body">
+        <div class="language-grid">
+          ${visibleLanguageOrder.map(lang => renderLanguageSection(page, tutorialsByLanguage.get(lang), lang)).join('')}
+        </div>
+      </div>
+    </article>`;
+}
+
 function renderLibrary() {
   const container = document.getElementById('libraryFolders');
   const summary = document.getElementById('resultsSummary');
 
-  const totalPages = foldersData.folders.reduce((s, f) => s + f.pages.length, 0);
   const generated = tutorials.filter(t => normalizeStatus(t.status) === 'up-to-date').length;
 
   if (!foldersData.folders.length) {
@@ -126,17 +298,24 @@ function renderLibrary() {
   }
 
   let visiblePages = 0;
+  let visibleRows = 0;
+  const visiblePartKeys = [];
 
   container.innerHTML = foldersData.folders.map(folder => {
     const isCollapsed = collapsedFolders.has(folder.id);
 
-    const pageRows = folder.pages.map(page => {
-      const tutorial = urlToTutorial.get(page.url);
-      return { page, tutorial };
-    }).filter(({ page, tutorial }) => rowMatchesFilters(page, tutorial, folder));
+    const pageCards = folder.pages.map(page => {
+      const pageTutorials = urlToTutorials.get(page.url) || [];
+      const matchingTutorials = pageTutorials.filter(tutorial => rowMatchesFilters(page, tutorial, folder));
+      if (!matchingTutorials.length) return null;
+      const key = getPartKey(folder, page);
+      visiblePartKeys.push(key);
+      return { key, page, tutorials: matchingTutorials };
+    }).filter(Boolean);
 
-    if (!pageRows.length) return '';
-    visiblePages += pageRows.length;
+    if (!pageCards.length) return '';
+    visiblePages += pageCards.length;
+    visibleRows += pageCards.reduce((count, card) => count + card.tutorials.length, 0);
 
     return `
       <div class="folder-group${isCollapsed ? ' collapsed' : ''}">
@@ -145,56 +324,23 @@ function renderLibrary() {
             <svg class="folder-chevron" width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <svg class="folder-icon" width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <span class="folder-name">${esc(folder.name)}</span>
-            <span class="folder-count">${pageRows.length} tutorial${pageRows.length !== 1 ? 's' : ''}</span>
+            <span class="folder-count">${pageCards.length} part${pageCards.length !== 1 ? 's' : ''}</span>
           </div>
         </div>
         <div class="folder-pages">
-          ${pageRows.map(({ page, tutorial }) => {
-            const status = tutorial ? statusMeta(tutorial.status) : statusMeta('pending');
-            const title = page.label || 'Untitled';
-            const language = tutorial?.language ? tutorial.language.toUpperCase() : '-';
-            const lastGenerated = tutorial ? formatDate(tutorial.lastGeneratedAt || tutorial.lastUpdatedAt, true) : '-';
-            const isProcessing = tutorial && (normalizeStatus(tutorial.status) === 'processing' || normalizeStatus(tutorial.status) === 'queued');
-
-            return `
-              <article class="lib-item">
-                <div class="lib-item-main">
-                  <span class="mini-icon">${esc(title.charAt(0).toUpperCase())}</span>
-                  <div class="lib-item-info">
-                    <strong>${esc(title)}</strong>
-                    <div class="lib-item-meta">
-                      ${status.className !== 'up-to-date' ? `<span class="badge ${status.className}">${status.label}</span>` : ''}
-                      <span class="pill">${esc(language)}</span>
-                      <span class="lib-date">${lastGenerated}</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="lib-item-links">
-                  ${linkHtml(page.url, 'Confluence', 'text-link sm')}
-                  ${linkHtml(tutorial?.gammaUrl, 'Gamma', 'text-link sm')}
-                  ${linkHtml(tutorial?.sharepointUrl, 'PDF', 'text-link sm')}
-                </div>
-                <div class="row-actions">
-                  ${tutorial ? `
-                    <button class="icon-btn" onclick="showHistory('${tutorial.id}')" title="View generation history">
-                      <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v6h6M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                    </button>
-                    <button class="icon-btn" onclick="regenerateTutorial('${tutorial.id}')" ${isProcessing ? 'disabled' : ''} title="Regenerate tutorial">
-                      <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M23 4v6h-6M20.5 15A9 9 0 1 1 18 5.7L23 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                    </button>
-                    <button class="icon-btn danger" onclick="deleteTutorial('${tutorial.id}')" ${isProcessing ? 'disabled' : ''} title="Delete from library">
-                      <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                    </button>
-                  ` : ''}
-                </div>
-              </article>`;
-          }).join('')}
+          ${pageCards.map(card => renderPartCard(card, expandedPartId === card.key)).join('')}
         </div>
       </div>`;
   }).join('');
 
-  summary.textContent = `${visiblePages} pages · ${generated} generated`;
-  updateExportButton(visiblePages);
+  if (visiblePartKeys.length && (expandedPartId === null || (expandedPartId && !visiblePartKeys.includes(expandedPartId)))) {
+    expandedPartId = visiblePartKeys[0];
+    renderLibrary();
+    return;
+  }
+
+  summary.textContent = `${visiblePages} parts · ${visibleRows} presentation${visibleRows !== 1 ? 's' : ''} · ${generated} generated`;
+  updateExportButton(visibleRows);
 }
 
 function updateExportButton(visibleCount) {
@@ -211,6 +357,11 @@ function toggleLibFolder(folderId) {
   renderLibrary();
 }
 
+function togglePartCard(partId) {
+  expandedPartId = expandedPartId === partId ? '' : partId;
+  renderLibrary();
+}
+
 async function deleteTutorial(id) {
   const tutorial = tutorials.find(item => item.id === id);
   if (!tutorial) return;
@@ -220,37 +371,6 @@ async function deleteTutorial(id) {
 
   await fetch(`/api/tutorials/${id}`, { method: 'DELETE' });
   await loadTutorials();
-}
-
-async function regenerateTutorial(id) {
-  const tutorial = tutorials.find(item => item.id === id);
-  if (!tutorial) return;
-
-  tutorial.status = 'running';
-  renderLibrary();
-
-  try {
-    const response = await fetch(`/api/tutorials/${id}/regenerate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ language: tutorial.language || 'he', linkType: 'regular' }),
-    });
-
-    const reader = response.body.getReader();
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer = parseServerSentEvents(buffer, value, message => {
-        if (message.status === 'done' || message.status === 'error') {
-          loadTutorials();
-        }
-      });
-    }
-  } catch {
-    await loadTutorials();
-  }
 }
 
 function showHistory(id) {

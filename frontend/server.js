@@ -143,6 +143,44 @@ function saveTutorials(t) {
   fs.writeFileSync(TUTORIALS_FILE, JSON.stringify(t, null, 2));
 }
 
+/**
+ * Detect records whose language was incorrectly overwritten by a previous
+ * batch run (old code looked up by URL only).  A corrupted record has
+ * language:"en" but was never actually completed in English — its gammaUrl
+ * still points to the Hebrew presentation.  Fix by resetting language to
+ * the language of the most recent "done" history entry.
+ */
+function migrateCorrruptedLanguageRecords() {
+  const list = loadTutorials();
+  let changed = false;
+
+  for (const t of list) {
+    if (!t.language || t.language === 'he') continue;
+    if (!t.gammaUrl) continue;
+
+    const history = Array.isArray(t.history) ? t.history : [];
+    const hasDoneInCurrentLang = history.some(
+      h => h.status === 'done' && h.language === t.language && h.gammaUrl
+    );
+    if (hasDoneInCurrentLang) continue;
+
+    const lastDone = history.find(h => h.status === 'done' && h.gammaUrl);
+    const originalLang = lastDone?.language || 'he';
+
+    if (originalLang !== t.language) {
+      console.log(
+        `[migration] Fixing corrupted record "${t.label}" (${t.id}): ` +
+        `language "${t.language}" → "${originalLang}"`
+      );
+      t.language = originalLang;
+      t.status = 'done';
+      changed = true;
+    }
+  }
+
+  if (changed) saveTutorials(list);
+}
+
 /* ── Extract Gamma / SharePoint URLs from pipeline output ── */
 function extractGeneratedUrls(result) {
   if (result?.gamma_url || result?.sharepoint_url) {
@@ -166,6 +204,29 @@ function extractGeneratedUrls(result) {
   };
 }
 
+/* ── Handle stopped/cancelled tutorial ── */
+function handleStoppedTutorial(url, updates) {
+  const list = loadTutorials();
+  const lang = updates.language || null;
+  const existing = list.find(t => t.url === url && t.language === lang);
+
+  if (!existing) return;
+
+  const wasPreviouslyGenerated = existing.gammaUrl || existing.sharepointUrl;
+
+  if (wasPreviouslyGenerated) {
+    const history = Array.isArray(existing.history) ? existing.history : [];
+    existing.history = [
+      historyEntry('stopped', updates),
+      ...history,
+    ].slice(0, 25);
+    existing.lastUpdatedAt = new Date().toISOString();
+    saveTutorials(list);
+  } else {
+    saveTutorials(list.filter(t => !(t.url === url && t.language === lang)));
+  }
+}
+
 /* ── Create or update a tutorial record by URL ── */
 function historyEntry(status, updates) {
   return {
@@ -181,7 +242,27 @@ function historyEntry(status, updates) {
 
 function upsertTutorial(url, updates, options = {}) {
   const list = loadTutorials();
-  const existing = list.find(t => t.url === url);
+  const lang = updates.language || null;
+  let existing = list.find(t => t.url === url && t.language === lang);
+
+  // Safeguard: if the found record has a gammaUrl but was never completed in
+  // this language, it's a corrupted record.  Restore its original language and
+  // treat it as "not found" so a fresh record is created for the new language.
+  if (existing && existing.gammaUrl && lang) {
+    const history = Array.isArray(existing.history) ? existing.history : [];
+    const everDoneInLang = history.some(
+      h => h.status === 'done' && h.language === lang && h.gammaUrl
+    );
+    if (!everDoneInLang) {
+      const lastDone = history.find(h => h.status === 'done' && h.gammaUrl);
+      if (lastDone && lastDone.language && lastDone.language !== lang) {
+        existing.language = lastDone.language;
+        existing.status = 'done';
+        existing = null; // force creation of a new record for the target language
+      }
+    }
+  }
+
   const now = new Date().toISOString();
   if (existing) {
     const history = Array.isArray(existing.history) ? existing.history : [];
@@ -465,11 +546,7 @@ async function executeRun(runId, runItems, language) {
 
     if (run.controller.signal.aborted) {
       run.itemStates.set(url, { status: 'stopped', error: 'Generation stopped by user' });
-      upsertTutorial(url, {
-        status: 'pending',
-        language,
-        error: 'Generation stopped by user',
-      }, { appendHistory: true });
+      handleStoppedTutorial(url, { language, sessionId: null, error: 'Generation stopped by user' });
       run.emitter.emit('event', { url, status: 'stopped', error: 'Generation stopped by user' });
       continue;
     }
@@ -502,12 +579,7 @@ async function executeRun(runId, runItems, language) {
     } catch (err) {
       if (sessionController.signal.aborted || err.name === 'AbortError') {
         run.itemStates.set(url, { status: 'stopped', sessionId, error: 'Generation stopped by user' });
-        upsertTutorial(url, {
-          status: 'pending',
-          language,
-          sessionId,
-          error: 'Generation stopped by user',
-        }, { appendHistory: true });
+        handleStoppedTutorial(url, { language, sessionId, error: 'Generation stopped by user' });
         run.emitter.emit('event', { url, status: 'stopped', sessionId, linkType: itemLinkType, error: 'Generation stopped by user' });
         continue;
       }
@@ -556,12 +628,7 @@ async function executeRegenerate(runId, tutorialUrl, language, linkType) {
   } catch (err) {
     if (sessionController.signal.aborted || err.name === 'AbortError') {
       run.itemStates.set(tutorialUrl, { status: 'stopped', sessionId, error: 'Generation stopped by user' });
-      upsertTutorial(tutorialUrl, {
-        status: 'pending',
-        language,
-        sessionId,
-        error: 'Generation stopped by user',
-      }, { appendHistory: true });
+      handleStoppedTutorial(tutorialUrl, { language, sessionId, error: 'Generation stopped by user' });
       run.emitter.emit('event', { status: 'stopped', sessionId, error: 'Generation stopped by user' });
     } else {
       run.itemStates.set(tutorialUrl, { status: 'error', sessionId, error: err.message });
@@ -730,6 +797,8 @@ app.post('/api/tutorials/:id/regenerate', (req, res) => {
 app.get('/generate', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'generate.html'));
 });
+
+migrateCorrruptedLanguageRecords();
 
 app.listen(PORT, () => {
   console.log(`Running at http://localhost:${PORT}`);
