@@ -50,4 +50,20 @@ IMGBB_API_KEY = os.getenv("IMGBB_API_KEY", "")
 
 SCREENSHOT_DIR = os.getenv("SCREENSHOT_DIR", str(Path.home() / ".langflow" / "data"))
 
+VIDEO_DIR = os.getenv("VIDEO_DIR", str(Path.home() / ".langflow" / "videos"))
+VIDEO_PROJECT_DIR = os.getenv(
+    "VIDEO_PROJECT_DIR",
+    str(Path(__file__).resolve().parent.parent / "video"),
+)
+JEEN_VIDEOS_DIR = os.getenv(
+    "JEEN_VIDEOS_DIR",
+    str(Path(__file__).resolve().parent.parent / "JeenVideos"),
+)
+
 BACKEND_PORT = int(os.getenv("BACKEND_PORT", "8000"))
+
+# TTS — ElevenLabs (primary) or Azure Speech (fallback). Leave blank to skip audio.
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
+ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "EXAVITQu4vr4xnSDxMaL")  # Sarah
+AZURE_SPEECH_KEY = os.getenv("AZURE_SPEECH_KEY", "")
+AZURE_SPEECH_REGION = os.getenv("AZURE_SPEECH_REGION", "swedencentral")

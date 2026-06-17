@@ -49,6 +49,8 @@ function normalizeRunItems({ items, urls, linkType }) {
         return {
           url,
           linkType: normalizeLinkType(derivedLinkType),
+          folderName: item.folderName || '',
+          label: item.label || '',
         };
       })
       .filter(Boolean);
@@ -58,7 +60,7 @@ function normalizeRunItems({ items, urls, linkType }) {
     return urls
       .map(url => (typeof url === 'string' ? url.trim() : ''))
       .filter(Boolean)
-      .map(url => ({ url, linkType: normalizeLinkType(linkType) }));
+      .map(url => ({ url, linkType: normalizeLinkType(linkType), folderName: '', label: '' }));
   }
 
   return [];
@@ -129,7 +131,7 @@ function loadUrlsFlat() {
   const flat = [];
   for (const folder of data.folders) {
     for (const page of folder.pages) {
-      flat.push({ url: page.url, label: page.label, addedAt: page.addedAt });
+      flat.push({ url: page.url, label: page.label, folderName: folder.name, addedAt: page.addedAt });
     }
   }
   return flat;
@@ -183,10 +185,11 @@ function migrateCorrruptedLanguageRecords() {
 
 /* ── Extract Gamma / SharePoint URLs from pipeline output ── */
 function extractGeneratedUrls(result) {
-  if (result?.gamma_url || result?.sharepoint_url) {
+  if (result?.gamma_url || result?.sharepoint_url || result?.video_url) {
     return {
       gammaUrl:      result.gamma_url || null,
       sharepointUrl: result.sharepoint_url || null,
+      videoUrl:      result.video_url || null,
     };
   }
 
@@ -201,6 +204,7 @@ function extractGeneratedUrls(result) {
   return {
     gammaUrl:      gammaMatch ? gammaMatch[0].replace(/[.,;]+$/, '') : null,
     sharepointUrl: spMatch    ? spMatch[0].replace(/[.,;]+$/, '')    : null,
+    videoUrl:      null,
   };
 }
 
@@ -236,6 +240,7 @@ function historyEntry(status, updates) {
     sessionId: updates.sessionId || null,
     gammaUrl: updates.gammaUrl || null,
     sharepointUrl: updates.sharepointUrl || null,
+    videoUrl: updates.videoUrl || null,
     error: updates.error || null,
   };
 }
@@ -283,6 +288,7 @@ function upsertTutorial(url, updates, options = {}) {
       sessionId:     updates.sessionId || null,
       gammaUrl:      null,
       sharepointUrl: null,
+      videoUrl:      null,
       createdAt:     now,
       lastUpdatedAt: now,
       lastGeneratedAt: null,
@@ -298,12 +304,13 @@ function upsertTutorial(url, updates, options = {}) {
   saveTutorials(list);
 }
 
-/* ── Python backend call ── */
+/* ── Python backend calls ── */
 const http = require('http');
 const PYTHON_BACKEND_URL = process.env.PYTHON_BACKEND_URL || 'http://localhost:8000';
 const PIPELINE_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
+const VIDEO_PIPELINE_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes (recording + render)
 
-function runPipeline(url, language, linkType, signal, sessionId) {
+function runPipeline(url, language, linkType, signal, sessionId, folderName = '', label = '') {
   return new Promise((resolve, reject) => {
     if (signal?.aborted) return reject(new DOMException('Aborted', 'AbortError'));
 
@@ -313,6 +320,8 @@ function runPipeline(url, language, linkType, signal, sessionId) {
       language,
       link_type: linkType,
       session_id: sessionId,
+      folder_name: folderName,
+      part_name: label,
     });
 
     const req = http.request(
@@ -361,6 +370,194 @@ function runPipeline(url, language, linkType, signal, sessionId) {
     req.end();
   });
 }
+
+/**
+ * Stream the video pipeline SSE endpoint, logging each stage and calling
+ * onStageEvent(event) for live UI updates. Resolves with the final event data.
+ */
+function runVideoPipelineStream(url, language, linkType, signal, sessionId, onStageEvent, folderName = '', label = '') {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) return reject(new DOMException('Aborted', 'AbortError'));
+
+    const parsed = new URL(`${PYTHON_BACKEND_URL}/api/generate-video/stream`);
+    const body = JSON.stringify({
+      confluence_url: url,
+      language,
+      link_type: linkType,
+      session_id: sessionId,
+      folder_name: folderName,
+      part_name: label,
+    });
+
+    console.log(`[video] ▶ start  session=${sessionId}  url=${url}`);
+
+    const req = http.request(
+      {
+        hostname: parsed.hostname,
+        port: parsed.port,
+        path: parsed.pathname,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(body),
+        },
+        timeout: VIDEO_PIPELINE_TIMEOUT_MS,
+      },
+      (res) => {
+        if (res.statusCode >= 400) {
+          const errChunks = [];
+          res.on('data', c => errChunks.push(c));
+          res.on('end', () =>
+            reject(new Error(`Video pipeline HTTP ${res.statusCode}: ${Buffer.concat(errChunks).toString().slice(0, 300)}`))
+          );
+          return;
+        }
+
+        let sseBuffer = '';
+        let finalEvent = null;
+
+        res.on('data', (chunk) => {
+          sseBuffer += chunk.toString();
+          const lines = sseBuffer.split('\n');
+          sseBuffer = lines.pop(); // keep the incomplete trailing line
+
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            try {
+              const event = JSON.parse(line.slice(6));
+              const ts = new Date().toISOString().slice(11, 23);
+              console.log(`[video] [${ts}] ${event.stage || '?'} ${event.status} — ${event.detail || ''}`);
+              onStageEvent?.(event);
+              if (event.stage === 'complete') finalEvent = event;
+            } catch { /* ignore malformed lines */ }
+          }
+        });
+
+        res.on('end', () => {
+          if (finalEvent) {
+            console.log(`[video] ✓ done  session=${sessionId}  video_url=${finalEvent.video_url || 'none'}`);
+            resolve(finalEvent);
+          } else {
+            reject(new Error('Video stream ended without a complete event'));
+          }
+        });
+      },
+    );
+
+    req.on('error', (err) => {
+      console.error(`[video] ✗ request error  session=${sessionId}:`, err.message);
+      reject(err);
+    });
+    req.on('timeout', () => {
+      req.destroy();
+      console.error(`[video] ✗ timed out  session=${sessionId}`);
+      reject(new Error('Video pipeline timed out'));
+    });
+
+    const onAbort = () => { req.destroy(); reject(new DOMException('Aborted', 'AbortError')); };
+    signal?.addEventListener('abort', onAbort, { once: true });
+    req.on('close', () => signal?.removeEventListener('abort', onAbort));
+
+    req.write(body);
+    req.end();
+  });
+}
+
+/** Sync (blocking) variant — used by fire-and-forget paths that don't need stage events. */
+function runVideoPipeline(url, language, linkType, signal, sessionId, folderName = '', label = '') {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) return reject(new DOMException('Aborted', 'AbortError'));
+
+    const parsed = new URL(`${PYTHON_BACKEND_URL}/api/generate-video/sync`);
+    const body = JSON.stringify({
+      confluence_url: url,
+      language,
+      link_type: linkType,
+      session_id: sessionId,
+      folder_name: folderName,
+      part_name: label,
+    });
+
+    console.log(`[video-sync] ▶ start  session=${sessionId}  url=${url}`);
+
+    const req = http.request(
+      {
+        hostname: parsed.hostname,
+        port: parsed.port,
+        path: parsed.pathname,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(body),
+        },
+        timeout: VIDEO_PIPELINE_TIMEOUT_MS,
+      },
+      (res) => {
+        const chunks = [];
+        res.on('data', (chunk) => chunks.push(chunk));
+        res.on('end', () => {
+          const raw = Buffer.concat(chunks).toString();
+          if (res.statusCode >= 400) {
+            console.error(`[video-sync] ✗ HTTP ${res.statusCode}  session=${sessionId}:`, raw.slice(0, 200));
+            return reject(new Error(`Video pipeline error: ${res.statusCode} - ${raw}`));
+          }
+          try {
+            const result = JSON.parse(raw);
+            console.log(`[video-sync] ✓ done  session=${sessionId}  video_url=${result?.video_url || 'none'}`);
+            resolve(result);
+          } catch {
+            reject(new Error(`Invalid JSON from video pipeline: ${raw.slice(0, 200)}`));
+          }
+        });
+      },
+    );
+
+    req.on('error', (err) => {
+      console.error(`[video-sync] ✗ request error  session=${sessionId}:`, err.message);
+      reject(err);
+    });
+    req.on('timeout', () => { req.destroy(); reject(new Error('Video pipeline timed out')); });
+
+    const onAbort = () => { req.destroy(); reject(new DOMException('Aborted', 'AbortError')); };
+    signal?.addEventListener('abort', onAbort, { once: true });
+    req.on('close', () => signal?.removeEventListener('abort', onAbort));
+
+    req.write(body);
+    req.end();
+  });
+}
+
+/* ── Trigger video generation for a single tutorial ── */
+app.post('/api/tutorials/:id/generate-video', async (req, res) => {
+  const list = loadTutorials();
+  const tutorial = list.find(t => t.id === req.params.id);
+  if (!tutorial) return res.status(404).json({ error: 'Tutorial not found' });
+
+  const url = tutorial.confluenceUrl || tutorial.url;
+  if (!url) return res.status(400).json({ error: 'Tutorial has no Confluence URL' });
+
+  const { language = tutorial.language || 'he', linkType = 'regular' } = req.body || {};
+  const sessionId = makeSessionId('video');
+
+  const flat = loadUrlsFlat();
+  const entry = flat.find(u => u.url === url);
+  const folderName = entry?.folderName || '';
+  const partName = tutorial.label || entry?.label || '';
+
+  // Mark as video-generating so the UI can show a spinner
+  upsertTutorial(url, { videoStatus: 'processing', language }, { appendHistory: false });
+  res.json({ started: true, sessionId });
+
+  // Run the video pipeline in the background (fire-and-forget from HTTP perspective)
+  runVideoPipeline(url, language, linkType, null, sessionId, folderName, partName)
+    .then((result) => {
+      const videoUrl = result?.video_url || null;
+      upsertTutorial(url, { videoStatus: 'done', videoUrl, language }, { appendHistory: false });
+    })
+    .catch((err) => {
+      upsertTutorial(url, { videoStatus: 'error', language }, { appendHistory: false });
+    });
+});
 
 /* ══════════════════════════════════════════════════
    Folder endpoints
@@ -563,8 +760,8 @@ async function executeRun(runId, runItems, language) {
     run.emitter.emit('event', { url, status: 'running', sessionId, linkType: itemLinkType });
 
     try {
-      const result = await runPipeline(url, language, itemLinkType, sessionController.signal, sessionId);
-      const { gammaUrl, sharepointUrl } = extractGeneratedUrls(result);
+      const result = await runPipeline(url, language, itemLinkType, sessionController.signal, sessionId, item.folderName || '', item.label || '');
+      const { gammaUrl, sharepointUrl, videoUrl } = extractGeneratedUrls(result);
       run.itemStates.set(url, { status: 'done', sessionId });
       upsertTutorial(url, {
         status: 'done',
@@ -572,6 +769,7 @@ async function executeRun(runId, runItems, language) {
         sessionId,
         gammaUrl,
         sharepointUrl,
+        videoUrl,
         lastGeneratedAt: new Date().toISOString(),
         error: null,
       }, { appendHistory: true });
@@ -613,7 +811,7 @@ async function executeRegenerate(runId, tutorialUrl, language, linkType) {
 
   try {
     const result = await runPipeline(tutorialUrl, language, linkType, sessionController.signal, sessionId);
-    const { gammaUrl, sharepointUrl } = extractGeneratedUrls(result);
+    const { gammaUrl, sharepointUrl, videoUrl } = extractGeneratedUrls(result);
     run.itemStates.set(tutorialUrl, { status: 'done', sessionId });
     upsertTutorial(tutorialUrl, {
       status: 'done',
@@ -621,10 +819,11 @@ async function executeRegenerate(runId, tutorialUrl, language, linkType) {
       sessionId,
       gammaUrl,
       sharepointUrl,
+      videoUrl,
       lastGeneratedAt: new Date().toISOString(),
       error: null,
     }, { appendHistory: true });
-    run.emitter.emit('event', { status: 'done', sessionId, gammaUrl, sharepointUrl });
+    run.emitter.emit('event', { status: 'done', sessionId, gammaUrl, sharepointUrl, videoUrl });
   } catch (err) {
     if (sessionController.signal.aborted || err.name === 'AbortError') {
       run.itemStates.set(tutorialUrl, { status: 'stopped', sessionId, error: 'Generation stopped by user' });
@@ -680,6 +879,114 @@ app.post('/api/run', (req, res) => {
   });
 
   executeRun(runId, runItems, language);
+});
+
+/* ══════════════════════════════════════════════════
+   Video generation — separate flow from presentations
+══════════════════════════════════════════════════ */
+const activeVideoRuns = new Map();
+
+async function executeVideoRun(runId, runItems, language) {
+  const run = activeVideoRuns.get(runId);
+  if (!run) return;
+
+  for (const item of runItems) {
+    if (run.controller.signal.aborted) {
+      run.emitter.emit('event', { url: item.url, status: 'error', error: 'Stopped by user' });
+      continue;
+    }
+
+    const { url, linkType: itemLinkType } = item;
+    const sessionId = makeSessionId('video-run');
+
+    run.emitter.emit('event', { url, status: 'running', sessionId });
+    console.log(`[video-run] ${runId} — starting item  url=${url}  session=${sessionId}`);
+
+    try {
+      const result = await runVideoPipelineStream(
+        url, language, itemLinkType, run.controller.signal, sessionId,
+        (stageEvent) => {
+          // Relay each pipeline stage to the frontend so it can show live progress
+          run.emitter.emit('event', {
+            url,
+            status: 'stage',
+            stage: stageEvent.stage,
+            stageStatus: stageEvent.status,
+            detail: stageEvent.detail,
+          });
+        },
+        item.folderName || '',
+        item.label || '',
+      );
+
+      const videoUrl = result?.video_url || null;
+
+      // Store videoUrl in the tutorial record (creates one if it doesn't exist yet)
+      upsertTutorial(url, {
+        status: 'done',
+        language,
+        sessionId,
+        videoUrl,
+        lastGeneratedAt: new Date().toISOString(),
+        error: null,
+      }, { appendHistory: false });
+
+      console.log(`[video-run] ${runId} — done  url=${url}  video_url=${videoUrl || 'none'}`);
+      run.emitter.emit('event', { url, status: 'done', sessionId, video_url: videoUrl });
+    } catch (err) {
+      if (run.controller.signal.aborted || err.name === 'AbortError') {
+        console.log(`[video-run] ${runId} — stopped by user  url=${url}`);
+        run.emitter.emit('event', { url, status: 'error', error: 'Stopped by user' });
+      } else {
+        console.error(`[video-run] ${runId} — error  url=${url}:`, err.message);
+        run.emitter.emit('event', { url, status: 'error', error: err.message });
+      }
+    }
+  }
+
+  console.log(`[video-run] ${runId} — all items complete`);
+  run.emitter.emit('event', { status: 'complete' });
+  activeVideoRuns.delete(runId);
+}
+
+app.post('/api/run-video', (req, res) => {
+  const { urls, items, language = 'he', linkType = 'regular' } = req.body;
+  const runItems = normalizeRunItems({ items, urls, linkType });
+  if (!runItems.length) return res.status(400).json({ error: 'No URLs provided' });
+
+  const runId = makeSessionId('video-run');
+  const emitter = new EventEmitter();
+  const run = {
+    runId,
+    emitter,
+    controller: new AbortController(),
+    items: runItems,
+    language,
+    startedAt: new Date().toISOString(),
+  };
+  activeVideoRuns.set(runId, run);
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.flushHeaders();
+
+  res.write(`data: ${JSON.stringify({ status: 'started', runId })}\n\n`);
+  subscribeSSE(res, emitter);
+
+  emitter.on('event', payload => {
+    if (payload.status === 'complete') {
+      if (!res.destroyed) { try { res.end(); } catch {} }
+    }
+  });
+
+  executeVideoRun(runId, runItems, language);
+});
+
+app.post('/api/video-runs/:runId/stop', (req, res) => {
+  const run = activeVideoRuns.get(req.params.runId);
+  if (!run) return res.status(404).json({ error: 'Video run not found or already completed' });
+  run.controller.abort();
+  res.json({ stopped: true, runId: req.params.runId });
 });
 
 /* ── Reconnect to an active run's event stream ── */

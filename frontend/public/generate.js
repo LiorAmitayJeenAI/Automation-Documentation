@@ -7,10 +7,17 @@ let collapsedFolders = new Set();
 let knownFolderIds = new Set();
 let rowIds = {};
 
+// Video generation state (independent from presentation run)
+let isVideoRunning = false;
+let currentVideoRunId = null;
+let videoRowIds = {};
+
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('addUrlBtn').addEventListener('click', addUrl);
   document.getElementById('runBtn').addEventListener('click', runSelected);
+  document.getElementById('runVideoBtn').addEventListener('click', runVideoSelected);
   document.getElementById('stopBtn').addEventListener('click', stopGeneration);
+  document.getElementById('stopVideoBtn').addEventListener('click', stopVideoGeneration);
   document.getElementById('selectAllBtn').addEventListener('click', toggleSelectAll);
   document.getElementById('newUrlBtn').addEventListener('click', openAddModal);
   document.getElementById('urlInput').addEventListener('keydown', e => { if (e.key === 'Enter') addUrl(); });
@@ -226,6 +233,8 @@ function toggleSelectAll() {
 function syncRunButton() {
   document.getElementById('runBtn').disabled = selected.size === 0 || isRunning;
   document.getElementById('stopBtn').classList.toggle('hidden', !isRunning);
+  document.getElementById('runVideoBtn').disabled = selected.size === 0 || isVideoRunning;
+  document.getElementById('stopVideoBtn').classList.toggle('hidden', !isVideoRunning);
 }
 
 /* ── Modal ── */
@@ -431,6 +440,7 @@ function getSelectedItems() {
         url: page.url,
         folderId: folder.id,
         folderName: folder.name,
+        label: page.label || '',
         linkType: getLinkTypeForFolder(folder.name),
       });
     }
@@ -608,4 +618,141 @@ function disableSessionStop(row) {
   if (!stopBtn) return;
   stopBtn.disabled = true;
   stopBtn.textContent = 'Stop';
+}
+
+/* ══════════════════════════════════════════════════
+   Video generation (separate flow)
+══════════════════════════════════════════════════ */
+
+async function runVideoSelected() {
+  const toRun = getSelectedItems();
+  if (!toRun.length || isVideoRunning) return;
+
+  const results = document.getElementById('results');
+  const notice = document.getElementById('successNotice');
+  videoRowIds = {};
+
+  notice.classList.remove('visible');
+  results.classList.add('visible');
+
+  // Append video rows after any existing rows (presentation run may be visible)
+  toRun.forEach((item, index) => {
+    const url = item.url;
+    const id = `video-result-${index}`;
+    videoRowIds[url] = id;
+    results.insertAdjacentHTML('beforeend', `
+      <div id="${id}" class="result-row running video-row">
+        <span class="result-dot"></span>
+        <span class="result-label video-tag">Video</span>
+        <span class="result-url" title="${esc(url)}">${esc(url)}</span>
+        <span class="result-msg">Pending...</span>
+      </div>`);
+  });
+
+  isVideoRunning = true;
+  syncRunButton();
+
+  try {
+    const response = await fetch('/api/run-video', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: toRun, language }),
+    });
+
+    const reader = response.body.getReader();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer = parseServerSentEvents(buffer, value, message => {
+        if (message.status === 'started' && message.runId) {
+          currentVideoRunId = message.runId;
+          return;
+        }
+        handleVideoRunMessage(message);
+      });
+    }
+
+    finishVideoRun();
+  } catch (error) {
+    results.insertAdjacentHTML('beforeend', `
+      <div class="result-row error">
+        <span class="result-dot"></span>
+        <span class="result-label video-tag">Video</span>
+        <span class="result-url">Video generation failed</span>
+        <span class="result-msg">${esc(error.message)}</span>
+      </div>`);
+    isVideoRunning = false;
+    currentVideoRunId = null;
+    syncRunButton();
+  }
+}
+
+const VIDEO_STAGE_LABELS = {
+  confluence: 'Fetching Confluence…',
+  script:     'Generating video script…',
+  record:     'Recording browser session…',
+  render:     'Rendering MP4…',
+  upload:     'Uploading to SharePoint…',
+  complete:   'Done',
+};
+
+function handleVideoRunMessage(message) {
+  if (message.status === 'snapshot' || message.status === 'started') return;
+
+  if (message.status === 'complete') {
+    finishVideoRun();
+    return;
+  }
+
+  const row = document.getElementById(videoRowIds[message.url]);
+  if (!row) return;
+  const msgEl = row.querySelector('.result-msg');
+
+  if (message.status === 'running') {
+    row.className = 'result-row running video-row';
+    msgEl.textContent = 'Starting…';
+  }
+
+  if (message.status === 'stage') {
+    row.className = 'result-row running video-row';
+    const label = VIDEO_STAGE_LABELS[message.stage] || message.detail || 'Processing…';
+    const detail = message.detail && message.detail !== label ? ` — ${message.detail}` : '';
+    msgEl.textContent = label + detail;
+    console.log(`[video] stage=${message.stage} (${message.stageStatus}) ${message.detail || ''}`);
+  }
+
+  if (message.status === 'done') {
+    row.className = 'result-row done video-row';
+    msgEl.textContent = message.video_url ? 'Done — Video ready' : 'Done';
+    if (message.video_url) {
+      row.insertAdjacentHTML('beforeend',
+        `<a class="text-link" href="${esc(message.video_url)}" target="_blank" rel="noopener">Open Video</a>`
+      );
+    }
+  }
+
+  if (message.status === 'error') {
+    row.className = 'result-row error video-row';
+    msgEl.textContent = message.error || 'Failed';
+    console.error('[video] error:', message.error);
+  }
+}
+
+function finishVideoRun() {
+  if (!isVideoRunning) return;
+  const notice = document.getElementById('successNotice');
+  const hasSuccess = document.querySelectorAll('.video-row.done').length > 0;
+  if (hasSuccess) notice.classList.add('visible');
+  isVideoRunning = false;
+  currentVideoRunId = null;
+  syncRunButton();
+}
+
+async function stopVideoGeneration() {
+  if (!currentVideoRunId) return;
+  try {
+    await fetch(`/api/video-runs/${encodeURIComponent(currentVideoRunId)}/stop`, { method: 'POST' });
+  } catch {}
 }

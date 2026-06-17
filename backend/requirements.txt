@@ -6,3 +6,4 @@ playwright
 python-dotenv
 sse-starlette
 markdownify
+mutagen

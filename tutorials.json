@@ -640,7 +640,7 @@
     "gammaUrl": "https://gamma.app/docs/4v7nlds4k8hmxf3",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383025178-Part-2-Spark-Agent.pdf",
     "createdAt": "2026-06-15T09:18:37.733Z",
-    "lastUpdatedAt": "2026-06-15T09:24:20.938Z",
+    "lastUpdatedAt": "2026-06-16T08:03:46.069Z",
     "lastGeneratedAt": "2026-06-15T09:24:20.935Z",
     "error": null,
     "history": [
@@ -662,7 +662,9 @@
         "sharepointUrl": null,
         "error": null
       }
-    ]
+    ],
+    "videoStatus": "done",
+    "videoUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/video-1781596738122-oyhxdj.mp4"
   },
   {
     "id": "mqf03qg27buie",
@@ -675,7 +677,7 @@
     "gammaUrl": "https://gamma.app/docs/2or6bmvsbrgpcyn",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/384073731-Part-1-Agent-Introduction.pdf",
     "createdAt": "2026-06-15T09:18:37.726Z",
-    "lastUpdatedAt": "2026-06-15T09:21:27.173Z",
+    "lastUpdatedAt": "2026-06-16T13:32:50.099Z",
     "lastGeneratedAt": "2026-06-15T09:21:27.170Z",
     "error": null,
     "history": [
@@ -697,7 +699,8 @@
         "sharepointUrl": null,
         "error": null
       }
-    ]
+    ],
+    "videoStatus": "error"
   },
   {
     "id": "mqezp2lx37q02",
@@ -1772,7 +1775,7 @@
     "gammaUrl": "https://gamma.app/docs/7uljnmbtc1f04qi",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383025178-2-Spark-Agent.pdf",
     "createdAt": "2026-06-14T14:28:50.173Z",
-    "lastUpdatedAt": "2026-06-14T14:32:25.247Z",
+    "lastUpdatedAt": "2026-06-16T12:58:00.762Z",
     "lastGeneratedAt": "2026-06-14T14:32:25.246Z",
     "error": null,
     "history": [
@@ -1794,7 +1797,9 @@
         "sharepointUrl": null,
         "error": null
       }
-    ]
+    ],
+    "videoStatus": "done",
+    "videoUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/video-1781614377046-iuamyo.mp4"
   },
   {
     "id": "mqdvkohoc30i3",
@@ -1803,12 +1808,12 @@
     "label": "Part 1 - Agent Introduction",
     "status": "done",
     "language": "he",
-    "sessionId": "tutorial-run-1781447044096-89gu01",
+    "sessionId": "video-run-1781591377023-vga26a",
     "gammaUrl": "https://gamma.app/docs/jt8o791nn2ag0r6",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/384073731-1.pdf",
     "createdAt": "2026-06-14T14:24:04.089Z",
-    "lastUpdatedAt": "2026-06-14T14:27:03.972Z",
-    "lastGeneratedAt": "2026-06-14T14:27:03.971Z",
+    "lastUpdatedAt": "2026-06-16T14:00:56.898Z",
+    "lastGeneratedAt": "2026-06-16T06:34:46.926Z",
     "error": null,
     "history": [
       {
@@ -1829,7 +1834,9 @@
         "sharepointUrl": null,
         "error": null
       }
-    ]
+    ],
+    "videoUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/Agent_Part_1_-_Agent_Introduction.mp4",
+    "videoStatus": "done"
   },
   {
     "id": "mqdtmz5ilc6y7",
@@ -1996,13 +2003,13 @@
     "label": "Part 7 - Triggers (Scheduler)",
     "status": "done",
     "language": "he",
-    "sessionId": "tutorial-run-1781512431914-ds1xuq",
+    "sessionId": "video-run-1781600527779-x6wb0t",
     "gammaUrl": "https://gamma.app/docs/atln9tsfs5y2sen",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383189061-7-Scheduler.pdf",
     "createdAt": "2026-06-14T13:22:50.680Z",
-    "lastUpdatedAt": "2026-06-15T08:33:52.444Z",
-    "lastGeneratedAt": "2026-06-14T13:26:48.790Z",
-    "error": "Generation stopped by user",
+    "lastUpdatedAt": "2026-06-17T06:31:54.939Z",
+    "lastGeneratedAt": "2026-06-16T09:06:09.340Z",
+    "error": null,
     "history": [
       {
         "status": "pending",
@@ -2040,7 +2047,9 @@
         "sharepointUrl": null,
         "error": null
       }
-    ]
+    ],
+    "videoUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/Workspace_Part_7_-_Triggers__Scheduler.mp4",
+    "videoStatus": "done"
   },
   {
     "id": "mqdqvy95ucfc3",
@@ -2102,14 +2111,52 @@
     "label": "Part 4 - Chat Workspace Overview",
     "status": "done",
     "language": "he",
-    "sessionId": "tutorial-run-1781512430577-5z2lim",
-    "gammaUrl": "https://gamma.app/docs/vk6jbkyxd5zq2os",
+    "sessionId": "tutorial-run-1781596774837-4hppfc",
+    "gammaUrl": "https://gamma.app/docs/2jl34ftvoq55kfz",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/382468185-4.pdf",
     "createdAt": "2026-06-14T12:08:13.954Z",
-    "lastUpdatedAt": "2026-06-15T08:33:50.996Z",
-    "lastGeneratedAt": "2026-06-14T12:12:51.873Z",
-    "error": "Generation stopped by user",
+    "lastUpdatedAt": "2026-06-16T08:03:53.683Z",
+    "lastGeneratedAt": "2026-06-16T08:03:53.681Z",
+    "error": null,
     "history": [
+      {
+        "status": "done",
+        "timestamp": "2026-06-16T08:03:53.683Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781596774837-4hppfc",
+        "gammaUrl": "https://gamma.app/docs/2jl34ftvoq55kfz",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/382468185-4.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-16T07:59:34.838Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781596774837-4hppfc",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "error",
+        "timestamp": "2026-06-16T06:04:40.539Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781589739951-wc9wi8",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "error": "Pipeline error: 500 Internal Server Error - {\"error\":\"Error code: 400 - {'error': {'message': \\\"Unsupported value: 'temperature' does not support 0.5 with this model. Only the default (1) value is supported.\\\", 'type': 'invalid_request_error', 'param': 'temperature', 'code': 'unsupported_value'}}\"}"
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-16T06:02:19.952Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781589739951-wc9wi8",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "error": null
+      },
       {
         "status": "pending",
         "timestamp": "2026-06-15T08:33:50.996Z",
@@ -2146,7 +2193,8 @@
         "sharepointUrl": null,
         "error": null
       }
-    ]
+    ],
+    "videoUrl": null
   },
   {
     "id": "mqdqpzswmimvd",

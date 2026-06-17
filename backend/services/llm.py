@@ -22,6 +22,8 @@ from backend.config import (
     AZURE_OPENAI_API_VERSION,
 )
 from backend.prompts.document_formatter import DOCUMENT_FORMATTER_PROMPT
+from backend.prompts.narration import NARRATION_PROMPT
+from backend.prompts.video_script import VIDEO_SCRIPT_PROMPT
 
 logger = logging.getLogger(__name__)
 
@@ -187,6 +189,111 @@ async def format_document(
         parsed["screenshot_script"] = []
 
     return parsed
+
+
+async def generate_video_script(
+    markdown_content: str,
+    language: str = "he",
+    base_url: str = "https://jeenai.app",
+    link_type: str = "regular",
+) -> list[dict]:
+    """
+    Generate a comprehensive video recording script from Confluence markdown.
+
+    Returns a list of step dicts, each with:
+      url, action, narration (Hebrew), interactions (optional), settle_ms
+    """
+    allowed_routes = _format_allowed_routes(_load_allowed_routes(link_type), base_url)
+    system_prompt = VIDEO_SCRIPT_PROMPT.format(allowed_routes=allowed_routes)
+
+    response = await _client.chat.completions.create(
+        model=AZURE_OPENAI_DEPLOYMENT,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": markdown_content},
+        ],
+        max_completion_tokens=8000,
+    )
+
+    raw = response.choices[0].message.content or ""
+    logger.info("Video script LLM response: %d chars", len(raw))
+    cleaned = _strip_code_fences(raw)
+
+    try:
+        parsed = json.loads(cleaned)
+    except json.JSONDecodeError as exc:
+        match = re.search(r'\{[\s\S]*\}', cleaned)
+        if match:
+            parsed = json.loads(match.group(0))
+        else:
+            raise ValueError(f"Video script LLM returned invalid JSON: {raw[:200]}") from exc
+
+    steps = parsed.get("video_script", [])
+    if not isinstance(steps, list):
+        raise ValueError(f"Expected list under 'video_script', got {type(steps)}")
+
+    return steps
+
+
+async def generate_narration(
+    screenshot_results: list[dict],
+    presentation_content: str = "",
+    language: str = "he",
+) -> list[dict]:
+    """
+    Generate Hebrew (or English) narration for each real screenshot taken by Playwright.
+
+    Receives the actual screenshot_results list (from take_screenshots) — each dict has
+    at minimum 'path', 'action', and 'slide_section'. Returns the same list with a
+    'narration' key added to every item. Narration is grounded strictly in the 'action'
+    and 'slide_section' fields; the LLM is instructed not to invent any UI detail that
+    isn't explicitly mentioned there.
+    """
+    if not screenshot_results:
+        return screenshot_results
+
+    input_data = [
+        {"action": r.get("action", ""), "slide_section": r.get("slide_section", "")}
+        for r in screenshot_results
+    ]
+
+    user_message = json.dumps(input_data, ensure_ascii=False)
+    if presentation_content:
+        # Provide limited context so the narration is coherent, but the LLM
+        # is told not to extrapolate beyond the action/slide_section fields.
+        user_message = (
+            f"Document context (for tone only — do not add features not in action):\n"
+            f"{presentation_content[:2000]}\n\n"
+            f"Screenshots:\n{user_message}"
+        )
+
+    response = await _client.chat.completions.create(
+        model=AZURE_OPENAI_DEPLOYMENT,
+        messages=[
+            {"role": "system", "content": NARRATION_PROMPT},
+            {"role": "user", "content": user_message},
+        ],
+        max_completion_tokens=4000,
+    )
+
+    raw = response.choices[0].message.content or ""
+    logger.info("Narration LLM response length: %d chars", len(raw))
+    cleaned = _strip_code_fences(raw)
+
+    try:
+        narrations = json.loads(cleaned)
+        if not isinstance(narrations, list):
+            raise ValueError("Expected JSON array")
+    except (json.JSONDecodeError, ValueError) as exc:
+        logger.error("Failed to parse narration JSON: %s | raw: %s", exc, raw[:300])
+        # Fallback: use the action text as the narration
+        narrations = [r.get("action", "") for r in screenshot_results]
+
+    # Guard against mismatched lengths
+    while len(narrations) < len(screenshot_results):
+        narrations.append(screenshot_results[len(narrations)].get("action", ""))
+
+    return [{**r, "narration": str(narrations[i])} for i, r in enumerate(screenshot_results)]
 
 
 def extract_title(markdown_content: str) -> str:

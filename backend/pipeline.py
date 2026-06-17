@@ -56,6 +56,8 @@ async def run_pipeline(
     language: str = "he",
     link_type: str = "regular",
     session_id: str = "default_session",
+    folder_name: str = "",
+    part_name: str = "",
 ) -> AsyncGenerator[PipelineEvent, None]:
     """
     Run the full documentation automation pipeline, yielding progress events.
@@ -104,12 +106,17 @@ async def run_pipeline(
 
     # ── Branch B: Screenshots ──
     image_list: list[dict] = []
+    screenshot_results: list[dict] = []
     images_publicly_accessible = False
     if screenshot_script:
         yield PipelineEvent("screenshots", "running", f"Taking {len(screenshot_script)} screenshots...")
         try:
             screenshot_results = await screenshots.take_screenshots(
-                screenshot_script, base_url=base_url, link_type=link_type,
+                screenshot_script,
+                base_url=base_url,
+                link_type=link_type,
+                folder_name=folder_name,
+                part_name=part_name,
             )
             saved_paths = [r["path"] for r in screenshot_results]
             yield PipelineEvent(

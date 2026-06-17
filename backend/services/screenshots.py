@@ -57,6 +57,13 @@ def _sanitize_filename(action: str) -> str:
     return slug or "screenshot"
 
 
+def _make_screenshot_prefix(folder_name: str, part_name: str) -> str:
+    def sanitize(s: str) -> str:
+        return re.sub(r"[^\w\-]", "_", s.strip(), flags=re.UNICODE).strip("_")[:80]
+    parts = [sanitize(p) for p in [folder_name, part_name] if p and p.strip()]
+    return "_".join(parts) if parts else ""
+
+
 async def _looks_like_error_page(page: Page) -> str | None:
     """
     Return a reason string if the page looks like a 404 / error / empty page,
@@ -319,6 +326,31 @@ async def _find_clickable(page: Page, text: str):
     return None
 
 
+async def _find_input(page: Page, label: str):
+    """
+    Locate a visible text input / textarea by its placeholder, aria-label, or
+    associated <label> text. Returns the first visible locator found, or None.
+    """
+    normalized = " ".join(label.split())
+    candidates = [
+        page.get_by_placeholder(normalized, exact=False),
+        page.locator(f'[aria-label*="{normalized}"]'),
+        page.get_by_label(normalized, exact=False),
+        page.locator(f'input[name*="{normalized}"]'),
+        page.locator(f'textarea[name*="{normalized}"]'),
+    ]
+    for locator in candidates:
+        element = locator.first
+        try:
+            if await element.count() == 0:
+                continue
+            if await element.is_visible():
+                return element
+        except Exception:
+            continue
+    return None
+
+
 async def _run_interactions(
     page: Page, interactions: list[dict], variant_groups: list[list[str]] | None = None
 ) -> None:
@@ -327,6 +359,7 @@ async def _run_interactions(
 
     Supported steps:
       - {"type": "click", "text": "<button/element label>"}
+      - {"type": "fill", "label": "<input placeholder or aria-label>", "value": "<demo text>"}
       - {"type": "wait", "ms": <milliseconds>}
 
     For a click, the chosen label is expanded to all of its recorded language
@@ -334,6 +367,9 @@ async def _run_interactions(
     visible-text and aria-label matching, so the click works regardless of which
     UI language the page is currently rendered in. Destructive labels are
     refused. Raises on failure so the caller can fall back for this item.
+
+    For a fill, the input is located by placeholder / aria-label / <label> text
+    and filled with the provided demo value (never triggers real persistence).
     """
     variant_groups = variant_groups or []
     for step in interactions:
@@ -341,6 +377,21 @@ async def _run_interactions(
 
         if kind == "wait":
             await page.wait_for_timeout(int(step.get("ms", 1000)))
+            continue
+
+        if kind == "fill":
+            label = (step.get("label") or "").strip()
+            value = (step.get("value") or "").strip()
+            if not label:
+                logger.warning("Skipping fill step with no label: %s", step)
+                continue
+            logger.info("Interaction: filling input label=%r value=%r", label, value)
+            element = await _find_input(page, label)
+            if element is None:
+                raise RuntimeError(f"no visible input for label {label!r}")
+            await element.click(timeout=5000)
+            await element.fill(value)
+            await page.wait_for_timeout(500)
             continue
 
         if kind == "click":
@@ -373,6 +424,8 @@ async def take_screenshots(
     screenshot_script: list[dict],
     base_url: str = "https://jeenai.app",
     link_type: str = "regular",
+    folder_name: str = "",
+    part_name: str = "",
 ) -> list[dict]:
     """
     Execute the screenshot script and return a list of result dicts.
@@ -387,6 +440,7 @@ async def take_screenshots(
     """
     os.makedirs(SCREENSHOT_DIR, exist_ok=True)
     results: list[dict] = []
+    name_prefix = _make_screenshot_prefix(folder_name, part_name)
 
     logger.info("Screenshot script received (%d items): %s", len(screenshot_script), screenshot_script)
 
@@ -482,7 +536,10 @@ async def take_screenshots(
                             i + 1, len(screenshot_script), url, exc,
                         )
 
-                filename = f"{_sanitize_filename(action)}_{i + 1}.png"
+                if name_prefix:
+                    filename = f"{name_prefix}_{i + 1}.png"
+                else:
+                    filename = f"{_sanitize_filename(action)}_{i + 1}.png"
                 filepath = os.path.join(SCREENSHOT_DIR, filename)
                 await page.screenshot(path=filepath, full_page=False)
                 results.append({

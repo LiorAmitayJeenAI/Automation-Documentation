@@ -20,6 +20,7 @@ from sse_starlette.sse import EventSourceResponse
 
 from backend.config import BACKEND_PORT, SP_SCREENSHOTS_FOLDER, REGULAR_URL, ADMIN_URL
 from backend.pipeline import run_pipeline
+from backend.video_pipeline import run_video_pipeline
 from backend.services import sharepoint, route_crawler
 
 logging.basicConfig(
@@ -45,6 +46,8 @@ class GenerateRequest(BaseModel):
     language: str = "he"
     link_type: str = "regular"
     session_id: str = "default_session"
+    folder_name: str = ""
+    part_name: str = ""
 
 
 class DiscoverRoutesRequest(BaseModel):
@@ -105,6 +108,8 @@ async def generate(req: GenerateRequest, request: Request):
             language=req.language,
             link_type=req.link_type,
             session_id=req.session_id,
+            folder_name=req.folder_name,
+            part_name=req.part_name,
         ):
             if await request.is_disconnected():
                 logger.info("Client disconnected, stopping pipeline stream")
@@ -128,6 +133,8 @@ async def generate_sync(req: GenerateRequest, request: Request):
         language=req.language,
         link_type=req.link_type,
         session_id=req.session_id,
+        folder_name=req.folder_name,
+        part_name=req.part_name,
     ):
         if await request.is_disconnected():
             logger.info("Client disconnected during sync generate, stopping pipeline")
@@ -153,6 +160,71 @@ async def generate_sync(req: GenerateRequest, request: Request):
         status_code=500,
         content={"error": "Pipeline produced no events"},
     )
+
+
+@app.post("/api/generate-video/stream")
+async def generate_video_stream(req: GenerateRequest, request: Request):
+    """
+    Streaming SSE version of the video pipeline.
+    Emits one event per stage so callers can show live progress.
+    """
+
+    async def event_stream() -> AsyncGenerator[dict, None]:
+        async for event in run_video_pipeline(
+            confluence_url=req.confluence_url,
+            language=req.language,
+            link_type=req.link_type,
+            session_id=req.session_id,
+            folder_name=req.folder_name,
+            part_name=req.part_name,
+        ):
+            if await request.is_disconnected():
+                logger.info("Client disconnected, stopping video pipeline stream")
+                break
+            logger.info(
+                "[video-stream] stage=%s status=%s — %s",
+                event.stage, event.status, event.detail,
+            )
+            yield {"data": json.dumps(event.to_dict())}
+
+    return EventSourceResponse(event_stream())
+
+
+@app.post("/api/generate-video/sync")
+async def generate_video_sync(req: GenerateRequest, request: Request):
+    """
+    Blocking JSON version (used by fire-and-forget paths that don't need streaming).
+    Returns {video_url, title} on success.
+    """
+    last_event = None
+    error_msg = None
+
+    async for event in run_video_pipeline(
+        confluence_url=req.confluence_url,
+        language=req.language,
+        link_type=req.link_type,
+        session_id=req.session_id,
+        folder_name=req.folder_name,
+        part_name=req.part_name,
+    ):
+        if await request.is_disconnected():
+            return JSONResponse(status_code=499, content={"error": "Client disconnected"})
+        logger.info(
+            "[video-sync] stage=%s status=%s — %s",
+            event.stage, event.status, event.detail,
+        )
+        last_event = event
+        if event.status == "error":
+            error_msg = event.detail
+            break
+
+    if error_msg:
+        return JSONResponse(status_code=500, content={"error": error_msg})
+
+    if last_event:
+        return last_event.to_dict()
+
+    return JSONResponse(status_code=500, content={"error": "Video pipeline produced no events"})
 
 
 if __name__ == "__main__":

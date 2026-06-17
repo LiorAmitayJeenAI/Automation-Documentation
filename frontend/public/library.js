@@ -35,6 +35,7 @@ function exportToExcel() {
     'Confluence URL': page.url || '',
     'Gamma URL': tutorial.gammaUrl || '',
     'PDF URL': tutorial.sharepointUrl || '',
+    'Video URL': tutorial.videoUrl || '',
   }));
 
   const ws = XLSX.utils.json_to_sheet(data);
@@ -199,6 +200,7 @@ function assetIcon(type) {
     confluence: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M7.5 7.5h9v9h-9zM4 4h7m2 0h7M4 20h7m2 0h7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     gamma: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3zM12 12l8-4.5M12 12v9M12 12L4 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     pdf: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM14 3v5h5M8 15h8M8 18h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    video: '<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0 1 21 8.723v6.554a1 1 0 0 1-1.447.894L15 14M3 8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   };
   return icons[type] || '';
 }
@@ -219,6 +221,41 @@ function assetButton(url, type, label) {
       <span>${esc(label)}</span>
       ${externalIcon()}
     </a>`;
+}
+
+function renderGenerateVideoButton(tutorial) {
+  if (!tutorial) return '';
+  const isProcessing = tutorial.videoStatus === 'processing';
+  const hasVideo = !!tutorial.videoUrl;
+  const label = isProcessing ? 'Generating…' : hasVideo ? 'Regenerate Video' : 'Generate Video';
+  const disabled = isProcessing || isTutorialProcessing(tutorial) ? 'disabled' : '';
+  return `<button
+    class="asset-btn video-generate"
+    onclick="event.stopPropagation(); generateVideo('${esc(jsString(tutorial.id))}')"
+    ${disabled}
+    title="${esc(label)}"
+  >${assetIcon('video')}<span>${esc(label)}</span></button>`;
+}
+
+async function generateVideo(tutorialId) {
+  const res = await fetch(`/api/tutorials/${encodeURIComponent(tutorialId)}/generate-video`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({}),
+  });
+  if (!res.ok) {
+    alert('Failed to start video generation. Check the server logs.');
+    return;
+  }
+  // Refresh library after a short delay so the "Generating…" state shows
+  setTimeout(() => loadTutorials(), 800);
+  // Keep polling until done
+  const pollInterval = setInterval(async () => {
+    await loadTutorials();
+    const list = tutorials;
+    const t = list.find(x => x.id === tutorialId);
+    if (!t || t.videoStatus !== 'processing') clearInterval(pollInterval);
+  }, 6000);
 }
 
 function renderLanguageSection(page, tutorial, language) {
@@ -250,6 +287,8 @@ function renderLanguageSection(page, tutorial, language) {
         ${assetButton(page.url, 'confluence', 'Confluence')}
         ${assetButton(tutorial?.gammaUrl, 'gamma', 'Gamma')}
         ${assetButton(tutorial?.sharepointUrl, 'pdf', 'PDF')}
+        ${assetButton(tutorial?.videoUrl, 'video', 'Video')}
+        ${renderGenerateVideoButton(tutorial)}
       </div>
     </section>`;
 }
@@ -420,6 +459,7 @@ function showHistory(id) {
           <span>${item.sessionId ? `Session: ${esc(item.sessionId)}` : 'Session: -'}</span>
           <span>${item.gammaUrl ? `Gamma: ${esc(item.gammaUrl)}` : 'Gamma: -'}</span>
           <span>${item.sharepointUrl ? `PDF: ${esc(item.sharepointUrl)}` : 'PDF: -'}</span>
+          <span>${item.videoUrl ? `Video: ${esc(item.videoUrl)}` : 'Video: -'}</span>
           ${item.error ? `<span>Error: ${esc(item.error)}</span>` : ''}
         </div>`;
     }).join('');
