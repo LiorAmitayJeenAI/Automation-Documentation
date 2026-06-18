@@ -1056,6 +1056,92 @@ app.get('/api/tutorials', (req, res) => {
   res.json(loadTutorials());
 });
 
+/* ── Save all tutorial PDFs to a new SharePoint folder ── */
+function callExportPdfsBackend(folderName, pdfUrls) {
+  return new Promise((resolve, reject) => {
+    const parsed = new URL(`${PYTHON_BACKEND_URL}/api/export-pdfs-to-sharepoint`);
+    const body = JSON.stringify({ folder_name: folderName, pdf_urls: pdfUrls });
+
+    const request = http.request(
+      {
+        hostname: parsed.hostname,
+        port: parsed.port,
+        path: parsed.pathname,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(body),
+        },
+        timeout: PIPELINE_TIMEOUT_MS,
+      },
+      (resp) => {
+        const chunks = [];
+        resp.on('data', (chunk) => chunks.push(chunk));
+        resp.on('end', () => {
+          const raw = Buffer.concat(chunks).toString();
+          let parsedBody = null;
+          try { parsedBody = JSON.parse(raw); } catch { /* ignore */ }
+          if (resp.statusCode >= 400) {
+            const message = parsedBody?.error || raw || `HTTP ${resp.statusCode}`;
+            return reject({ statusCode: resp.statusCode, message });
+          }
+          if (!parsedBody) {
+            return reject({ statusCode: 502, message: `Invalid JSON from backend: ${raw.slice(0, 200)}` });
+          }
+          resolve(parsedBody);
+        });
+      },
+    );
+
+    request.on('error', (err) => reject({ statusCode: 502, message: err.message }));
+    request.on('timeout', () => {
+      request.destroy();
+      reject({ statusCode: 504, message: 'SharePoint export timed out' });
+    });
+
+    request.write(body);
+    request.end();
+  });
+}
+
+function exportFolderName(date = new Date()) {
+  const pad = (n) => String(n).padStart(2, '0');
+  const stamp = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
+    + ` ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  return `PDF Gamma ${stamp}`;
+}
+
+app.post('/api/export-sharepoint', async (req, res) => {
+  const list = loadTutorials();
+  const seen = new Set();
+  const pdfUrls = [];
+  for (const t of list) {
+    const url = t.sharepointUrl;
+    if (!url || seen.has(url)) continue;
+    seen.add(url);
+    pdfUrls.push(url);
+  }
+
+  if (!pdfUrls.length) {
+    return res.status(400).json({ error: 'No presentations with a PDF to export.' });
+  }
+
+  const folderName = exportFolderName();
+
+  try {
+    const result = await callExportPdfsBackend(folderName, pdfUrls);
+    res.json({
+      folderName,
+      folderUrl: result.folderUrl || null,
+      count: Array.isArray(result.uploaded) ? result.uploaded.length : 0,
+      skipped: result.skipped || 0,
+    });
+  } catch (err) {
+    const statusCode = err?.statusCode || 500;
+    res.status(statusCode).json({ error: err?.message || 'SharePoint export failed.' });
+  }
+});
+
 app.delete('/api/tutorials/:id', (req, res) => {
   const list = loadTutorials();
   const next = list.filter(t => t.id !== req.params.id);

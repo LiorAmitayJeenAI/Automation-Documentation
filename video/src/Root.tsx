@@ -3,13 +3,16 @@ import {Composition} from 'remotion';
 import {TutorialVideo} from './TutorialVideo';
 import {VideoProps} from './types';
 import {FPS, TITLE_FRAMES, END_FRAMES} from './constants';
+import './fonts';
 
 const DEFAULT_PROPS: VideoProps = {
   title: 'Tutorial',
   language: 'he',
   recordedVideoFilename: '',
   recordedVideoFrames: FPS * 30,  // 30 s placeholder
+  titleFrames: TITLE_FRAMES,
   totalFrames: TITLE_FRAMES + FPS * 30 + END_FRAMES,
+  segments: [],
   cues: [],
   explanationCues: [],
   explanationFrames: 0,

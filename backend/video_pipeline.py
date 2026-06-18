@@ -4,14 +4,15 @@ Standalone video generation pipeline.
 Completely independent from the presentation pipeline (pipeline.py).
 Produces an MP4 tutorial video from a Confluence page by:
   1. Fetching Confluence content
-  2. Generating a comprehensive video script (5-12 steps, with Hebrew narration)
+  2. Generating a video script (5-12 steps, narration in the chosen language)
   3. Recording a real Playwright browser session following the script
-  4. Rendering the recording with Hebrew subtitle overlays via Remotion
+  4. Rendering the recording with subtitle overlays via Remotion
   5. Uploading the MP4 to SharePoint
 """
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
 from typing import AsyncGenerator
@@ -67,7 +68,9 @@ async def run_video_pipeline(
         yield VideoEvent("confluence", "error", str(exc))
         return
 
-    # ── 2. Generate video script (comprehensive, 5-12 steps + Hebrew narration) ──
+    lang_label = "Hebrew" if language == "he" else "English"
+
+    # ── 2. Generate video script (5-7 steps, target <60 s) ──
     yield VideoEvent("script", "running", "Generating video script with AI...")
     try:
         video_script = await llm.generate_video_script(
@@ -90,9 +93,11 @@ async def run_video_pipeline(
         return
 
     # ── 3. Synthesize TTS audio for each step ──
-    yield VideoEvent("tts", "running", "Synthesizing Hebrew voiceover...")
+    yield VideoEvent("tts", "running", f"Synthesizing {lang_label} voiceover...")
     try:
-        audio_results = await tts.synthesize_script(video_script, session_id)
+        audio_results = await tts.synthesize_script(
+            video_script, session_id, language=language,
+        )
         n_audio = sum(1 for a in audio_results if a)
         yield VideoEvent(
             "tts", "done",
@@ -129,6 +134,46 @@ async def run_video_pipeline(
         yield VideoEvent("record", "error", "No steps were captured successfully")
         return
 
+    # ── 4b. Synthesize TTS for title, explanation slides, and end card ──
+    extra_audio: dict = {"title": None, "end": None, "explanations": []}
+    try:
+        is_heb = language == "he"
+        title_narration = f"מדריך: {title}" if is_heb else f"Guide: {title}"
+        end_narration = "תודה שצפיתם" if is_heb else "Thank you for watching"
+
+        title_audio, end_audio = await asyncio.gather(
+            tts.synthesize_step(
+                title_narration, step_index=900, session_id=session_id,
+                language=language,
+            ),
+            tts.synthesize_step(
+                end_narration, step_index=901, session_id=session_id,
+                language=language,
+            ),
+        )
+        extra_audio["title"] = title_audio
+        extra_audio["end"] = end_audio
+
+        failed_steps = recording_result.get("failed_steps", [])
+        if failed_steps:
+            expl_tasks = [
+                tts.synthesize_step(
+                    s.get("narration", ""), step_index=950 + i,
+                    session_id=session_id, language=language,
+                )
+                for i, s in enumerate(failed_steps)
+                if s.get("narration")
+            ]
+            expl_results = await asyncio.gather(*expl_tasks)
+            extra_audio["explanations"] = list(expl_results)
+
+        n_extra = sum(1 for v in [title_audio, end_audio] if v) + sum(
+            1 for e in extra_audio["explanations"] if e
+        )
+        logger.info("Extra TTS (title/end/explanations): %d clips voiced", n_extra)
+    except Exception as exc:
+        logger.warning("Extra TTS synthesis failed (%s) — continuing without", exc)
+
     # ── 5. Render with Remotion (subtitles + audio + branding) ──
     yield VideoEvent("render", "running", "Rendering video with Remotion...")
     try:
@@ -139,6 +184,7 @@ async def run_video_pipeline(
             language=language,
             session_id=session_id,
             file_stem=file_stem,
+            extra_audio=extra_audio,
         )
         if not mp4_path:
             yield VideoEvent("render", "error", "Remotion render returned no output")

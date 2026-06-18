@@ -15,13 +15,18 @@ export const TutorialVideo: React.FC<VideoProps> = ({
   language,
   recordedVideoFilename,
   recordedVideoFrames,
+  titleFrames,
+  segments,
   cues,
   explanationCues,
   explanationFrames,
+  titleAudioFilename,
+  endAudioFilename,
 }) => {
   const frame = useCurrentFrame();
-  const videoStart = TITLE_FRAMES;
-  const explanationStart = TITLE_FRAMES + recordedVideoFrames;
+  const actualTitleFrames = titleFrames ?? TITLE_FRAMES;
+  const videoStart = actualTitleFrames;
+  const explanationStart = actualTitleFrames + recordedVideoFrames;
   const endStart = explanationStart + (explanationFrames ?? 0);
 
   return (
@@ -30,16 +35,25 @@ export const TutorialVideo: React.FC<VideoProps> = ({
       {HAS_BG_MUSIC && (
         <Audio src={staticFile('music/bg.mp3')} volume={0.07} loop />
       )}
-      {/* Title card — first 3 seconds */}
-      {frame < videoStart && (
-        <TitleSlide frame={frame} title={title} language={language} />
+
+      {/* Title card voiceover */}
+      {titleAudioFilename && (
+        <Sequence from={0} durationInFrames={actualTitleFrames}>
+          <Audio src={staticFile(titleAudioFilename)} />
+        </Sequence>
       )}
 
-      {/* Real product recording + subtitle overlays */}
+      {/* Title card */}
+      {frame < videoStart && (
+        <TitleSlide frame={frame} title={title} language={language} titleFrames={actualTitleFrames} />
+      )}
+
+      {/* Real product recording (jump-cut segments) + subtitle overlays */}
       {frame >= videoStart && frame < explanationStart && (
         <Sequence from={videoStart} durationInFrames={recordedVideoFrames}>
           <VideoSection
             recordedVideoFilename={recordedVideoFilename}
+            segments={segments}
             cues={cues}
             language={language}
             title={title}
@@ -60,7 +74,14 @@ export const TutorialVideo: React.FC<VideoProps> = ({
         </Sequence>
       )}
 
-      {/* End card — last 2 seconds */}
+      {/* End card voiceover */}
+      {endAudioFilename && (
+        <Sequence from={endStart}>
+          <Audio src={staticFile(endAudioFilename)} />
+        </Sequence>
+      )}
+
+      {/* End card */}
       {frame >= endStart && (
         <EndSlide frame={frame - endStart} language={language} />
       )}

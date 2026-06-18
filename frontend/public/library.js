@@ -21,8 +21,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
 
+  setupExportMenu();
+
   loadTutorials();
 });
+
+function setupExportMenu() {
+  const menuBtn = document.getElementById('exportMenuBtn');
+  const menu = document.getElementById('exportMenu');
+  const saveBtn = document.getElementById('saveSharepointBtn');
+  if (!menuBtn || !menu || !saveBtn) return;
+
+  const closeMenu = () => {
+    menu.hidden = true;
+    menuBtn.setAttribute('aria-expanded', 'false');
+  };
+  const openMenu = () => {
+    menu.hidden = false;
+    menuBtn.setAttribute('aria-expanded', 'true');
+  };
+
+  menuBtn.addEventListener('click', event => {
+    event.stopPropagation();
+    if (menu.hidden) openMenu(); else closeMenu();
+  });
+
+  document.addEventListener('click', event => {
+    if (!menu.hidden && !menu.contains(event.target) && event.target !== menuBtn) {
+      closeMenu();
+    }
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeMenu();
+  });
+
+  saveBtn.addEventListener('click', () => {
+    closeMenu();
+    saveToSharePoint();
+  });
+}
+
+async function saveToSharePoint() {
+  const saveBtn = document.getElementById('saveSharepointBtn');
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.classList.add('loading');
+  }
+
+  try {
+    const res = await fetch('/api/export-sharepoint', { method: 'POST' });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      alert(data.error || 'Failed to save PDFs to SharePoint.');
+      return;
+    }
+
+    const lines = [`Saved ${data.count} PDF${data.count !== 1 ? 's' : ''} to SharePoint folder "${data.folderName}".`];
+    if (data.skipped) lines.push(`${data.skipped} file${data.skipped !== 1 ? 's were' : ' was'} skipped.`);
+    if (data.folderUrl) lines.push(`\nOpen folder:\n${data.folderUrl}`);
+    alert(lines.join('\n'));
+  } catch (err) {
+    alert('Failed to save PDFs to SharePoint. Check the server logs.');
+  } finally {
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.classList.remove('loading');
+    }
+  }
+}
 
 function exportToExcel() {
   const rows = getVisibleRows();

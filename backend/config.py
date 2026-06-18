@@ -29,6 +29,12 @@ SP_CLIENT_ID = _require("SP_CLIENT_ID")
 SP_SITE_URL = os.getenv("SP_SITE_URL", "https://jeenai365.sharepoint.com/sites/JEEN.AI")
 SP_FOLDER_PATH = os.getenv("SP_FOLDER_PATH", "Testing/LiorAmitay/JeenTutorial")
 SP_SCREENSHOTS_FOLDER = os.getenv("SP_SCREENSHOTS_FOLDER", "Testing/LiorAmitay")
+# Base folder under which "Save to SharePoint" creates new timestamped export
+# folders. This path is relative to the SharePoint document library root.
+SP_EXPORT_BASE = os.getenv(
+    "SP_EXPORT_BASE",
+    "jeen tutorial/tutorial automation/automation output",
+)
 
 JEEN_USERNAME = os.getenv("JEEN_USERNAME", "")
 JEEN_PASSWORD = os.getenv("JEEN_PASSWORD", "")

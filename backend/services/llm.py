@@ -23,7 +23,7 @@ from backend.config import (
 )
 from backend.prompts.document_formatter import DOCUMENT_FORMATTER_PROMPT
 from backend.prompts.narration import NARRATION_PROMPT
-from backend.prompts.video_script import VIDEO_SCRIPT_PROMPT
+from backend.prompts.video_script import VIDEO_SCRIPT_PROMPT, get_language_instructions
 
 logger = logging.getLogger(__name__)
 
@@ -201,10 +201,14 @@ async def generate_video_script(
     Generate a comprehensive video recording script from Confluence markdown.
 
     Returns a list of step dicts, each with:
-      url, action, narration (Hebrew), interactions (optional), settle_ms
+      url, action, narration, interactions (optional), settle_ms
     """
     allowed_routes = _format_allowed_routes(_load_allowed_routes(link_type), base_url)
-    system_prompt = VIDEO_SCRIPT_PROMPT.format(allowed_routes=allowed_routes)
+    lang_instructions = get_language_instructions(language)
+    system_prompt = VIDEO_SCRIPT_PROMPT.format(
+        language_instructions=lang_instructions,
+        allowed_routes=allowed_routes,
+    )
 
     response = await _client.chat.completions.create(
         model=AZURE_OPENAI_DEPLOYMENT,
@@ -231,6 +235,12 @@ async def generate_video_script(
     steps = parsed.get("video_script", [])
     if not isinstance(steps, list):
         raise ValueError(f"Expected list under 'video_script', got {type(steps)}")
+
+    logger.info(
+        "═══ VIDEO SCRIPT (%d steps) ═══\n%s\n═══ END VIDEO SCRIPT ═══",
+        len(steps),
+        json.dumps(steps, ensure_ascii=False, indent=2),
+    )
 
     return steps
 

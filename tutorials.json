@@ -1582,7 +1582,7 @@
     "gammaUrl": "https://gamma.app/docs/w6ayqxbtz6s4lix",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/382468165-1-Skills.pdf",
     "createdAt": "2026-06-15T06:23:07.109Z",
-    "lastUpdatedAt": "2026-06-15T06:27:17.692Z",
+    "lastUpdatedAt": "2026-06-17T14:19:31.352Z",
     "lastGeneratedAt": "2026-06-15T06:27:17.691Z",
     "error": null,
     "history": [
@@ -1604,7 +1604,9 @@
         "sharepointUrl": null,
         "error": null
       }
-    ]
+    ],
+    "videoStatus": "done",
+    "videoUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/Skills_Part_1_-_Skills.mp4"
   },
   {
     "id": "mqdw6hdbympdg",
@@ -1775,7 +1777,7 @@
     "gammaUrl": "https://gamma.app/docs/7uljnmbtc1f04qi",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383025178-2-Spark-Agent.pdf",
     "createdAt": "2026-06-14T14:28:50.173Z",
-    "lastUpdatedAt": "2026-06-16T12:58:00.762Z",
+    "lastUpdatedAt": "2026-06-18T13:55:43.571Z",
     "lastGeneratedAt": "2026-06-14T14:32:25.246Z",
     "error": null,
     "history": [
@@ -1799,7 +1801,7 @@
       }
     ],
     "videoStatus": "done",
-    "videoUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/video-1781614377046-iuamyo.mp4"
+    "videoUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/Agent_Part_2_-_Spark_Agent.mp4"
   },
   {
     "id": "mqdvkohoc30i3",
@@ -1880,14 +1882,74 @@
     "label": "Part 2 - RAG Mechanism",
     "status": "done",
     "language": "he",
-    "sessionId": "tutorial-run-1781444151108-ki6i4d",
-    "gammaUrl": "https://gamma.app/docs/72tnazsz8wqbrsg",
+    "sessionId": "tutorial-run-1781697158207-o8durg",
+    "gammaUrl": "https://gamma.app/docs/vgd6nuhzv14qo65",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383189041-2-RAG.pdf",
     "createdAt": "2026-06-14T13:29:51.984Z",
-    "lastUpdatedAt": "2026-06-14T13:39:19.648Z",
-    "lastGeneratedAt": "2026-06-14T13:39:19.647Z",
+    "lastUpdatedAt": "2026-06-17T11:56:31.020Z",
+    "lastGeneratedAt": "2026-06-17T11:56:31.017Z",
     "error": null,
     "history": [
+      {
+        "status": "done",
+        "timestamp": "2026-06-17T11:56:31.020Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781697158207-o8durg",
+        "gammaUrl": "https://gamma.app/docs/vgd6nuhzv14qo65",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383189041-2-RAG.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T11:52:38.208Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781697158207-o8durg",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "done",
+        "timestamp": "2026-06-17T11:17:39.029Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781694649782-5qoszr",
+        "gammaUrl": "https://gamma.app/docs/2i58zhrbsw0oows",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383189041-2-RAG.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T11:10:49.783Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781694649782-5qoszr",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "error",
+        "timestamp": "2026-06-17T09:02:05.918Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781686835390-7aqpw3",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": "Pipeline error: 500 Internal Server Error - {\"error\":\"Client error '400 Bad Request' for url 'https://public-api.gamma.app/v1.0/generations'\\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400\"}"
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T09:00:35.391Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781686835390-7aqpw3",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
       {
         "status": "done",
         "timestamp": "2026-06-14T13:39:19.648Z",
@@ -1906,7 +1968,8 @@
         "sharepointUrl": null,
         "error": null
       }
-    ]
+    ],
+    "videoUrl": null
   },
   {
     "id": "mqdtmz5baan12",
@@ -2003,14 +2066,74 @@
     "label": "Part 7 - Triggers (Scheduler)",
     "status": "done",
     "language": "he",
-    "sessionId": "video-run-1781600527779-x6wb0t",
-    "gammaUrl": "https://gamma.app/docs/atln9tsfs5y2sen",
+    "sessionId": "tutorial-run-1781697391022-xp5dte",
+    "gammaUrl": "https://gamma.app/docs/f1pu8ie8vqzcvbk",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383189061-7-Scheduler.pdf",
     "createdAt": "2026-06-14T13:22:50.680Z",
-    "lastUpdatedAt": "2026-06-17T06:31:54.939Z",
-    "lastGeneratedAt": "2026-06-16T09:06:09.340Z",
+    "lastUpdatedAt": "2026-06-18T13:29:42.217Z",
+    "lastGeneratedAt": "2026-06-17T11:59:27.753Z",
     "error": null,
     "history": [
+      {
+        "status": "done",
+        "timestamp": "2026-06-17T11:59:27.754Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781697391022-xp5dte",
+        "gammaUrl": "https://gamma.app/docs/f1pu8ie8vqzcvbk",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383189061-7-Scheduler.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T11:56:31.024Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781697391022-xp5dte",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "done",
+        "timestamp": "2026-06-17T11:21:57.071Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781695134350-jz0yc5",
+        "gammaUrl": "https://gamma.app/docs/tp2rhv90or6o0pw",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383189061-7-Triggers-Scheduler.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T11:18:54.351Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781695134350-jz0yc5",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "stopped",
+        "timestamp": "2026-06-17T09:02:48.117Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781686967540-a92p7n",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": "Generation stopped by user"
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T09:02:47.540Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781686967540-a92p7n",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
       {
         "status": "pending",
         "timestamp": "2026-06-15T08:33:52.444Z",
@@ -2203,14 +2326,74 @@
     "label": "Part 2 - User Profile",
     "status": "done",
     "language": "he",
-    "sessionId": "tutorial-run-1781512415272-c9uw8j",
-    "gammaUrl": "https://gamma.app/docs/gh49wexiuro0sl5",
+    "sessionId": "tutorial-run-1781697567755-xkch7k",
+    "gammaUrl": "https://gamma.app/docs/8dndilyggwfxw15",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/384204884-2.pdf",
     "createdAt": "2026-06-14T12:08:13.948Z",
-    "lastUpdatedAt": "2026-06-15T08:33:49.909Z",
-    "lastGeneratedAt": "2026-06-14T12:20:53.302Z",
-    "error": "Generation stopped by user",
+    "lastUpdatedAt": "2026-06-17T12:02:03.549Z",
+    "lastGeneratedAt": "2026-06-17T12:02:03.548Z",
+    "error": null,
     "history": [
+      {
+        "status": "done",
+        "timestamp": "2026-06-17T12:02:03.549Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781697567755-xkch7k",
+        "gammaUrl": "https://gamma.app/docs/8dndilyggwfxw15",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/384204884-2.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T11:59:27.756Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781697567755-xkch7k",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "done",
+        "timestamp": "2026-06-17T11:24:38.625Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781695317072-rnip9v",
+        "gammaUrl": "https://gamma.app/docs/q0hjd3cd8ogq4xt",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/384204884-2.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T11:21:57.073Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781695317072-rnip9v",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "stopped",
+        "timestamp": "2026-06-17T09:02:49.057Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781686968118-vpezek",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": "Generation stopped by user"
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T09:02:48.118Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781686968118-vpezek",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
       {
         "status": "pending",
         "timestamp": "2026-06-15T08:33:49.909Z",
@@ -2265,7 +2448,8 @@
         "sharepointUrl": null,
         "error": null
       }
-    ]
+    ],
+    "videoUrl": null
   },
   {
     "id": "mqdqkdsdviwww",
@@ -2345,14 +2529,74 @@
     "label": "Part 2- Get Better Results from AI",
     "status": "done",
     "language": "he",
-    "sessionId": "tutorial-run-1781438632138-zo0oxb",
-    "gammaUrl": "https://gamma.app/docs/cgpg8rcbitlgtc4",
+    "sessionId": "tutorial-run-1781697723551-5lak2e",
+    "gammaUrl": "https://gamma.app/docs/5acdw2dfstpitxw",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/429457411-2-AI.pdf",
     "createdAt": "2026-06-14T12:03:52.138Z",
-    "lastUpdatedAt": "2026-06-14T12:08:13.947Z",
-    "lastGeneratedAt": "2026-06-14T12:08:13.947Z",
+    "lastUpdatedAt": "2026-06-17T12:06:15.137Z",
+    "lastGeneratedAt": "2026-06-17T12:06:15.136Z",
     "error": null,
     "history": [
+      {
+        "status": "done",
+        "timestamp": "2026-06-17T12:06:15.137Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781697723551-5lak2e",
+        "gammaUrl": "https://gamma.app/docs/5acdw2dfstpitxw",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/429457411-2-AI.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T12:02:03.552Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781697723551-5lak2e",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "done",
+        "timestamp": "2026-06-17T11:28:42.728Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781695478626-sus6bn",
+        "gammaUrl": "https://gamma.app/docs/ozrawna30b47pec",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/429457411-2-AI.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T11:24:38.627Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781695478626-sus6bn",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "stopped",
+        "timestamp": "2026-06-17T09:02:46.854Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781686925920-kqe7v2",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": "Generation stopped by user"
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T09:02:05.921Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781686925920-kqe7v2",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
       {
         "status": "done",
         "timestamp": "2026-06-14T12:08:13.947Z",
@@ -2362,7 +2606,8 @@
         "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/429457411-2-AI.pdf",
         "error": null
       }
-    ]
+    ],
+    "videoUrl": null
   },
   {
     "id": "mqdq4kie260c3",
@@ -2371,14 +2616,74 @@
     "label": "Part 3 - Side Menu",
     "status": "done",
     "language": "he",
-    "sessionId": "tutorial-run-1781512429910-t26by7",
-    "gammaUrl": "https://gamma.app/docs/9sl86p8fry1zidk",
+    "sessionId": "tutorial-run-1781697975139-ymtj5t",
+    "gammaUrl": "https://gamma.app/docs/dhfi0tfzywsj9fb",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383615020-3.pdf",
     "createdAt": "2026-06-14T11:51:34.354Z",
-    "lastUpdatedAt": "2026-06-15T08:33:50.576Z",
-    "lastGeneratedAt": "2026-06-14T11:55:07.361Z",
-    "error": "Generation stopped by user",
+    "lastUpdatedAt": "2026-06-17T12:09:43.992Z",
+    "lastGeneratedAt": "2026-06-17T12:09:43.990Z",
+    "error": null,
     "history": [
+      {
+        "status": "done",
+        "timestamp": "2026-06-17T12:09:43.992Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781697975139-ymtj5t",
+        "gammaUrl": "https://gamma.app/docs/dhfi0tfzywsj9fb",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383615020-3.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T12:06:15.140Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781697975139-ymtj5t",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "done",
+        "timestamp": "2026-06-17T11:32:02.682Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781695722731-nigl15",
+        "gammaUrl": "https://gamma.app/docs/3970fkbcxj85dnd",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383615020-3.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T11:28:42.732Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781695722731-nigl15",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "stopped",
+        "timestamp": "2026-06-17T09:02:47.539Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781686966856-he1423",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": "Generation stopped by user"
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T09:02:46.856Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781686966856-he1423",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
       {
         "status": "pending",
         "timestamp": "2026-06-15T08:33:50.576Z",
@@ -2415,7 +2720,8 @@
         "sharepointUrl": null,
         "error": null
       }
-    ]
+    ],
+    "videoUrl": null
   },
   {
     "id": "mqdpcf4upxu6s",
@@ -2507,7 +2813,7 @@
     "gammaUrl": "https://gamma.app/docs/2d9vxrdzkoesiz9",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/384270339-3-Cortex.pdf",
     "createdAt": "2026-06-14T10:06:49.170Z",
-    "lastUpdatedAt": "2026-06-14T14:23:16.135Z",
+    "lastUpdatedAt": "2026-06-18T08:09:51.634Z",
     "lastGeneratedAt": "2026-06-14T14:23:16.134Z",
     "error": null,
     "history": [
@@ -2547,7 +2853,9 @@
         "sharepointUrl": null,
         "error": null
       }
-    ]
+    ],
+    "videoStatus": "done",
+    "videoUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/Agent_Part_3_-_Cortex_Agent.mp4"
   },
   {
     "id": "mqdl237no6vc2",
@@ -2662,14 +2970,94 @@
     "label": "Part 1 - Introduction to Workspace",
     "status": "done",
     "language": "he",
-    "sessionId": "tutorial-run-1781429060805-ks2p0f",
-    "gammaUrl": "https://gamma.app/docs/cae5fax66gxixvz",
+    "sessionId": "tutorial-run-1781698470129-d3lkv7",
+    "gammaUrl": "https://gamma.app/docs/wetkfwd061w90uc",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/382337056-1-Workspace.pdf",
     "createdAt": "2026-06-14T09:24:20.805Z",
-    "lastUpdatedAt": "2026-06-14T09:29:40.542Z",
-    "lastGeneratedAt": "2026-06-14T09:29:40.542Z",
+    "lastUpdatedAt": "2026-06-17T12:17:22.712Z",
+    "lastGeneratedAt": "2026-06-17T12:17:22.711Z",
     "error": null,
     "history": [
+      {
+        "status": "done",
+        "timestamp": "2026-06-17T12:17:22.712Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781698470129-d3lkv7",
+        "gammaUrl": "https://gamma.app/docs/wetkfwd061w90uc",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/382337056-1-Workspace.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T12:14:30.130Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781698470129-d3lkv7",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "error",
+        "timestamp": "2026-06-17T12:09:44.000Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781698183994-0ydvfh",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": "socket hang up"
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T12:09:43.995Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781698183994-0ydvfh",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "done",
+        "timestamp": "2026-06-17T11:38:09.455Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781695922685-nu1bda",
+        "gammaUrl": "https://gamma.app/docs/odvnxz9ft2do0vh",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/382337056-1-Workspace.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T11:32:02.686Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781695922685-nu1bda",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "stopped",
+        "timestamp": "2026-06-17T09:02:49.761Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781686969058-f6y81p",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": "Generation stopped by user"
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-17T09:02:49.058Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1781686969058-f6y81p",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
       {
         "status": "done",
         "timestamp": "2026-06-14T09:29:40.542Z",
@@ -2679,6 +3067,7 @@
         "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/382337056-1-Workspace.pdf",
         "error": null
       }
-    ]
+    ],
+    "videoUrl": null
   }
 ]

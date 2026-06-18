@@ -1,6 +1,7 @@
 import React from 'react';
-import {AbsoluteFill, interpolate} from 'remotion';
+import {AbsoluteFill, Img, interpolate, staticFile} from 'remotion';
 import {COLORS} from '../constants';
+import {FONT_FAMILY} from '../fonts';
 
 interface Props {
   frame: number;
@@ -21,24 +22,16 @@ export const EndSlide: React.FC<Props> = ({frame, language}) => {
         opacity,
       }}
     >
-      <div
-        style={{
-          color: COLORS.accent,
-          fontSize: 38,
-          fontFamily: 'Arial, sans-serif',
-          fontWeight: 700,
-          letterSpacing: 3,
-          marginBottom: 24,
-        }}
-      >
-        JEEN
-      </div>
+      <Img
+        src={staticFile('jeen-logo.png')}
+        style={{width: 160, height: 'auto', marginBottom: 24}}
+      />
 
       <div
         style={{
           color: COLORS.text,
           fontSize: 60,
-          fontFamily: 'Arial, sans-serif',
+          fontFamily: FONT_FAMILY,
           fontWeight: 700,
           direction: isHeb ? 'rtl' : 'ltr',
         }}
@@ -50,12 +43,12 @@ export const EndSlide: React.FC<Props> = ({frame, language}) => {
         style={{
           color: COLORS.textMuted,
           fontSize: 28,
-          fontFamily: 'Arial, sans-serif',
+          fontFamily: FONT_FAMILY,
           marginTop: 18,
           direction: isHeb ? 'rtl' : 'ltr',
         }}
       >
-        {isHeb ? 'jeenai.app' : 'jeenai.app'}
+        jeenai.app
       </div>
 
       <div

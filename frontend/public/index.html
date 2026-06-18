@@ -33,10 +33,23 @@
             <p>Manage and access all generated tutorials and presentations.</p>
           </div>
           <div class="top-actions">
-            <button id="exportExcelBtn" class="btn btn-primary" type="button" disabled>
-              <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Export to Excel
-            </button>
+            <div class="export-group">
+              <button id="exportExcelBtn" class="btn btn-primary" type="button" disabled>
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Export to Excel
+              </button>
+              <div class="kebab-wrap">
+                <button id="exportMenuBtn" class="btn btn-icon" type="button" aria-haspopup="true" aria-expanded="false" aria-label="More export options">
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+                </button>
+                <div id="exportMenu" class="dropdown-menu" role="menu" hidden>
+                  <button id="saveSharepointBtn" type="button" class="dropdown-item" role="menuitem">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Save to SharePoint
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </header>
 

@@ -80,6 +80,15 @@ Screenshots and visual assets:
 * Maintain a professional and visually balanced layout when incorporating screenshots."""
 
 
+def get_audience_framing() -> str:
+    """Return the shared customer-facing audience/purpose framing.
+
+    Single source of truth for the "product training for non-technical users"
+    framing, reused by both the presentation flow and the video-script prompt.
+    """
+    return _SHARED_PREAMBLE
+
+
 def get_presentation_style_prompt(language: str = "he") -> str:
     """Return the full presentation style prompt for the given language."""
     lang_section = _LANGUAGE_SECTION_HE if language == "he" else _LANGUAGE_SECTION_EN

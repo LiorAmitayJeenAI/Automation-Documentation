@@ -1,6 +1,7 @@
 import React from 'react';
 import {AbsoluteFill, Img, interpolate, staticFile} from 'remotion';
 import {COLORS, STEP_FRAMES} from '../constants';
+import {FONT_FAMILY} from '../fonts';
 import {VideoStep} from '../types';
 
 interface Props {
@@ -43,22 +44,18 @@ export const StepSlide: React.FC<Props> = ({
     <AbsoluteFill
       style={{background: COLORS.bg, opacity: globalOpacity}}
     >
-      {/* Brand */}
-      <div
+      {/* Brand logo */}
+      <Img
+        src={staticFile('jeen-logo.png')}
         style={{
           position: 'absolute',
-          top: 38,
+          top: 30,
           left: 72,
-          color: COLORS.accent,
-          fontSize: 26,
-          fontFamily: 'Arial, sans-serif',
-          fontWeight: 700,
-          letterSpacing: 3,
+          width: 100,
+          height: 'auto',
           zIndex: 10,
         }}
-      >
-        JEEN
-      </div>
+      />
 
       {/* Step counter */}
       <div
@@ -68,7 +65,7 @@ export const StepSlide: React.FC<Props> = ({
           right: 72,
           color: COLORS.textMuted,
           fontSize: 26,
-          fontFamily: 'Arial, sans-serif',
+          fontFamily: FONT_FAMILY,
           fontWeight: 600,
           zIndex: 10,
         }}
@@ -124,7 +121,7 @@ export const StepSlide: React.FC<Props> = ({
           style={{
             color: COLORS.text,
             fontSize: 30,
-            fontFamily: 'Arial, sans-serif',
+            fontFamily: FONT_FAMILY,
             textAlign: isHeb ? 'right' : 'left',
             direction: isHeb ? 'rtl' : 'ltr',
             margin: 0,

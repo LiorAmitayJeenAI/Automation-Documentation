@@ -1,25 +1,26 @@
 /**
- * The main video section: plays the real Playwright WebM inside a browser-window
- * mockup, overlays a short caption pill, and plays per-step voiceover audio.
- * Frame 0 here = start of the recording (Sequence offset handled by TutorialVideo).
+ * The main video section: plays jump-cut segments from the Playwright WebM,
+ * skipping loading/navigation time. Overlays caption pill and per-step audio.
+ * Frame 0 here = start of the output timeline (Sequence offset handled by TutorialVideo).
  *
  * Layout (1920×1080):
  *   0–80px      branding bar (JEEN + title)
- *   80–950px    BrowserFrame with the recording + slow camera zoom
+ *   80–950px    recording with slow camera zoom
  *   950–1040px  caption pill area (gradient background, below the frame)
  *   cross-dissolve overlay on first/last DISSOLVE_FRAMES frames
  */
 import React from 'react';
 import {
-  AbsoluteFill, Audio, OffthreadVideo, Sequence,
+  AbsoluteFill, Audio, Img, OffthreadVideo, Sequence,
   staticFile, useCurrentFrame, interpolate,
 } from 'remotion';
 import {COLORS, DISSOLVE_FRAMES} from '../constants';
-import {SubtitleCue} from '../types';
-import {BrowserFrame} from './BrowserFrame';
+import {FONT_FAMILY} from '../fonts';
+import {SubtitleCue, VideoSegment} from '../types';
 
 interface Props {
   recordedVideoFilename: string;
+  segments: VideoSegment[];
   cues: SubtitleCue[];
   language: 'he' | 'en';
   title: string;
@@ -30,14 +31,10 @@ const TOP_BAR   = 80;   // px reserved above the browser frame for branding
 const MARGIN_H  = 70;   // px left/right margin around the browser frame
 const FRAME_BTM = 130;  // px reserved below the browser frame for caption pill
 
-/** First sentence of a string, used as caption fallback. */
-function firstSentence(text: string): string {
-  const m = text.match(/^[^.!?]*[.!?]?/);
-  return (m?.[0] ?? text).trim() || text;
-}
 
 export const VideoSection: React.FC<Props> = ({
   recordedVideoFilename,
+  segments,
   cues,
   language,
   title,
@@ -57,10 +54,8 @@ export const VideoSection: React.FC<Props> = ({
     }
   }
 
-  // ── Caption text: prefer explicit caption, else first sentence of narration ──
-  const captionText = activeCue
-    ? (activeCue.caption?.trim() || firstSentence(activeCue.text))
-    : '';
+  // ── Subtitle text: show the full narration (matches the spoken voiceover) ──
+  const captionText = activeCue?.text ?? '';
 
   // ── Subtitle opacity: fade IN over 15 frames, fade OUT 15 frames before next cue ──
   const nextCue = activeCueIndex >= 0 && activeCueIndex < cues.length - 1
@@ -79,8 +74,8 @@ export const VideoSection: React.FC<Props> = ({
       )
     : 0;
 
-  // ── Slow camera zoom: 1.0 → 1.06 across the full clip ──
-  const scale = interpolate(frame, [0, durationInFrames], [1.0, 1.06], {
+  // ── Slow camera zoom: 1.0 → 1.04 across the full clip ──
+  const scale = interpolate(frame, [0, durationInFrames], [1.0, 1.04], {
     extrapolateRight: 'clamp',
   });
 
@@ -93,6 +88,8 @@ export const VideoSection: React.FC<Props> = ({
     {extrapolateLeft: 'clamp'},
   );
   const dissolveOpacity = Math.max(dissolveIn, dissolveOut);
+
+  const videoSrc = staticFile(recordedVideoFilename);
 
   return (
     <AbsoluteFill style={{background: COLORS.bgGradient}}>
@@ -110,19 +107,15 @@ export const VideoSection: React.FC<Props> = ({
           zIndex: 10,
         }}
       >
+        <Img
+          src={staticFile('jeen-logo.png')}
+          style={{width: 100, height: 'auto'}}
+        />
         <div style={{
-          color: COLORS.accent,
-          fontSize: 24,
-          fontFamily: 'Arial, sans-serif',
-          fontWeight: 700,
-          letterSpacing: 3,
-        }}>
-          JEEN
-        </div>
-        <div style={{
-          color: 'rgba(255,255,255,0.7)',
+          color: COLORS.textMuted,
           fontSize: 18,
-          fontFamily: 'Arial, sans-serif',
+          fontFamily: FONT_FAMILY,
+          fontWeight: 500,
           direction: isHeb ? 'rtl' : 'ltr',
           maxWidth: 860,
           overflow: 'hidden',
@@ -133,7 +126,7 @@ export const VideoSection: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* ── Browser frame — leaves FRAME_BTM px at bottom for the caption pill ── */}
+      {/* ── Video segments (jump-cuts) — only visible-content portions ── */}
       <div
         style={{
           position: 'absolute',
@@ -146,22 +139,30 @@ export const VideoSection: React.FC<Props> = ({
           boxShadow: '0 40px 120px rgba(0,0,0,0.5)',
         }}
       >
-        <BrowserFrame url="jeenai.app">
-          <div style={{
-            width: '100%',
-            height: '100%',
-            transform: `scale(${scale})`,
-            transformOrigin: 'center center',
-          }}>
-            <OffthreadVideo
-              src={staticFile(recordedVideoFilename)}
-              style={{width: '100%', height: '100%', objectFit: 'cover'}}
-            />
-          </div>
-        </BrowserFrame>
+        <div style={{
+          width: '100%',
+          height: '100%',
+          transform: `scale(${scale})`,
+          transformOrigin: 'center center',
+        }}>
+          {segments.map((seg, i) => (
+            <Sequence
+              key={`seg-${i}`}
+              from={seg.outputStartFrame}
+              durationInFrames={seg.durationFrames}
+            >
+              <Sequence from={-seg.sourceStartFrame}>
+                <OffthreadVideo
+                  src={videoSrc}
+                  style={{width: '100%', height: '100%', objectFit: 'contain'}}
+                />
+              </Sequence>
+            </Sequence>
+          ))}
+        </div>
       </div>
 
-      {/* ── Per-step voiceover — unchanged, stays in sync ── */}
+      {/* ── Per-step voiceover ── */}
       {cues.map((cue, i) =>
         cue.audioFilename ? (
           <Sequence key={`audio-${i}`} from={cue.startFrame}>
@@ -170,7 +171,7 @@ export const VideoSection: React.FC<Props> = ({
         ) : null
       )}
 
-      {/* ── Caption pill — centered on the gradient strip below the frame ── */}
+      {/* ── Caption pill — centered below the frame ── */}
       {activeCue && captionText && (
         <div
           style={{
@@ -180,19 +181,20 @@ export const VideoSection: React.FC<Props> = ({
             transform: 'translateX(-50%)',
             maxWidth: '70%',
             padding: '14px 36px',
-            background: 'rgba(11,11,26,0.90)',
+            background: COLORS.narrationBg,
             borderRadius: 14,
-            border: `1px solid rgba(108,92,231,0.35)`,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.55)',
+            border: `1px solid ${COLORS.border}`,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
             opacity: subtitleOpacity,
             direction: isHeb ? 'rtl' : 'ltr',
             textAlign: isHeb ? 'right' : 'left',
           }}
         >
           <p style={{
-            color: COLORS.text,
+            color: COLORS.textLight,
             fontSize: 28,
-            fontFamily: 'Arial, sans-serif',
+            fontFamily: FONT_FAMILY,
+            fontWeight: 500,
             margin: 0,
             lineHeight: 1.45,
             whiteSpace: 'normal',

@@ -18,7 +18,13 @@ from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 
-from backend.config import BACKEND_PORT, SP_SCREENSHOTS_FOLDER, REGULAR_URL, ADMIN_URL
+from backend.config import (
+    BACKEND_PORT,
+    SP_SCREENSHOTS_FOLDER,
+    SP_EXPORT_BASE,
+    REGULAR_URL,
+    ADMIN_URL,
+)
 from backend.pipeline import run_pipeline
 from backend.video_pipeline import run_video_pipeline
 from backend.services import sharepoint, route_crawler
@@ -54,6 +60,12 @@ class DiscoverRoutesRequest(BaseModel):
     link_type: str = "regular"
 
 
+class ExportPdfsRequest(BaseModel):
+    folder_name: str
+    pdf_urls: list[str]
+    session_id: str = "default_session"
+
+
 @app.get("/health")
 async def health():
     return {"status": "ok"}
@@ -71,6 +83,31 @@ async def discover_routes(req: DiscoverRoutesRequest):
         return result
     except Exception as exc:
         logger.error("Route discovery failed: %s", exc)
+        return JSONResponse(status_code=500, content={"error": str(exc)})
+
+
+@app.post("/api/export-pdfs-to-sharepoint")
+async def export_pdfs_to_sharepoint(req: ExportPdfsRequest):
+    """
+    Copy the given SharePoint PDFs into a new folder under SP_EXPORT_BASE.
+    Returns {"folderUrl", "uploaded", "skipped"} on success.
+    """
+    if not req.pdf_urls:
+        return JSONResponse(status_code=400, content={"error": "No PDFs to export"})
+
+    dest_folder = f"{SP_EXPORT_BASE.strip('/')}/{req.folder_name.strip('/')}"
+    try:
+        result = await sharepoint.copy_pdfs_to_folder(
+            req.pdf_urls, dest_folder, session_id=req.session_id,
+        )
+        return result
+    except RuntimeError as exc:
+        # Device-flow auth required / pending — surface the message so the UI
+        # can show the verification URL + code.
+        logger.warning("SharePoint export auth required: %s", exc)
+        return JSONResponse(status_code=401, content={"error": str(exc)})
+    except Exception as exc:
+        logger.error("SharePoint export failed: %s", exc)
         return JSONResponse(status_code=500, content={"error": str(exc)})
 
 

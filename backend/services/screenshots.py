@@ -31,6 +31,12 @@ RENDER_SETTLE_MS = 1500
 # visible labels of the tile that navigates to the admin app.
 APPS_MENU_BUTTON_SELECTOR = 'button[aria-label="User interface controls menu"]'
 ADMIN_TILE_LABELS = ("Admin", "ניהול")
+SIDEBAR_SWAP_BUTTON_SELECTOR = "button[data-sidebar-swap], [data-sidebar-swap]"
+SIDEBAR_SWAP_LABELS = {
+    "פתח תפריט",
+    "open sidebar",
+    "sidebar menu",
+}
 
 # Button text that would persist/destroy data — never clicked during interactions,
 # even if the LLM requests it (defense in depth alongside the prompt rule).
@@ -308,13 +314,18 @@ async def _find_clickable(page: Page, text: str):
     text, or only its aria-label (icon-only buttons), so we try each in turn.
     """
     normalized = " ".join(text.split())
+    lowered = normalized.lower()
     candidates = [
+        page.locator(SIDEBAR_SWAP_BUTTON_SELECTOR)
+        if lowered in SIDEBAR_SWAP_LABELS else None,
         page.get_by_role("button", name=normalized, exact=False),
         page.get_by_role("menuitem", name=normalized, exact=False),
         page.get_by_text(normalized, exact=False),
         page.locator(f'[aria-label*="{normalized}"]'),
     ]
     for locator in candidates:
+        if locator is None:
+            continue
         element = locator.first
         try:
             if await element.count() == 0:
@@ -333,9 +344,10 @@ async def _find_input(page: Page, label: str):
     """
     normalized = " ".join(label.split())
     candidates = [
+        page.get_by_role("textbox", name=normalized, exact=False),
+        page.get_by_label(normalized, exact=False),
         page.get_by_placeholder(normalized, exact=False),
         page.locator(f'[aria-label*="{normalized}"]'),
-        page.get_by_label(normalized, exact=False),
         page.locator(f'input[name*="{normalized}"]'),
         page.locator(f'textarea[name*="{normalized}"]'),
     ]

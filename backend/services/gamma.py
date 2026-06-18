@@ -153,6 +153,15 @@ async def generate_presentation(
             "tone": "professional",
         },
         "imageOptions": image_options,
+        "cardOptions": {
+            "headerFooter": {
+                "bottomRight": {
+                    "type": "image",
+                    "source": "themeLogo",
+                    "size": "md",
+                },
+            },
+        },
     }
 
     logger.info("Gamma payload — imageOptions: %s", image_options)
@@ -167,7 +176,9 @@ async def generate_presentation(
 
     async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
         resp = await client.post(GAMMA_GENERATIONS_URL, json=payload, headers=headers)
-        resp.raise_for_status()
+        if resp.status_code >= 400:
+            logger.error("Gamma API %s: %s", resp.status_code, resp.text)
+            raise RuntimeError(f"Gamma API {resp.status_code}: {resp.text}")
 
     data = resp.json()
     generation_id = data.get("generationId")
@@ -195,7 +206,9 @@ async def poll_generation(generation_id: str, max_wait: int = 3600) -> dict:
     async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
         while True:
             resp = await client.get(url, headers=headers)
-            resp.raise_for_status()
+            if resp.status_code >= 400:
+                logger.error("Gamma poll API %s: %s", resp.status_code, resp.text)
+                raise RuntimeError(f"Gamma poll API {resp.status_code}: {resp.text}")
             data = resp.json()
             status = data.get("status")
 

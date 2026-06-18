@@ -1,17 +1,20 @@
 import React from 'react';
-import {AbsoluteFill, interpolate} from 'remotion';
+import {AbsoluteFill, Img, interpolate, staticFile} from 'remotion';
 import {COLORS, TITLE_FRAMES} from '../constants';
+import {FONT_FAMILY} from '../fonts';
 
 interface Props {
   frame: number;
   title: string;
   language: 'he' | 'en';
+  titleFrames?: number;
 }
 
-export const TitleSlide: React.FC<Props> = ({frame, title, language}) => {
+export const TitleSlide: React.FC<Props> = ({frame, title, language, titleFrames}) => {
+  const duration = titleFrames ?? TITLE_FRAMES;
   const isHeb = language === 'he';
   const fadeIn = interpolate(frame, [0, 20], [0, 1], {extrapolateRight: 'clamp'});
-  const fadeOut = interpolate(frame, [TITLE_FRAMES - 20, TITLE_FRAMES], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const fadeOut = interpolate(frame, [duration - 20, duration], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   const opacity = Math.min(fadeIn, fadeOut);
 
   const titleY = interpolate(frame, [0, 25], [30, 0], {extrapolateRight: 'clamp'});
@@ -26,21 +29,17 @@ export const TitleSlide: React.FC<Props> = ({frame, title, language}) => {
         opacity,
       }}
     >
-      {/* Brand */}
-      <div
+      {/* Brand logo */}
+      <Img
+        src={staticFile('jeen-logo.png')}
         style={{
           position: 'absolute',
-          top: 60,
+          top: 50,
           left: 80,
-          color: COLORS.accent,
-          fontSize: 30,
-          fontFamily: 'Arial, sans-serif',
-          fontWeight: 700,
-          letterSpacing: 3,
+          width: 120,
+          height: 'auto',
         }}
-      >
-        JEEN
-      </div>
+      />
 
       {/* Main title */}
       <div
@@ -48,7 +47,7 @@ export const TitleSlide: React.FC<Props> = ({frame, title, language}) => {
           transform: `translateY(${titleY}px)`,
           color: COLORS.text,
           fontSize: 72,
-          fontFamily: 'Arial, sans-serif',
+          fontFamily: FONT_FAMILY,
           fontWeight: 700,
           textAlign: 'center',
           direction: isHeb ? 'rtl' : 'ltr',
@@ -65,7 +64,7 @@ export const TitleSlide: React.FC<Props> = ({frame, title, language}) => {
         style={{
           color: COLORS.textMuted,
           fontSize: 34,
-          fontFamily: 'Arial, sans-serif',
+          fontFamily: FONT_FAMILY,
           marginTop: 28,
           direction: isHeb ? 'rtl' : 'ltr',
         }}

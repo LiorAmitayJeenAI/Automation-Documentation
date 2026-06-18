@@ -4,6 +4,7 @@
  * this component focuses purely on the chrome UI.
  */
 import React from 'react';
+import {FONT_FAMILY} from '../fonts';
 
 interface Props {
   url?: string;
@@ -23,7 +24,7 @@ export const BrowserFrame: React.FC<Props> = ({url = 'jeenai.app', children}) =>
       <div
         style={{
           height: CHROME_H,
-          background: '#16162A',
+          background: '#3D2B3A',
           borderBottom: '1px solid rgba(255,255,255,0.06)',
           display: 'flex',
           alignItems: 'center',
@@ -51,7 +52,7 @@ export const BrowserFrame: React.FC<Props> = ({url = 'jeenai.app', children}) =>
               padding: '5px 22px',
               color: 'rgba(255,255,255,0.5)',
               fontSize: 15,
-              fontFamily: 'Arial, sans-serif',
+              fontFamily: FONT_FAMILY,
               letterSpacing: 0.2,
               maxWidth: 520,
               overflow: 'hidden',

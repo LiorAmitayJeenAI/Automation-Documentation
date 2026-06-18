@@ -13,7 +13,7 @@ import logging
 import os
 import time
 from pathlib import Path
-from urllib.parse import quote, urlparse
+from urllib.parse import quote, unquote, urlparse
 
 import httpx
 
@@ -408,3 +408,106 @@ async def download_url_and_upload(
         file_name = "presentation.pdf"
 
     return await upload_file_bytes(content, file_name, folder_path, session_id)
+
+
+def _drive_relative_path(web_url: str) -> str | None:
+    """
+    Convert a SharePoint file webUrl into a path relative to the document
+    library (drive) root.
+
+    e.g. ".../Shared%20Documents/Testing/LiorAmitay/JeenTutorial/445906946-x.pdf"
+         -> "Testing/LiorAmitay/JeenTutorial/445906946-x.pdf"
+    """
+    if not web_url:
+        return None
+    path = unquote(urlparse(web_url).path)
+    # The default document library is exposed as "Shared Documents".
+    for marker in ("/Shared Documents/", "/Documents/"):
+        idx = path.find(marker)
+        if idx != -1:
+            return path[idx + len(marker):].strip("/")
+    return None
+
+
+async def copy_pdfs_to_folder(
+    pdf_urls: list[str],
+    dest_folder: str,
+    session_id: str = "default_session",
+) -> dict:
+    """
+    Copy a set of existing SharePoint PDFs (given by their webUrls) into a new
+    destination folder. Files are downloaded then re-uploaded via Graph so the
+    copy works regardless of the caller's browser session.
+
+    De-duplicates by destination file name. Returns
+    {"folderUrl", "uploaded": [...], "skipped": int}.
+    """
+    dest_folder = dest_folder.strip("/")
+    token = _ensure_token(session_id=session_id)
+    _, drive_id = _get_drive_id(token)
+
+    uploaded: list[dict] = []
+    folder_url: str | None = None
+    seen_names: set[str] = set()
+    skipped = 0
+
+    async with httpx.AsyncClient(timeout=_UPLOAD_TIMEOUT) as client:
+        for web_url in pdf_urls:
+            rel_path = _drive_relative_path(web_url)
+            if not rel_path:
+                logger.warning("Could not parse SharePoint path from URL: %s", web_url)
+                skipped += 1
+                continue
+
+            file_name = os.path.basename(rel_path)
+            if file_name in seen_names:
+                continue
+            seen_names.add(file_name)
+
+            # Download the source file's bytes.
+            download_url = (
+                f"{GRAPH_V1}/drives/{drive_id}/root:/{quote(rel_path)}:/content"
+            )
+            resp = await client.get(
+                download_url,
+                headers={"Authorization": f"Bearer {token}"},
+                follow_redirects=True,
+            )
+            if resp.status_code >= 400:
+                logger.warning(
+                    "Skipping %s — download failed (%s)", file_name, resp.status_code
+                )
+                skipped += 1
+                continue
+            content = resp.content
+
+            # Upload into the destination folder.
+            upload_url = (
+                f"{GRAPH_V1}/drives/{drive_id}"
+                f"/root:/{quote(dest_folder)}/{quote(file_name)}:/content"
+            )
+            up = await client.put(
+                upload_url,
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/octet-stream",
+                },
+                content=content,
+            )
+            up.raise_for_status()
+            item = up.json()
+            uploaded.append({
+                "name": item.get("name"),
+                "webUrl": item.get("webUrl"),
+                "size": item.get("size"),
+            })
+
+            if folder_url is None:
+                # Derive the folder URL by stripping the file name from the
+                # uploaded file's webUrl.
+                item_url = item.get("webUrl") or ""
+                folder_url = item_url.rsplit("/", 1)[0] if item_url else None
+
+            logger.info("Copied %s to %s (%d bytes)", file_name, dest_folder, len(content))
+
+    return {"folderUrl": folder_url, "uploaded": uploaded, "skipped": skipped}

@@ -7,8 +7,9 @@
  * Frame 0 here = start of the explanation sequence (after the recording).
  */
 import React from 'react';
-import {AbsoluteFill, useCurrentFrame, interpolate} from 'remotion';
+import {AbsoluteFill, Audio, Img, Sequence, staticFile, useCurrentFrame, interpolate} from 'remotion';
 import {COLORS, EXPLANATION_FRAMES} from '../constants';
+import {FONT_FAMILY} from '../fonts';
 import {ExplanationCue} from '../types';
 
 interface Props {
@@ -53,29 +54,23 @@ export const ExplanationSlides: React.FC<Props> = ({cues, language, title}) => {
           left: 0,
           right: 0,
           height: 90,
-          background: 'linear-gradient(to bottom, rgba(11,11,26,0.9) 0%, transparent 100%)',
+          background: 'linear-gradient(to bottom, rgba(99,64,94,0.5) 0%, transparent 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '0 64px',
         }}
       >
+        <Img
+          src={staticFile('jeen-logo.png')}
+          style={{width: 100, height: 'auto'}}
+        />
         <div
           style={{
-            color: COLORS.accent,
-            fontSize: 24,
-            fontFamily: 'Arial, sans-serif',
-            fontWeight: 700,
-            letterSpacing: 3,
-          }}
-        >
-          JEEN
-        </div>
-        <div
-          style={{
-            color: 'rgba(255,255,255,0.7)',
+            color: COLORS.textMuted,
             fontSize: 18,
-            fontFamily: 'Arial, sans-serif',
+            fontFamily: FONT_FAMILY,
+            fontWeight: 500,
             direction: isHeb ? 'rtl' : 'ltr',
             maxWidth: 800,
             overflow: 'hidden',
@@ -116,7 +111,7 @@ export const ExplanationSlides: React.FC<Props> = ({cues, language, title}) => {
             boxShadow: `0 0 40px ${COLORS.glow}`,
             fontSize: 32,
             color: '#fff',
-            fontFamily: 'Arial, sans-serif',
+            fontFamily: FONT_FAMILY,
             fontWeight: 700,
           }}
         >
@@ -135,7 +130,7 @@ export const ExplanationSlides: React.FC<Props> = ({cues, language, title}) => {
             style={{
               color: COLORS.text,
               fontSize: 36,
-              fontFamily: 'Arial, sans-serif',
+              fontFamily: FONT_FAMILY,
               textAlign: isHeb ? 'right' : 'center',
               direction: isHeb ? 'rtl' : 'ltr',
               lineHeight: 1.65,
@@ -155,7 +150,7 @@ export const ExplanationSlides: React.FC<Props> = ({cues, language, title}) => {
           ...(isHeb ? { left: 64 } : { right: 64 }),
           color: COLORS.textMuted,
           fontSize: 20,
-          fontFamily: 'Arial, sans-serif',
+          fontFamily: FONT_FAMILY,
           fontWeight: 600,
         }}
       >
@@ -174,6 +169,15 @@ export const ExplanationSlides: React.FC<Props> = ({cues, language, title}) => {
         }}
       />
     </AbsoluteFill>
+
+      {/* Per-slide voiceover audio */}
+      {cues.map((c, i) =>
+        c.audioFilename ? (
+          <Sequence key={`expl-audio-${i}`} from={i * EXPLANATION_FRAMES}>
+            <Audio src={staticFile(c.audioFilename)} />
+          </Sequence>
+        ) : null
+      )}
     </AbsoluteFill>
   );
 };

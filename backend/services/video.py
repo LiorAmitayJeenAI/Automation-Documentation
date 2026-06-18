@@ -25,8 +25,8 @@ from backend.config import VIDEO_DIR, VIDEO_PROJECT_DIR, JEEN_VIDEOS_DIR
 logger = logging.getLogger(__name__)
 
 FPS = 30
-TITLE_FRAMES = 90        # 3 s title card before the recording
-END_FRAMES = 60          # 2 s end card after the recording
+TITLE_FRAMES_DEFAULT = 90   # 3 s fallback when no title audio
+END_FRAMES = 45             # 1.5 s end card after the recording
 EXPLANATION_FRAMES = 180 # 6 s per explanation slide (failed steps)
 RENDER_TIMEOUT_SECONDS = 600  # 10 min — real video can be long
 
@@ -38,6 +38,7 @@ async def render_video(
     language: str = "he",
     session_id: str = "default",
     file_stem: str = "",
+    extra_audio: dict | None = None,
 ) -> str | None:
     """
     Compose the WebM recording with subtitles and render to MP4 via Remotion.
@@ -56,6 +57,7 @@ async def render_video(
         return None
 
     step_timings: list[float] = recording_result.get("step_timings", [])
+    step_settles: list[float] = recording_result.get("step_settles", [])
     recorded_steps: list[dict] = recording_result.get("recorded_steps", [])
     recorded_audio: list[dict | None] = recording_result.get("recorded_audio", [])
     failed_steps: list[dict] = recording_result.get("failed_steps", [])
@@ -78,9 +80,26 @@ async def render_video(
     audio_public = Path(VIDEO_PROJECT_DIR) / "public" / "audio" / session_id
     audio_public.mkdir(parents=True, exist_ok=True)
 
-    # Build subtitle cues — startFrame is relative to the recording (not the title slide)
+    # ── Build segments (jump-cut): only show the "visible content" portion of each step ──
+    # Each segment = the settle period after content is fully loaded (skips loading/navigation)
+    segments: list[dict] = []
+    output_frame_cursor = 0
+
+    for idx, timing in enumerate(step_timings):
+        settle_s = step_settles[idx] if idx < len(step_settles) else 2.0
+        source_start_frame = math.floor(timing * FPS)
+        segment_duration_frames = math.ceil(settle_s * FPS)
+
+        segments.append({
+            "sourceStartFrame": source_start_frame,
+            "durationFrames": segment_duration_frames,
+            "outputStartFrame": output_frame_cursor,
+        })
+        output_frame_cursor += segment_duration_frames
+
+    # Build subtitle cues — startFrame is now relative to the jump-cut output timeline
     cues = []
-    for idx, (timing, step) in enumerate(zip(step_timings, recorded_steps)):
+    for idx, (seg, step) in enumerate(zip(segments, recorded_steps)):
         audio = recorded_audio[idx] if idx < len(recorded_audio) else None
         audio_filename: str | None = None
 
@@ -92,7 +111,7 @@ async def render_video(
                 audio_filename = f"audio/{session_id}/{src.name}"
 
         cue: dict = {
-            "startFrame": math.floor(timing * FPS),
+            "startFrame": seg["outputStartFrame"],
             "text": step.get("narration", ""),
             "action": step.get("action", ""),
         }
@@ -102,6 +121,18 @@ async def render_video(
             cue["audioFilename"] = audio_filename
         cues.append(cue)
 
+    # ── Per-cue diagnostics ──
+    logger.info("Jump-cut segment analysis (%d segments):", len(segments))
+    for idx, seg in enumerate(segments):
+        audio = recorded_audio[idx] if idx < len(recorded_audio) else None
+        audio_s = audio["duration_s"] if audio and audio.get("duration_s") else 0.0
+        seg_s = seg["durationFrames"] / FPS
+        logger.info(
+            "  segment %d: source=%.1fs dur=%.1fs audio=%.1fs%s",
+            idx, seg["sourceStartFrame"] / FPS, seg_s, audio_s,
+            " [NO AUDIO]" if not audio else "",
+        )
+
     # Build explanation cues for steps Playwright could not navigate to
     explanation_cues = [
         {"text": s.get("narration", ""), "action": s.get("action", "")}
@@ -109,9 +140,47 @@ async def render_video(
         if s.get("narration")
     ]
 
-    recorded_video_frames = math.ceil(total_seconds * FPS)
+    # ── Copy extra audio (title / end / explanation) into Remotion public ──
+    extra_audio = extra_audio or {}
+    title_audio_filename: str | None = None
+    end_audio_filename: str | None = None
+
+    title_audio = extra_audio.get("title")
+    if title_audio and title_audio.get("path"):
+        src = Path(title_audio["path"])
+        if src.is_file():
+            dest = audio_public / src.name
+            shutil.copy2(src, dest)
+            title_audio_filename = f"audio/{session_id}/{src.name}"
+
+    end_audio = extra_audio.get("end")
+    if end_audio and end_audio.get("path"):
+        src = Path(end_audio["path"])
+        if src.is_file():
+            dest = audio_public / src.name
+            shutil.copy2(src, dest)
+            end_audio_filename = f"audio/{session_id}/{src.name}"
+
+    expl_audio_list = extra_audio.get("explanations") or []
+    for idx_e, expl_audio in enumerate(expl_audio_list):
+        if idx_e < len(explanation_cues) and expl_audio and expl_audio.get("path"):
+            src = Path(expl_audio["path"])
+            if src.is_file():
+                dest = audio_public / src.name
+                shutil.copy2(src, dest)
+                explanation_cues[idx_e]["audioFilename"] = f"audio/{session_id}/{src.name}"
+
+    recorded_video_frames = output_frame_cursor  # sum of all segment durations
     explanation_frames = len(explanation_cues) * EXPLANATION_FRAMES
-    total_frames = TITLE_FRAMES + recorded_video_frames + explanation_frames + END_FRAMES
+
+    # Title duration adapts to audio length (+ 0.5 s pad) so narration never gets cut off
+    title_audio_data = extra_audio.get("title")
+    if title_audio_data and title_audio_data.get("duration_s"):
+        title_frames = math.ceil((title_audio_data["duration_s"] + 0.5) * FPS)
+    else:
+        title_frames = TITLE_FRAMES_DEFAULT
+
+    total_frames = title_frames + recorded_video_frames + explanation_frames + END_FRAMES
 
     if explanation_cues:
         logger.info(
@@ -119,16 +188,43 @@ async def render_video(
             len(explanation_cues), explanation_frames,
         )
 
+    total_duration_s = total_frames / FPS
+    recording_s = recorded_video_frames / FPS
+    title_s = title_frames / FPS
+    end_s = END_FRAMES / FPS
+    logger.info(
+        "Projected duration: %.1f s (title=%.1f + recording=%.1f + explanations=%.1f + end=%.1f) "
+        "[raw recording was %.1f s, saved %.1f s via jump-cuts]",
+        total_duration_s, title_s, recording_s, explanation_frames / FPS, end_s,
+        total_seconds, total_seconds - recording_s,
+    )
+    if total_duration_s > 60:
+        breakdown = []
+        for idx, seg in enumerate(segments):
+            seg_s = seg["durationFrames"] / FPS
+            action = recorded_steps[idx].get("action", "?") if idx < len(recorded_steps) else "?"
+            breakdown.append(f"  step {idx + 1}: {seg_s:.1f}s — {action}")
+        logger.warning(
+            "Video exceeds 60 s target (%.1f s). Per-segment breakdown:\n%s",
+            total_duration_s, "\n".join(breakdown),
+        )
+
     props: dict = {
         "title": title,
         "language": language,
         "recordedVideoFilename": f"recordings/{session_id}.webm",
         "recordedVideoFrames": recorded_video_frames,
+        "titleFrames": title_frames,
         "totalFrames": total_frames,
+        "segments": segments,
         "cues": cues,
         "explanationCues": explanation_cues,
         "explanationFrames": explanation_frames,
     }
+    if title_audio_filename:
+        props["titleAudioFilename"] = title_audio_filename
+    if end_audio_filename:
+        props["endAudioFilename"] = end_audio_filename
 
     props_fd, props_path = tempfile.mkstemp(suffix=".json")
     try:

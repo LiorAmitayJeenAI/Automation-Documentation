@@ -5,6 +5,13 @@
     "clickable_elements": [
       {
         "variants": [
+          "פתח תפריט",
+          "Open sidebar",
+          "Sidebar menu"
+        ]
+      },
+      {
+        "variants": [
           "GPT 5.1 - Azure OpenAI",
           "dropdown-trigger"
         ]
@@ -61,6 +68,13 @@
     "path": "/chat",
     "description": "Active conversation thread with the AI assistant — message bubbles and input box",
     "clickable_elements": [
+      {
+        "variants": [
+          "פתח תפריט",
+          "Open sidebar",
+          "Sidebar menu"
+        ]
+      },
       {
         "variants": [
           "GPT 5.1 - Azure OpenAI",

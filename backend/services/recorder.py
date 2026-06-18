@@ -36,7 +36,112 @@ from backend.services.screenshots import (
 logger = logging.getLogger(__name__)
 
 VIEWPORT = {"width": 1920, "height": 1080}
-MIN_SETTLE_MS = 2500  # minimum dwell time per step regardless of script value
+MIN_SETTLE_MS = 1200  # minimum dwell time per step regardless of script value
+
+# Selectors that indicate the page is still loading / not painted yet.
+_SPINNER_SELECTORS = [
+    '[class*="spinner"]',
+    '[class*="loading"]',
+    '[class*="skeleton"]',
+    '[aria-busy="true"]',
+]
+_SPINNER_COMBINED = ", ".join(_SPINNER_SELECTORS)
+_SPINNER_POLL_TIMEOUT_MS = 4000
+_SPINNER_POLL_INTERVAL_MS = 200
+
+async def wait_until_no_spinner(page: Page, timeout_ms: int = _SPINNER_POLL_TIMEOUT_MS) -> bool:
+    """
+    Poll until no visible spinner / loading / skeleton elements remain on the
+    page.  Returns True if the page became clean within *timeout_ms*, False if
+    the timeout elapsed (caller should fall back to current behaviour).
+    """
+    deadline = time.time() + timeout_ms / 1000.0
+    while time.time() < deadline:
+        count = await page.evaluate(
+            """(sel) => {
+                const els = document.querySelectorAll(sel);
+                let visible = 0;
+                for (const el of els) {
+                    const r = el.getBoundingClientRect();
+                    if (r.width > 0 && r.height > 0) visible++;
+                }
+                return visible;
+            }""",
+            _SPINNER_COMBINED,
+        )
+        if count == 0:
+            return True
+        await page.wait_for_timeout(_SPINNER_POLL_INTERVAL_MS)
+    return False
+
+
+def _first_interaction_selector(interactions: list[dict]) -> str | None:
+    """
+    Return a CSS-ish selector for the first click/fill target in the
+    interaction list, so we can wait for it before stamping cue time.
+    Returns None if nothing usable is found.
+    """
+    for step in interactions:
+        kind = (step.get("type") or "click").lower()
+        if kind == "click":
+            text = (step.get("text") or "").strip()
+            if text:
+                return text
+        elif kind == "fill":
+            label = (step.get("label") or "").strip()
+            if label:
+                return label
+    return None
+
+
+async def _wait_for_page_ready(
+    page: Page,
+    interactions: list[dict],
+    variant_groups: list[list[str]] | None = None,
+) -> None:
+    """
+    Wait for a real "page is ready" signal after goto+networkidle.
+
+    Strategy (tried in order):
+    1. If the step has interactions, wait for the first click/fill target
+       element to become visible — that proves the SPA has finished painting
+       the relevant UI.
+    2. Fall back to wait_until_no_spinner: poll until no visible spinner /
+       loading / skeleton / aria-busy elements remain.
+    3. If neither signal arrives, log a warning and proceed (fall back to
+       current behaviour, which already waited for networkidle + RENDER_SETTLE_MS).
+    """
+    target = _first_interaction_selector(interactions)
+
+    if target:
+        try:
+            # For clicks, search using the same resolution chain as _find_clickable
+            first_kind = (interactions[0].get("type") or "click").lower()
+            if first_kind == "click":
+                candidates = _expand_variants(target, variant_groups or [])
+                for candidate in candidates:
+                    el = await _find_clickable(page, candidate)
+                    if el is not None:
+                        logger.debug("Page ready — interaction target %r found", candidate)
+                        return
+            elif first_kind == "fill":
+                el = await _find_input(page, target)
+                if el is not None:
+                    logger.debug("Page ready — input target %r found", target)
+                    return
+        except Exception as exc:
+            logger.debug("Interaction-target wait failed (%s), trying spinner poll", exc)
+
+    # Fallback: wait for spinners / skeletons / aria-busy to disappear
+    clean = await wait_until_no_spinner(page)
+    if clean:
+        logger.debug("Page ready — no spinners detected")
+    else:
+        logger.warning(
+            "Spinner wait timed out after %d ms — proceeding anyway",
+            _SPINNER_POLL_TIMEOUT_MS,
+        )
+
 
 # ── Injected cursor + click-ripple script ────────────────────────────────────
 # Runs on every navigation via page.add_init_script so headless Chromium shows
@@ -162,11 +267,18 @@ async def _run_interactions_visible(
             if bbox:
                 cx = bbox["x"] + bbox["width"] / 2
                 cy = bbox["y"] + bbox["height"] / 2
-                await page.mouse.move(cx, cy, steps=25)
-                await page.wait_for_timeout(300)
+                await page.mouse.move(cx, cy, steps=18)
+                await page.wait_for_timeout(200)
 
             await element.click(timeout=5000)
             await element.fill(value)
+
+            actual = await element.input_value()
+            if not actual and value:
+                logger.debug("fill() produced empty value for %r — retrying with press_sequentially", label)
+                await element.clear()
+                await element.press_sequentially(value, delay=50)
+
             await page.wait_for_timeout(500)
             continue
 
@@ -194,10 +306,10 @@ async def _run_interactions_visible(
             if bbox:
                 cx = bbox["x"] + bbox["width"] / 2
                 cy = bbox["y"] + bbox["height"] / 2
-                await page.mouse.move(cx, cy, steps=25)
-                await page.wait_for_timeout(300)
+                await page.mouse.move(cx, cy, steps=18)
+                await page.wait_for_timeout(200)
                 await page.evaluate(_JS_HIGHLIGHT_SHOW, bbox)
-                await page.wait_for_timeout(450)
+                await page.wait_for_timeout(350)
 
             await element.click(timeout=5000)
             await page.evaluate(_JS_HIGHLIGHT_HIDE)
@@ -240,8 +352,8 @@ async def record_product_video(
 
     audio_results: parallel list to video_script with TTS results
       {"path": str, "duration_s": float} or None per step.
-      When provided, effective settle_ms = max(MIN_SETTLE_MS, audio_duration_ms + 800)
-      so the page stays on screen exactly as long as the narration takes.
+      When provided, settle_ms = audio_duration_ms + 200 (tight to speech, no
+      MIN_SETTLE_MS floor) so the clip matches the narration with no silent tail.
 
     Returns:
       {
@@ -258,6 +370,7 @@ async def record_product_video(
 
     audio_results = audio_results or []
     step_timings: list[float] = []
+    step_settles: list[float] = []  # actual settle duration (seconds) per recorded step
     recorded_steps: list[dict] = []
     recorded_audio: list[dict | None] = []
     failed_steps: list[dict] = []
@@ -299,10 +412,10 @@ async def record_product_video(
             interactions = step.get("interactions") or []
             audio = audio_results[i] if i < len(audio_results) else None
 
-            # Audio-driven timing: page lingers exactly as long as narration + 0.8 s pad.
-            # Falls back to the script's settle_ms (min MIN_SETTLE_MS) when no audio.
+            # Audio-tight linger: clip matches narration length with minimal pad.
+            # No MIN_SETTLE_MS floor when audio exists — speech IS the timing.
             if audio and audio.get("duration_s"):
-                settle_ms = max(MIN_SETTLE_MS, round(audio["duration_s"] * 1000) + 800)
+                settle_ms = round(audio["duration_s"] * 1000) + 200
             else:
                 settle_ms = max(int(step.get("settle_ms", 3000)), MIN_SETTLE_MS)
 
@@ -333,7 +446,6 @@ async def record_product_video(
                     await page.wait_for_load_state("networkidle", timeout=PAGE_LOAD_WAIT_MS)
                 except Exception:
                     pass
-                await page.wait_for_timeout(RENDER_SETTLE_MS)
 
                 # Detect redirects (SPA route guards — page not reachable in current state)
                 final_url = page.url
@@ -351,10 +463,15 @@ async def record_product_video(
                     failed_steps.append(step)
                     continue
 
+                # ── Wait for the SPA to finish painting ──
+                # Resolve variant groups once (used by both ready-wait and interactions)
+                route_path = urlparse(url).path.rstrip("/") or "/"
+                variant_groups = _load_clickable_groups(route_path, link_type)
+
+                await _wait_for_page_ready(page, interactions, variant_groups)
+
                 # Run interactions with visible cursor, highlight ring, and ripple
                 if interactions:
-                    route_path = urlparse(url).path.rstrip("/") or "/"
-                    variant_groups = _load_clickable_groups(route_path, link_type)
                     try:
                         await _run_interactions_visible(page, interactions, variant_groups)
                         await page.wait_for_timeout(RENDER_SETTLE_MS)
@@ -363,9 +480,14 @@ async def record_product_video(
                             "Step %d interactions failed (%s) — capturing plain page", i + 1, exc
                         )
 
+                # One final spinner check after interactions (clicks may trigger
+                # new loading states, e.g. opening a modal with a skeleton).
+                await wait_until_no_spinner(page)
+
                 # Mark the moment the content is fully visible — this is the subtitle cue start
                 seen_urls.add(url_key)
                 step_timings.append(time.time() - record_start)
+                step_settles.append(settle_ms / 1000.0)
                 recorded_steps.append(step)
                 recorded_audio.append(audio)
 
@@ -395,6 +517,7 @@ async def record_product_video(
     return {
         "webm_path": str(webm_path),
         "step_timings": step_timings,
+        "step_settles": step_settles,
         "total_seconds": total_seconds,
         "recorded_steps": recorded_steps,
         "recorded_audio": recorded_audio,
