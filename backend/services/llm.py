@@ -22,7 +22,7 @@ from backend.config import (
     AZURE_OPENAI_API_VERSION,
 )
 from backend.prompts.document_formatter import DOCUMENT_FORMATTER_PROMPT
-from backend.prompts.narration import NARRATION_PROMPT
+from backend.prompts.narration import NARRATION_PROMPT, VIDEO_NARRATION_REGEN_PROMPT
 from backend.prompts.video_script import VIDEO_SCRIPT_PROMPT, get_language_instructions
 
 logger = logging.getLogger(__name__)
@@ -44,8 +44,12 @@ def _route_link_type(route: dict) -> str:
     return _normalize_link_type(route.get("link_type"))
 
 
-def _load_allowed_routes(link_type: str = "regular") -> list[dict]:
-    """Load the curated list of valid product routes used to constrain screenshots."""
+def _load_allowed_routes(link_type: str = "regular", language: str = "he") -> list[dict]:
+    """Load the curated list of valid product routes used to constrain screenshots.
+
+    Routes with a "language" field are only included when it matches the requested
+    language. Routes without a "language" field are shared and always included.
+    """
     normalized_link_type = _normalize_link_type(link_type)
     try:
         with open(_ROUTES_MAP_PATH, encoding="utf-8") as f:
@@ -60,6 +64,7 @@ def _load_allowed_routes(link_type: str = "regular") -> list[dict]:
                     and _route_link_type(r) == normalized_link_type
                     and not r["path"].startswith("/support/")
                     and r["path"] != "/chat"
+                    and (r.get("language") is None or r.get("language") == language)
                 )
             ]
     except FileNotFoundError:
@@ -151,7 +156,7 @@ async def format_document(
     }
     """
     language_name = "Hebrew" if language == "he" else "English"
-    allowed_routes = _format_allowed_routes(_load_allowed_routes(link_type), base_url)
+    allowed_routes = _format_allowed_routes(_load_allowed_routes(link_type, language), base_url)
     system_prompt = DOCUMENT_FORMATTER_PROMPT.format(
         language_name=language_name,
         base_url=base_url,
@@ -203,7 +208,7 @@ async def generate_video_script(
     Returns a list of step dicts, each with:
       url, action, narration, interactions (optional), settle_ms
     """
-    allowed_routes = _format_allowed_routes(_load_allowed_routes(link_type), base_url)
+    allowed_routes = _format_allowed_routes(_load_allowed_routes(link_type, language), base_url)
     lang_instructions = get_language_instructions(language)
     system_prompt = VIDEO_SCRIPT_PROMPT.format(
         language_instructions=lang_instructions,
@@ -304,6 +309,88 @@ async def generate_narration(
         narrations.append(screenshot_results[len(narrations)].get("action", ""))
 
     return [{**r, "narration": str(narrations[i])} for i, r in enumerate(screenshot_results)]
+
+
+def _describe_failed_interaction(step: dict) -> str:
+    """Build a short human-readable description of the click/tab that did not happen."""
+    labels: list[str] = []
+    for inter in step.get("interactions") or []:
+        kind = (inter.get("type") or "click").lower()
+        if kind == "click" and inter.get("text"):
+            labels.append(str(inter["text"]).strip())
+        elif kind == "fill" and inter.get("label"):
+            labels.append(str(inter["label"]).strip())
+    if labels:
+        return ", ".join(labels)
+    return step.get("action", "")
+
+
+async def regenerate_narrations(
+    recorded_steps: list[dict],
+    language: str = "he",
+) -> list[dict]:
+    """
+    Rewrite narration for steps whose interactions failed during recording.
+
+    When Playwright cannot open a planned tab/panel/modal, the recorder flags the
+    step with ``interaction_failed: True``. The original narration still describes
+    the un-opened state, so the voiceover no longer matches the screen. This pass
+    asks the LLM to rewrite ONLY those flagged steps to describe the plain base
+    page instead. Steps that recorded correctly are returned unchanged.
+
+    Returns the same list with the ``narration`` field replaced on flagged steps.
+    Falls back to the original narration on any error.
+    """
+    failed_indices = [
+        i for i, s in enumerate(recorded_steps) if s.get("interaction_failed")
+    ]
+    if not failed_indices:
+        return recorded_steps
+
+    logger.info(
+        "Regenerating narration for %d step(s) whose interactions failed",
+        len(failed_indices),
+    )
+
+    input_data = [
+        {
+            "url": recorded_steps[i].get("url", ""),
+            "action": recorded_steps[i].get("action", ""),
+            "failed_interaction": _describe_failed_interaction(recorded_steps[i]),
+            "original_narration": recorded_steps[i].get("narration", ""),
+            "language": language,
+        }
+        for i in failed_indices
+    ]
+
+    try:
+        response = await _client.chat.completions.create(
+            model=AZURE_OPENAI_DEPLOYMENT,
+            messages=[
+                {"role": "system", "content": VIDEO_NARRATION_REGEN_PROMPT},
+                {"role": "user", "content": json.dumps(input_data, ensure_ascii=False)},
+            ],
+            max_completion_tokens=2000,
+        )
+        raw = response.choices[0].message.content or ""
+        cleaned = _strip_code_fences(raw)
+        rewritten = json.loads(cleaned)
+        if not isinstance(rewritten, list):
+            raise ValueError("Expected JSON array")
+    except (json.JSONDecodeError, ValueError) as exc:
+        logger.warning("Narration regeneration failed (%s) — keeping originals", exc)
+        return recorded_steps
+
+    updated = [dict(s) for s in recorded_steps]
+    for n, idx in enumerate(failed_indices):
+        if n < len(rewritten) and str(rewritten[n]).strip():
+            old = updated[idx].get("narration", "")
+            updated[idx]["narration"] = str(rewritten[n]).strip()
+            logger.info(
+                "Step %d narration rewritten:\n  was: %s\n  now: %s",
+                idx + 1, old, updated[idx]["narration"],
+            )
+    return updated
 
 
 def extract_title(markdown_content: str) -> str:

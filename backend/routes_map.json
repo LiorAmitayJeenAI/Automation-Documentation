@@ -5,13 +5,6 @@
     "clickable_elements": [
       {
         "variants": [
-          "פתח תפריט",
-          "Open sidebar",
-          "Sidebar menu"
-        ]
-      },
-      {
-        "variants": [
           "GPT 5.1 - Azure OpenAI",
           "dropdown-trigger"
         ]
@@ -70,13 +63,6 @@
     "clickable_elements": [
       {
         "variants": [
-          "פתח תפריט",
-          "Open sidebar",
-          "Sidebar menu"
-        ]
-      },
-      {
-        "variants": [
           "GPT 5.1 - Azure OpenAI",
           "dropdown-trigger"
         ]
@@ -131,7 +117,7 @@
       {
         "variants": [
           "הסוכנים שלי",
-          "My agents"
+          "My Agents"
         ]
       },
       {
@@ -150,14 +136,14 @@
         "variants": [
           "צור סוכן",
           "agents-page-primary-action-add",
-          "Create agent"
+          "Create Agent"
         ]
       },
       {
         "variants": [
           "צור תיקייה",
           "agents-page-primary-action-create-folder",
-          "Create folder"
+          "Create Folder"
         ]
       },
       {
@@ -182,14 +168,9 @@
   },
   {
     "path": "/agent-configuration/b6f06945-ba74-4c86-8950-be90547055cb",
+    "language": "he",
     "description": "Edit a Spark agent — configuration and settings page for a Spark-type agent",
     "clickable_elements": [
-      {
-        "variants": [
-          "המר ל Cortex",
-          "Convert to Cortex"
-        ]
-      },
       {
         "variants": [
           "פעיל",
@@ -211,56 +192,63 @@
       },
       {
         "variants": [
-          "תוכל לעזור לי לבנות תרחישי בדיקה?",
-          "Can you help me build test scenarios?"
-        ]
-      },
-      {
-        "variants": [
-          "איך לנסח באג בצורה מדויקת?",
-          "How do I write a precise bug report?"
-        ]
-      },
-      {
-        "variants": [
-          "מהם סוגי הבדיקות שכדאי לבצע למוצר חדש?",
-          "What types of tests should be performed for a new product?"
-        ]
-      },
-      {
-        "variants": [
-          "האם תוכל לנתח עבורי בדיקות קיימות?",
-          "Can you analyze existing tests for me?"
-        ]
-      },
-      {
-        "variants": [
           "Brain",
           "Menu"
         ]
       },
       {
         "variants": [
-          "שיחה",
-          "Chat"
-        ]
-      },
-      {
-        "variants": [
-          "הגדרות",
-          "Settings"
-        ]
-      },
-      {
-        "variants": [
           "העלאת תמונה",
-          "Upload image"
+          "Upload Image"
+        ]
+      },
+      {
+        "variants": [
+          "הסרה",
+          "Remove"
+        ]
+      },
+      {
+        "variants": [
+          "בחר תהליכים",
+          "Select processes"
+        ]
+      },
+      {
+        "variants": [
+          "הוסף",
+          "Add"
+        ]
+      },
+      {
+        "variants": [
+          "0 קבצים",
+          "0 files"
+        ]
+      },
+      {
+        "variants": [
+          "העלאת קובץ",
+          "Upload File"
+        ]
+      },
+      {
+        "variants": [
+          "ערוך",
+          "Edit"
+        ]
+      },
+      {
+        "variants": [
+          "הגדר טבלת המרה",
+          "Configure conversion table"
         ]
       }
     ]
   },
   {
     "path": "/agent-configuration/d66e45bd-85de-40cf-a81a-ed8466d09c50",
+    "language": "he",
     "description": "Edit a Cortex agent — configuration and settings page for a Cortex-type agent",
     "clickable_elements": [
       {
@@ -284,30 +272,6 @@
       },
       {
         "variants": [
-          "תוכל לעזור לי לבנות תרחישי בדיקה?",
-          "Can you help me build test scenarios?"
-        ]
-      },
-      {
-        "variants": [
-          "איך לנסח באג בצורה מדויקת?",
-          "How do I write a precise bug report?"
-        ]
-      },
-      {
-        "variants": [
-          "מהם סוגי הבדיקות שכדאי לבצע למוצר חדש?",
-          "What types of tests should be performed for a new product?"
-        ]
-      },
-      {
-        "variants": [
-          "האם תוכל לנתח עבורי בדיקות קיימות?",
-          "Can you analyze existing tests for me?"
-        ]
-      },
-      {
-        "variants": [
           "Brain",
           "Menu"
         ]
@@ -315,7 +279,7 @@
       {
         "variants": [
           "העלאת תמונה",
-          "Upload image"
+          "Upload Image"
         ]
       },
       {
@@ -332,14 +296,54 @@
       },
       {
         "variants": [
-          "ערוך פתיחי שיחה",
-          "Edit conversation starters"
+          "הוסף",
+          "Add"
+        ]
+      },
+      {
+        "variants": [
+          "0 קבצים",
+          "0 files"
+        ]
+      },
+      {
+        "variants": [
+          "העלאת קובץ",
+          "Upload File"
+        ]
+      },
+      {
+        "variants": [
+          "ערוך",
+          "Edit"
+        ]
+      },
+      {
+        "variants": [
+          "הגדר טבלת המרה",
+          "Configure conversion table"
         ]
       }
     ]
   },
   {
     "path": "/workflow/flow/05e7f241-7528-4417-a5c6-4a2774ea0d9e",
+    "language": "he",
+    "description": "Edit a Workflow agent — visual flow builder for a workflow-type agent"
+  },
+  {
+    "path": "/agent-configuration/338b8275-4edf-41af-a846-baa2d08e1019",
+    "language": "en",
+    "description": "Edit a Spark agent — configuration and settings page for a Spark-type agent"
+  },
+  {
+    "path": "/agent-configuration/c40c8d50-2a04-4a1b-8932-bc0afbef7675",
+    "language": "en",
+    "description": "Edit a Cortex agent — configuration and settings page for a Cortex-type agent"
+  },
+  {
+    "path": "/workflow/flow/5625b3d8-3355-464c-b539-f7f1b1feb58e",
+    "language": "en",
     "description": "Edit a Workflow agent — visual flow builder for a workflow-type agent"
   },
   {
@@ -348,26 +352,76 @@
     "clickable_elements": [
       {
         "variants": [
-          "דלג",
-          "Skip"
+          "פעיל",
+          "dropdown-trigger",
+          "Active"
         ]
       },
       {
         "variants": [
-          "תבניות נוספות",
-          "More templates"
+          "יצירה",
+          "Create"
         ]
       },
       {
         "variants": [
-          "Voice input",
-          "קלט קולי"
+          "Brain",
+          "Menu"
         ]
       },
       {
         "variants": [
-          "Submit",
-          "שלח"
+          "העלאת תמונה",
+          "Upload Image"
+        ]
+      },
+      {
+        "variants": [
+          "הסרה",
+          "Remove"
+        ]
+      },
+      {
+        "variants": [
+          "בחר תהליכים",
+          "Select processes"
+        ]
+      },
+      {
+        "variants": [
+          "הוסף",
+          "Add"
+        ]
+      },
+      {
+        "variants": [
+          "0 קבצים",
+          "0 files"
+        ]
+      },
+      {
+        "variants": [
+          "העלאת קובץ",
+          "Upload File"
+        ]
+      },
+      {
+        "variants": [
+          "ערוך",
+          "Edit"
+        ]
+      },
+      {
+        "variants": [
+          "הגדר טבלת המרה",
+          "Configure conversion table"
+        ]
+      },
+      {
+        "variants": [
+          "GPT 5.1 - Azure OpenAI\nמומלץ",
+          "dropdown-trigger",
+          "GPT 5.1 - Azure OpenAI\nRecommended"
         ]
       }
     ]
@@ -441,14 +495,14 @@
       {
         "variants": [
           "התזמונים שלי",
-          "My schedules"
+          "My Schedules"
         ]
       },
       {
         "variants": [
           "צור תזמון",
           "triggers-page-primary-action-create",
-          "Create schedule"
+          "Create Schedule"
         ]
       },
       {
@@ -478,7 +532,7 @@
       {
         "variants": [
           "הקבצים שלי",
-          "My files"
+          "My Files"
         ]
       },
       {
@@ -497,7 +551,7 @@
       {
         "variants": [
           "צור תיקייה",
-          "Create folder"
+          "Create Folder"
         ]
       },
       {
@@ -760,41 +814,744 @@
   {
     "link_type": "admin",
     "path": "/roles-management",
-    "description": "Admin roles management page — shows default and custom account roles, default role settings, and a permissions editor. Includes role cards such as Company Admin, Unit Admin and Builder plus an \"Edit role\" button and collapsible admin sidebar."
+    "description": "Admin roles management page — shows default and custom account roles, default role settings, and a permissions editor. Includes role cards such as Company Admin, Unit Admin and Builder plus an \"Edit role\" button and collapsible admin sidebar.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Jeen Admin",
+          "logo-wrapper",
+          "מנהל Jeen"
+        ]
+      },
+      {
+        "variants": [
+          "Company Admin\nרמה 2",
+          "מנהל חברה\nרמה 2"
+        ]
+      },
+      {
+        "variants": [
+          "Unit Admin\nרמה 3",
+          "מנהל יחידה\nרמה 3"
+        ]
+      },
+      {
+        "variants": [
+          "רמה 4\n2 תפקידים",
+          "Level 4\n2 roles"
+        ]
+      },
+      {
+        "variants": [
+          "Member\nרמה 9",
+          "חבר\nרמה 9"
+        ]
+      },
+      {
+        "variants": [
+          "תפקיד חדש",
+          "new-role-button",
+          "New role"
+        ]
+      },
+      {
+        "variants": [
+          "Builder (רמה 4)",
+          "dropdown-trigger",
+          "בונה (רמה 4)"
+        ]
+      },
+      {
+        "variants": [
+          "Platform (Global)",
+          "פלטפורמה (גלובלית)"
+        ]
+      },
+      {
+        "variants": [
+          "Workspace",
+          "סביבת עבודה"
+        ]
+      },
+      {
+        "variants": [
+          "Knowledge",
+          "ידע"
+        ]
+      },
+      {
+        "variants": [
+          "Agents",
+          "סוכנים"
+        ]
+      },
+      {
+        "variants": [
+          "Admin APP",
+          "אפליקציית ניהול"
+        ]
+      }
+    ]
   },
   {
     "link_type": "admin",
     "path": "/design-management",
-    "description": "Admin design management page — create and manage UI themes with theme list, active/default status, color and logo settings, and a live preview. Includes actions like create theme, rename, delete theme, remove logo, and logo upload drop zone without changing the URL."
+    "description": "Admin design management page — create and manage UI themes with theme list, active/default status, color and logo settings, and a live preview. Includes actions like create theme, rename, delete theme, remove logo, and logo upload drop zone without changing the URL.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Jeen Admin",
+          "logo-wrapper",
+          "מנהל Jeen"
+        ]
+      },
+      {
+        "variants": [
+          "קובץ לוגו\nאו גרור ושחרר כאן",
+          "design-config-logo-drop-zone",
+          "Logo file\nor drag and drop here"
+        ]
+      },
+      {
+        "variants": [
+          "בהיר",
+          "design-preview-mode-button",
+          "Light"
+        ]
+      },
+      {
+        "variants": [
+          "בטל",
+          "btn-secondary",
+          "Cancel"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים",
+          "btn-primary",
+          "Save changes"
+        ]
+      },
+      {
+        "variants": [
+          "מחק ערכת נושא",
+          "Delete theme"
+        ]
+      },
+      {
+        "variants": [
+          "שנה שם",
+          "Rename"
+        ]
+      },
+      {
+        "variants": [
+          "הסר לוגו",
+          "Remove logo"
+        ]
+      },
+      {
+        "variants": [
+          "design-preview-app-switcher-button"
+        ]
+      },
+      {
+        "variants": [
+          "design-preview-attach-button"
+        ]
+      },
+      {
+        "variants": [
+          "design-preview-plus-button"
+        ]
+      },
+      {
+        "variants": [
+          "design-preview-send-button"
+        ]
+      }
+    ]
   },
   {
     "link_type": "admin",
     "path": "/system-prompts",
-    "description": "Admin system prompts page — configure the main system instruction used for AI interactions and assign or edit prompt content. Includes cancel/save controls and a close action within the editor area."
+    "description": "Admin system prompts page — configure the main system instruction used for AI interactions and assign or edit prompt content. Includes cancel/save controls and a close action within the editor area.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Jeen Admin",
+          "logo-wrapper",
+          "מנהל Jeen"
+        ]
+      },
+      {
+        "variants": [
+          "בטל",
+          "main-prompt-discard-button",
+          "Cancel"
+        ]
+      },
+      {
+        "variants": [
+          "שמור",
+          "main-prompt-save-button",
+          "Save"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים",
+          "btn-primary",
+          "Save changes"
+        ]
+      },
+      {
+        "variants": [
+          "סגור",
+          "Close"
+        ]
+      }
+    ]
   },
   {
     "link_type": "admin",
     "path": "/skills",
-    "description": "Admin skills library page — manage organization skill packages, showing an empty-state when no skills are found. Includes upload, create skill, status filter, cancel and save changes controls."
+    "description": "Admin skills library page — manage organization skill packages, showing an empty-state when no skills are found. Includes upload, create skill, status filter, cancel and save changes controls.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Jeen Admin",
+          "logo-wrapper",
+          "מנהל Jeen"
+        ]
+      },
+      {
+        "variants": [
+          "העלאה",
+          "upload-skill",
+          "Upload"
+        ]
+      },
+      {
+        "variants": [
+          "צור כישור",
+          "create-skill",
+          "Create skill"
+        ]
+      },
+      {
+        "variants": [
+          "כל הסטטוסים",
+          "dropdown-trigger",
+          "All statuses"
+        ]
+      },
+      {
+        "variants": [
+          "שם הכישור",
+          "Sort by שם הכישור",
+          "Skill name"
+        ]
+      },
+      {
+        "variants": [
+          "נוצר",
+          "Sort by נוצר",
+          "Created"
+        ]
+      },
+      {
+        "variants": [
+          "בטל",
+          "btn-secondary",
+          "Cancel"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים",
+          "btn-primary",
+          "Save changes"
+        ]
+      },
+      {
+        "variants": [
+          "פעולות",
+          "Actions"
+        ]
+      }
+    ]
   },
   {
     "link_type": "admin",
     "path": "/audit-logs",
-    "description": "Admin audit logs page — table of administrative and system changes with timestamp, category, action, entity, scope and actor columns. Includes CSV export plus date range, category and action type filters."
+    "description": "Admin audit logs page — table of administrative and system changes with timestamp, category, action, entity, scope and actor columns. Includes CSV export plus date range, category and action type filters.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Jeen Admin",
+          "logo-wrapper",
+          "מנהל Jeen"
+        ]
+      },
+      {
+        "variants": [
+          "ייצוא (CSV)",
+          "audit-logs-export-button",
+          "Export (CSV)"
+        ]
+      },
+      {
+        "variants": [
+          "טווח תאריכים",
+          "audit-logs-date-range-button",
+          "Date range"
+        ]
+      },
+      {
+        "variants": [
+          "קטגוריה",
+          "category-filter-button",
+          "Category"
+        ]
+      },
+      {
+        "variants": [
+          "סוג פעולה",
+          "action-filter-button",
+          "Action type"
+        ]
+      },
+      {
+        "variants": [
+          "היקף",
+          "scope-filter-button",
+          "Scope"
+        ]
+      },
+      {
+        "variants": [
+          "חותמת זמן",
+          "Sort by חותמת זמן",
+          "Timestamp"
+        ]
+      },
+      {
+        "variants": [
+          "פעולה",
+          "Sort by פעולה",
+          "Action"
+        ]
+      },
+      {
+        "variants": [
+          "ישות",
+          "Sort by ישות",
+          "Entity"
+        ]
+      },
+      {
+        "variants": [
+          "בוצע על ידי",
+          "Sort by בוצע על ידי",
+          "Performed by"
+        ]
+      },
+      {
+        "variants": [
+          "הקודם",
+          "pagination-prev",
+          "Previous"
+        ]
+      },
+      {
+        "variants": [
+          "הבא",
+          "pagination-next",
+          "Next"
+        ]
+      }
+    ]
   },
   {
     "link_type": "admin",
     "path": "/analytics",
-    "description": "Admin analytics dashboard — tracks platform usage, engagement, performance and agent metrics with charts and KPI cards. Includes in-page tabs for reports, user activity, performance/errors and agents, plus filters for date range, users and model."
+    "description": "Admin analytics dashboard — tracks platform usage, engagement, performance and agent metrics with charts and KPI cards. Includes in-page tabs for reports, user activity, performance/errors and agents, plus filters for date range, users and model.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Jeen Admin",
+          "logo-wrapper",
+          "מנהל Jeen"
+        ]
+      },
+      {
+        "variants": [
+          "דוחות",
+          "Reports"
+        ]
+      },
+      {
+        "variants": [
+          "פעילות משתמשים",
+          "User activity"
+        ]
+      },
+      {
+        "variants": [
+          "ביצועים ושגיאות",
+          "Performance and errors"
+        ]
+      },
+      {
+        "variants": [
+          "סוכנים",
+          "Agents"
+        ]
+      },
+      {
+        "variants": [
+          "מעקב",
+          "Monitoring"
+        ]
+      },
+      {
+        "variants": [
+          "5/23/2026 – 6/21/2026",
+          "date-range-picker-trigger"
+        ]
+      },
+      {
+        "variants": [
+          "כל המשתמשים",
+          "dropdown-trigger",
+          "All users"
+        ]
+      },
+      {
+        "variants": [
+          "כל המודלים",
+          "dropdown-trigger",
+          "All models"
+        ]
+      },
+      {
+        "variants": [
+          "שמור פילטרים מותאמים",
+          "Save custom filters"
+        ]
+      },
+      {
+        "variants": [
+          "שעות",
+          "Hours"
+        ]
+      },
+      {
+        "variants": [
+          "ימים",
+          "Days"
+        ]
+      }
+    ]
   },
   {
     "link_type": "admin",
     "path": "/organization-assets",
-    "description": "Admin organization assets page — lists user-created agents, skills and triggers across the organization with owner, visibility and status details. Includes in-page tabs for agents, skills and triggers plus filters such as owner, group and status."
+    "description": "Admin organization assets page — lists user-created agents, skills and triggers across the organization with owner, visibility and status details. Includes in-page tabs for agents, skills and triggers plus filters such as owner, group and status.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Jeen Admin",
+          "logo-wrapper",
+          "מנהל Jeen"
+        ]
+      },
+      {
+        "variants": [
+          "סוכנים",
+          "Agents"
+        ]
+      },
+      {
+        "variants": [
+          "כישורים",
+          "Skills"
+        ]
+      },
+      {
+        "variants": [
+          "טריגרים",
+          "Triggers"
+        ]
+      },
+      {
+        "variants": [
+          "בעלים",
+          "dropdown-trigger",
+          "Owner"
+        ]
+      },
+      {
+        "variants": [
+          "קבוצה",
+          "dropdown-trigger",
+          "Group"
+        ]
+      },
+      {
+        "variants": [
+          "כל הסטטוסים",
+          "dropdown-trigger",
+          "All statuses"
+        ]
+      },
+      {
+        "variants": [
+          "שם",
+          "Sort by שם",
+          "Name"
+        ]
+      },
+      {
+        "variants": [
+          "סוג",
+          "Sort by סוג",
+          "Type"
+        ]
+      },
+      {
+        "variants": [
+          "חשיפה",
+          "Sort by חשיפה",
+          "Visibility"
+        ]
+      },
+      {
+        "variants": [
+          "סטטוס בעלים",
+          "Sort by סטטוס בעלים",
+          "Owner status"
+        ]
+      },
+      {
+        "variants": [
+          "שליטה",
+          "Sort by שליטה",
+          "Control"
+        ]
+      }
+    ]
   },
   {
     "link_type": "admin",
     "path": "/organization-settings",
-    "description": "Admin organization settings page — configure organization defaults such as profile, memory, help center, languages, default role and token limits. Includes in-page tabs for general, agents, templates and models, with cancel/save changes controls for unsaved settings."
+    "description": "Admin organization settings page — configure organization defaults such as profile, memory, help center, languages, default role and token limits. Includes in-page tabs for general, agents, templates and models, with cancel/save changes controls for unsaved settings.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Jeen Admin",
+          "logo-wrapper",
+          "מנהל Jeen"
+        ]
+      },
+      {
+        "variants": [
+          "כללי",
+          "General"
+        ]
+      },
+      {
+        "variants": [
+          "סוכנים",
+          "Agents"
+        ]
+      },
+      {
+        "variants": [
+          "תבניות",
+          "Templates"
+        ]
+      },
+      {
+        "variants": [
+          "מודלים",
+          "Models"
+        ]
+      },
+      {
+        "variants": [
+          "הטמעה וניתוח",
+          "Embedding and analysis"
+        ]
+      },
+      {
+        "variants": [
+          "Builder",
+          "dropdown-trigger",
+          "בונה"
+        ]
+      },
+      {
+        "variants": [
+          "English",
+          "language-item-en",
+          "אנגלית"
+        ]
+      },
+      {
+        "variants": [
+          "Hebrew",
+          "language-item-he",
+          "עברית"
+        ]
+      },
+      {
+        "variants": [
+          "דחה",
+          "Reject"
+        ]
+      },
+      {
+        "variants": [
+          "אשר",
+          "Confirm"
+        ]
+      },
+      {
+        "variants": [
+          "הוספת תבנית",
+          "Add template"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "admin",
+    "path": "/guardrails",
+    "description": "Admin guardrails settings page — configure safety limits for input and output, including blocked keywords/topics, guard prompts, blocked-message response, validation rules, validation prompt, and safe fallback response. Includes the admin navigation sidebar with a collapse control.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Jeen Admin",
+          "logo-wrapper",
+          "מנהל Jeen"
+        ]
+      },
+      {
+        "variants": [
+          "Off",
+          "dropdown-trigger",
+          "כבוי"
+        ]
+      },
+      {
+        "variants": [
+          "13 selected",
+          "dropdown-trigger",
+          "13 נבחרו"
+        ]
+      },
+      {
+        "variants": [
+          "הרץ בדיקה",
+          "Run test"
+        ]
+      },
+      {
+        "variants": [
+          "בטל",
+          "btn-secondary",
+          "Cancel"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים",
+          "btn-primary",
+          "Save changes"
+        ]
+      },
+      {
+        "variants": [
+          "Add tag",
+          "הוסף תגית"
+        ]
+      },
+      {
+        "variants": [
+          "Clear selection",
+          "נקה בחירה"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "admin",
+    "path": "/users-and-groups",
+    "description": "Admin users and groups page — manage organization users, groups, role-change requests, and the SaaS group hierarchy. Includes links/add actions, role and override filters, and cancel/save changes buttons without changing the URL.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Jeen Admin",
+          "logo-wrapper",
+          "מנהל Jeen"
+        ]
+      },
+      {
+        "variants": [
+          "קישורים",
+          "manage-links-button",
+          "Links"
+        ]
+      },
+      {
+        "variants": [
+          "הוסף",
+          "Menu",
+          "Add"
+        ]
+      },
+      {
+        "variants": [
+          "תפקיד:\nכל התפקידים",
+          "dropdown-trigger",
+          "Role:\nAll roles"
+        ]
+      },
+      {
+        "variants": [
+          "דריסה:\nהכל",
+          "dropdown-trigger",
+          "Override:\nAll"
+        ]
+      },
+      {
+        "variants": [
+          "בטל",
+          "btn-secondary",
+          "Cancel"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים",
+          "btn-primary",
+          "Save changes"
+        ]
+      },
+      {
+        "variants": [
+          "collapse-expand-all-button"
+        ]
+      },
+      {
+        "variants": [
+          "פעולות",
+          "Actions"
+        ]
+      }
+    ]
   }
 ]

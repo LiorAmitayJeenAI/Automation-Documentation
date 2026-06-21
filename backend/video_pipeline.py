@@ -35,13 +35,16 @@ class VideoEvent:
         return {"stage": self.stage, "status": self.status, "detail": self.detail, **self.data}
 
 
-def _make_file_stem(folder_name: str, part_name: str, session_id: str) -> str:
-    """Build a clean file stem from folder + part name, falling back to session_id."""
+def _make_file_stem(folder_name: str, part_name: str, session_id: str, language: str = "") -> str:
+    """Build a clean file stem from folder + part name + language, falling back to session_id."""
     def sanitize(s: str) -> str:
         return re.sub(r"[^\w\-]", "_", s.strip(), flags=re.UNICODE).strip("_")[:80]
 
     parts = [sanitize(p) for p in [folder_name, part_name] if p and p.strip()]
-    return "_".join(parts) if parts else session_id
+    stem = "_".join(parts) if parts else session_id
+    if language:
+        stem = f"{stem}_{language}"
+    return stem
 
 
 async def run_video_pipeline(
@@ -57,7 +60,7 @@ async def run_video_pipeline(
     The final event carries video_url (SharePoint URL for the MP4).
     """
     base_url = ADMIN_URL if link_type == "admin" else REGULAR_URL
-    file_stem = _make_file_stem(folder_name, part_name, session_id)
+    file_stem = _make_file_stem(folder_name, part_name, session_id, language)
 
     # ── 1. Fetch Confluence content ──
     yield VideoEvent("confluence", "running", "Fetching Confluence page...")
@@ -118,6 +121,7 @@ async def run_video_pipeline(
             link_type=link_type,
             session_id=session_id,
             audio_results=audio_results,
+            language=language,
         )
         n_recorded = len(recording_result.get("recorded_steps", []))
         duration = recording_result.get("total_seconds", 0)
@@ -134,26 +138,53 @@ async def run_video_pipeline(
         yield VideoEvent("record", "error", "No steps were captured successfully")
         return
 
-    # ── 4b. Synthesize TTS for title, explanation slides, and end card ──
+    # ── 4a2. Fix narration for steps whose interactions failed ──
+    # When Playwright could not open a planned tab/panel, the viewer sees only the
+    # plain page. Rewrite those steps' narration to match, then re-synthesize their
+    # audio and tighten their segment timing so voiceover, subtitle and screen agree.
+    try:
+        recorded_steps = recording_result.get("recorded_steps", [])
+        if any(s.get("interaction_failed") for s in recorded_steps):
+            yield VideoEvent(
+                "narration_fix", "running",
+                "Aligning narration with captured screens...",
+            )
+            fixed_steps = await llm.regenerate_narrations(recorded_steps, language=language)
+            recording_result["recorded_steps"] = fixed_steps
+
+            recorded_audio = recording_result.get("recorded_audio", [])
+            step_settles = recording_result.get("step_settles", [])
+            n_fixed = 0
+            for idx, step in enumerate(fixed_steps):
+                if not step.get("interaction_failed"):
+                    continue
+                new_audio = await tts.synthesize_step(
+                    step.get("narration", ""),
+                    step_index=800 + idx,
+                    session_id=session_id,
+                    language=language,
+                )
+                if new_audio and idx < len(recorded_audio):
+                    recorded_audio[idx] = new_audio
+                    # Tighten the segment to the new clip, but never exceed the
+                    # originally recorded linger window (avoids bleeding into the
+                    # next step's navigation in the jump-cut output).
+                    if idx < len(step_settles):
+                        old_settle = step_settles[idx]
+                        step_settles[idx] = min(new_audio["duration_s"] + 0.2, old_settle)
+                    n_fixed += 1
+
+            yield VideoEvent(
+                "narration_fix", "done",
+                f"Re-aligned {n_fixed} narration(s) to the captured screens",
+                {"realigned_steps": n_fixed},
+            )
+    except Exception as exc:
+        logger.warning("Narration realignment failed (%s) — keeping originals", exc)
+
+    # ── 4b. Synthesize TTS for explanation slides (title/end cards are silent) ──
     extra_audio: dict = {"title": None, "end": None, "explanations": []}
     try:
-        is_heb = language == "he"
-        title_narration = f"מדריך: {title}" if is_heb else f"Guide: {title}"
-        end_narration = "תודה שצפיתם" if is_heb else "Thank you for watching"
-
-        title_audio, end_audio = await asyncio.gather(
-            tts.synthesize_step(
-                title_narration, step_index=900, session_id=session_id,
-                language=language,
-            ),
-            tts.synthesize_step(
-                end_narration, step_index=901, session_id=session_id,
-                language=language,
-            ),
-        )
-        extra_audio["title"] = title_audio
-        extra_audio["end"] = end_audio
-
         failed_steps = recording_result.get("failed_steps", [])
         if failed_steps:
             expl_tasks = [
@@ -167,10 +198,8 @@ async def run_video_pipeline(
             expl_results = await asyncio.gather(*expl_tasks)
             extra_audio["explanations"] = list(expl_results)
 
-        n_extra = sum(1 for v in [title_audio, end_audio] if v) + sum(
-            1 for e in extra_audio["explanations"] if e
-        )
-        logger.info("Extra TTS (title/end/explanations): %d clips voiced", n_extra)
+        n_extra = sum(1 for e in extra_audio["explanations"] if e)
+        logger.info("Extra TTS (explanations): %d clips voiced", n_extra)
     except Exception as exc:
         logger.warning("Extra TTS synthesis failed (%s) — continuing without", exc)
 

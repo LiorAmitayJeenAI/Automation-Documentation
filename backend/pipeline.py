@@ -117,6 +117,7 @@ async def run_pipeline(
                 link_type=link_type,
                 folder_name=folder_name,
                 part_name=part_name,
+                language=language,
             )
             saved_paths = [r["path"] for r in screenshot_results]
             yield PipelineEvent(

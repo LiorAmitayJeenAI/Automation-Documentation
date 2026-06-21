@@ -291,40 +291,6 @@ function assetButton(url, type, label) {
     </a>`;
 }
 
-function renderGenerateVideoButton(tutorial) {
-  if (!tutorial) return '';
-  const isProcessing = tutorial.videoStatus === 'processing';
-  const hasVideo = !!tutorial.videoUrl;
-  const label = isProcessing ? 'Generating…' : hasVideo ? 'Regenerate Video' : 'Generate Video';
-  const disabled = isProcessing || isTutorialProcessing(tutorial) ? 'disabled' : '';
-  return `<button
-    class="asset-btn video-generate"
-    onclick="event.stopPropagation(); generateVideo('${esc(jsString(tutorial.id))}')"
-    ${disabled}
-    title="${esc(label)}"
-  >${assetIcon('video')}<span>${esc(label)}</span></button>`;
-}
-
-async function generateVideo(tutorialId) {
-  const res = await fetch(`/api/tutorials/${encodeURIComponent(tutorialId)}/generate-video`, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({}),
-  });
-  if (!res.ok) {
-    alert('Failed to start video generation. Check the server logs.');
-    return;
-  }
-  // Refresh library after a short delay so the "Generating…" state shows
-  setTimeout(() => loadTutorials(), 800);
-  // Keep polling until done
-  const pollInterval = setInterval(async () => {
-    await loadTutorials();
-    const list = tutorials;
-    const t = list.find(x => x.id === tutorialId);
-    if (!t || t.videoStatus !== 'processing') clearInterval(pollInterval);
-  }, 6000);
-}
 
 function renderLanguageSection(page, tutorial, language) {
   const meta = getLanguageMeta(language);
@@ -356,7 +322,6 @@ function renderLanguageSection(page, tutorial, language) {
         ${assetButton(tutorial?.gammaUrl, 'gamma', 'Gamma')}
         ${assetButton(tutorial?.sharepointUrl, 'pdf', 'PDF')}
         ${assetButton(tutorial?.videoUrl, 'video', 'Video')}
-        ${renderGenerateVideoButton(tutorial)}
       </div>
     </section>`;
 }
@@ -388,7 +353,6 @@ function renderPartCard(card, isExpanded) {
         <span class="part-chevron">
           <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
-        <span class="part-badge">${esc(part.badge)}</span>
         <span class="part-heading">
           <strong>${esc(part.heading)}</strong>
           <span>${cardTutorials.length} asset set${cardTutorials.length !== 1 ? 's' : ''}${latestDate ? ` · Updated ${formatDate(latestDate, true)}` : ''}</span>

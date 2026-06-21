@@ -527,37 +527,6 @@ function runVideoPipeline(url, language, linkType, signal, sessionId, folderName
   });
 }
 
-/* ── Trigger video generation for a single tutorial ── */
-app.post('/api/tutorials/:id/generate-video', async (req, res) => {
-  const list = loadTutorials();
-  const tutorial = list.find(t => t.id === req.params.id);
-  if (!tutorial) return res.status(404).json({ error: 'Tutorial not found' });
-
-  const url = tutorial.confluenceUrl || tutorial.url;
-  if (!url) return res.status(400).json({ error: 'Tutorial has no Confluence URL' });
-
-  const { language = tutorial.language || 'he', linkType = 'regular' } = req.body || {};
-  const sessionId = makeSessionId('video');
-
-  const flat = loadUrlsFlat();
-  const entry = flat.find(u => u.url === url);
-  const folderName = entry?.folderName || '';
-  const partName = tutorial.label || entry?.label || '';
-
-  // Mark as video-generating so the UI can show a spinner
-  upsertTutorial(url, { videoStatus: 'processing', language }, { appendHistory: false });
-  res.json({ started: true, sessionId });
-
-  // Run the video pipeline in the background (fire-and-forget from HTTP perspective)
-  runVideoPipeline(url, language, linkType, null, sessionId, folderName, partName)
-    .then((result) => {
-      const videoUrl = result?.video_url || null;
-      upsertTutorial(url, { videoStatus: 'done', videoUrl, language }, { appendHistory: false });
-    })
-    .catch((err) => {
-      upsertTutorial(url, { videoStatus: 'error', language }, { appendHistory: false });
-    });
-});
 
 /* ══════════════════════════════════════════════════
    Folder endpoints
@@ -639,7 +608,7 @@ app.delete('/api/folders/:folderId/urls/:pageIndex', (req, res) => {
 /* ══════════════════════════════════════════════════
    Discover product routes (Playwright crawl)
 ══════════════════════════════════════════════════ */
-const ROUTE_DISCOVERY_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes
+const ROUTE_DISCOVERY_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
 
 function discoverRoutes(linkType) {
   return new Promise((resolve, reject) => {
@@ -744,7 +713,7 @@ async function executeRun(runId, runItems, language) {
     if (run.controller.signal.aborted) {
       run.itemStates.set(url, { status: 'stopped', error: 'Generation stopped by user' });
       handleStoppedTutorial(url, { language, sessionId: null, error: 'Generation stopped by user' });
-      run.emitter.emit('event', { url, status: 'stopped', error: 'Generation stopped by user' });
+      run.emitter.emit('event', { url, status: 'stopped', folderName: item.folderName, label: item.label, error: 'Generation stopped by user' });
       continue;
     }
 
@@ -757,7 +726,7 @@ async function executeRun(runId, runItems, language) {
 
     run.itemStates.set(url, { status: 'running', sessionId });
     upsertTutorial(url, { status: 'running', language, sessionId, error: null }, { appendHistory: true });
-    run.emitter.emit('event', { url, status: 'running', sessionId, linkType: itemLinkType });
+    run.emitter.emit('event', { url, status: 'running', sessionId, linkType: itemLinkType, folderName: item.folderName, label: item.label });
 
     try {
       const result = await runPipeline(url, language, itemLinkType, sessionController.signal, sessionId, item.folderName || '', item.label || '');
@@ -773,17 +742,17 @@ async function executeRun(runId, runItems, language) {
         lastGeneratedAt: new Date().toISOString(),
         error: null,
       }, { appendHistory: true });
-      run.emitter.emit('event', { url, status: 'done', sessionId, linkType: itemLinkType, result });
+      run.emitter.emit('event', { url, status: 'done', sessionId, linkType: itemLinkType, folderName: item.folderName, label: item.label, result });
     } catch (err) {
       if (sessionController.signal.aborted || err.name === 'AbortError') {
         run.itemStates.set(url, { status: 'stopped', sessionId, error: 'Generation stopped by user' });
         handleStoppedTutorial(url, { language, sessionId, error: 'Generation stopped by user' });
-        run.emitter.emit('event', { url, status: 'stopped', sessionId, linkType: itemLinkType, error: 'Generation stopped by user' });
+        run.emitter.emit('event', { url, status: 'stopped', sessionId, linkType: itemLinkType, folderName: item.folderName, label: item.label, error: 'Generation stopped by user' });
         continue;
       }
       run.itemStates.set(url, { status: 'error', sessionId, error: err.message });
       upsertTutorial(url, { status: 'error', language, sessionId, error: err.message }, { appendHistory: true });
-      run.emitter.emit('event', { url, status: 'error', sessionId, linkType: itemLinkType, error: err.message });
+      run.emitter.emit('event', { url, status: 'error', sessionId, linkType: itemLinkType, folderName: item.folderName, label: item.label, error: err.message });
     } finally {
       activeSessions.delete(sessionId);
       run.sessionIds.delete(sessionId);
@@ -892,27 +861,28 @@ async function executeVideoRun(runId, runItems, language) {
 
   for (const item of runItems) {
     if (run.controller.signal.aborted) {
-      run.emitter.emit('event', { url: item.url, status: 'error', error: 'Stopped by user' });
+      run.emitter.emit('event', { url: item.url, status: 'error', folderName: item.folderName, label: item.label, error: 'Stopped by user' });
       continue;
     }
 
     const { url, linkType: itemLinkType } = item;
     const sessionId = makeSessionId('video-run');
 
-    run.emitter.emit('event', { url, status: 'running', sessionId });
+    run.emitter.emit('event', { url, status: 'running', sessionId, folderName: item.folderName, label: item.label });
     console.log(`[video-run] ${runId} — starting item  url=${url}  session=${sessionId}`);
 
     try {
       const result = await runVideoPipelineStream(
         url, language, itemLinkType, run.controller.signal, sessionId,
         (stageEvent) => {
-          // Relay each pipeline stage to the frontend so it can show live progress
           run.emitter.emit('event', {
             url,
             status: 'stage',
             stage: stageEvent.stage,
             stageStatus: stageEvent.status,
             detail: stageEvent.detail,
+            folderName: item.folderName,
+            label: item.label,
           });
         },
         item.folderName || '',
@@ -921,7 +891,6 @@ async function executeVideoRun(runId, runItems, language) {
 
       const videoUrl = result?.video_url || null;
 
-      // Store videoUrl in the tutorial record (creates one if it doesn't exist yet)
       upsertTutorial(url, {
         status: 'done',
         language,
@@ -932,14 +901,14 @@ async function executeVideoRun(runId, runItems, language) {
       }, { appendHistory: false });
 
       console.log(`[video-run] ${runId} — done  url=${url}  video_url=${videoUrl || 'none'}`);
-      run.emitter.emit('event', { url, status: 'done', sessionId, video_url: videoUrl });
+      run.emitter.emit('event', { url, status: 'done', sessionId, folderName: item.folderName, label: item.label, video_url: videoUrl });
     } catch (err) {
       if (run.controller.signal.aborted || err.name === 'AbortError') {
         console.log(`[video-run] ${runId} — stopped by user  url=${url}`);
-        run.emitter.emit('event', { url, status: 'error', error: 'Stopped by user' });
+        run.emitter.emit('event', { url, status: 'error', folderName: item.folderName, label: item.label, error: 'Stopped by user' });
       } else {
         console.error(`[video-run] ${runId} — error  url=${url}:`, err.message);
-        run.emitter.emit('event', { url, status: 'error', error: err.message });
+        run.emitter.emit('event', { url, status: 'error', folderName: item.folderName, label: item.label, error: err.message });
       }
     }
   }
@@ -1000,7 +969,7 @@ app.get('/api/runs/:runId/events', (req, res) => {
 
   const snapshot = run.items.map(item => {
     const state = run.itemStates.get(item.url);
-    return { url: item.url, linkType: item.linkType, ...(state || { status: 'pending' }) };
+    return { url: item.url, linkType: item.linkType, folderName: item.folderName, label: item.label, ...(state || { status: 'pending' }) };
   });
   res.write(`data: ${JSON.stringify({ status: 'snapshot', runId: run.runId, items: snapshot })}\n\n`);
 
@@ -1019,7 +988,7 @@ app.get('/api/runs/active', (req, res) => {
   for (const [runId, run] of activeRuns) {
     const items = run.items.map(item => {
       const state = run.itemStates.get(item.url);
-      return { url: item.url, linkType: item.linkType, ...(state || { status: 'pending' }) };
+      return { url: item.url, linkType: item.linkType, folderName: item.folderName, label: item.label, ...(state || { status: 'pending' }) };
     });
     runs.push({ runId, language: run.language, startedAt: run.startedAt, items });
   }

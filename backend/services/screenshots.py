@@ -17,7 +17,7 @@ from urllib.parse import urlparse
 
 from playwright.async_api import async_playwright, Page, Browser
 
-from backend.config import JEEN_USERNAME, JEEN_PASSWORD, SCREENSHOT_DIR
+from backend.config import SCREENSHOT_DIR, get_jeen_credentials
 
 logger = logging.getLogger(__name__)
 
@@ -94,19 +94,22 @@ async def _looks_like_error_page(page: Page) -> str | None:
     return None
 
 
-async def _submit_credentials(page: Page) -> None:
+async def _submit_credentials(page: Page, language: str = "he") -> None:
     """Fill the two-step login form on the current page (email, then password).
 
     The password step is optional: when the session is already authenticated
     (e.g. the admin app via SSO), the password field never appears and we skip it.
     """
-    if not JEEN_USERNAME or not JEEN_PASSWORD:
-        raise RuntimeError("JEEN_USERNAME and JEEN_PASSWORD must be set in .env")
+    username, password = get_jeen_credentials(language)
+    if not username or not password:
+        raise RuntimeError(
+            f"JEEN credentials for language '{language}' must be set in .env"
+        )
 
     # Step 1: Type email and press Enter to submit
     email_input = page.locator('input[type="email"], input[name="email"]').first
     await email_input.click()
-    await email_input.press_sequentially(JEEN_USERNAME, delay=50)
+    await email_input.press_sequentially(username, delay=50)
     await page.keyboard.press("Enter")
     logger.info("Filled email, submitted with Enter...")
     await page.wait_for_timeout(2000)
@@ -116,7 +119,7 @@ async def _submit_credentials(page: Page) -> None:
         password_input = page.locator('input[type="password"]').first
         await password_input.wait_for(state="visible", timeout=5000)
         await password_input.click()
-        await password_input.press_sequentially(JEEN_PASSWORD, delay=50)
+        await password_input.press_sequentially(password, delay=50)
         await page.keyboard.press("Enter")
         logger.info("Filled password, submitted with Enter...")
         await page.wait_for_timeout(3000)
@@ -126,12 +129,12 @@ async def _submit_credentials(page: Page) -> None:
     await page.wait_for_load_state("domcontentloaded")
 
 
-async def _login(page: Page) -> None:
-    """Log into jeenai.app using stored credentials (two-step form)."""
-    logger.info("Logging into jeenai.app...")
+async def _login(page: Page, language: str = "he") -> None:
+    """Log into jeenai.app using credentials for the given language."""
+    logger.info("Logging into jeenai.app (language=%s)...", language)
     await page.goto(LOGIN_URL, wait_until="domcontentloaded", timeout=30000)
     await page.wait_for_timeout(2000)
-    await _submit_credentials(page)
+    await _submit_credentials(page, language=language)
     logger.info("Login complete — current URL: %s", page.url)
 
 
@@ -315,13 +318,20 @@ async def _find_clickable(page: Page, text: str):
     """
     normalized = " ".join(text.split())
     lowered = normalized.lower()
+    escaped = normalized.replace('"', '\\"')
     candidates = [
         page.locator(SIDEBAR_SWAP_BUTTON_SELECTOR)
         if lowered in SIDEBAR_SWAP_LABELS else None,
         page.get_by_role("button", name=normalized, exact=False),
+        page.get_by_role("tab", name=normalized, exact=False),
         page.get_by_role("menuitem", name=normalized, exact=False),
+        page.get_by_role("link", name=normalized, exact=False),
+        page.get_by_role("option", name=normalized, exact=False),
+        page.get_by_role("radio", name=normalized, exact=False),
+        page.locator(f'[role="tab"]:has-text("{escaped}")'),
         page.get_by_text(normalized, exact=False),
-        page.locator(f'[aria-label*="{normalized}"]'),
+        page.locator(f'[aria-label*="{escaped}"]'),
+        page.locator(f'[data-value*="{escaped}" i]'),
     ]
     for locator in candidates:
         if locator is None:
@@ -334,6 +344,37 @@ async def _find_clickable(page: Page, text: str):
                 return element
         except Exception:
             continue
+    return None
+
+
+async def _resolve_clickable_with_retry(
+    page: Page,
+    candidates: list[str],
+    attempts: int = 3,
+    wait_ms: int = 1000,
+):
+    """
+    Try to locate a clickable element for any of the candidate labels, retrying
+    a few times with a short wait between attempts.
+
+    SPA tabs/panels are often not painted into the DOM until a render cycle or
+    animation finishes, so a target that is missing on the first pass frequently
+    appears a second later. Destructive labels are skipped. Returns the first
+    visible locator found, or None after all attempts are exhausted.
+    """
+    for attempt in range(attempts):
+        for candidate in candidates:
+            if DESTRUCTIVE_TEXT.search(candidate):
+                continue
+            element = await _find_clickable(page, candidate)
+            if element is not None:
+                return element
+        if attempt < attempts - 1:
+            logger.info(
+                "Clickable %r not found (attempt %d/%d) — waiting %dms and retrying",
+                candidates, attempt + 1, attempts, wait_ms,
+            )
+            await page.wait_for_timeout(wait_ms)
     return None
 
 
@@ -416,13 +457,7 @@ async def _run_interactions(
 
             candidates = _expand_variants(text, variant_groups)
             logger.info("Interaction: clicking element, candidates=%s", candidates)
-            element = None
-            for candidate in candidates:
-                if DESTRUCTIVE_TEXT.search(candidate):
-                    continue
-                element = await _find_clickable(page, candidate)
-                if element is not None:
-                    break
+            element = await _resolve_clickable_with_retry(page, candidates)
             if element is None:
                 raise RuntimeError(f"no visible clickable element for {candidates!r}")
             await element.click(timeout=5000)
@@ -438,6 +473,7 @@ async def take_screenshots(
     link_type: str = "regular",
     folder_name: str = "",
     part_name: str = "",
+    language: str = "he",
 ) -> list[dict]:
     """
     Execute the screenshot script and return a list of result dicts.
@@ -464,7 +500,7 @@ async def take_screenshots(
         )
         page = await context.new_page()
 
-        await _login(page)
+        await _login(page, language=language)
 
         if link_type == "admin":
             page = await _enter_admin_app(page, base_url)

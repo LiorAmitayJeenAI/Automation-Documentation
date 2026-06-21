@@ -299,6 +299,13 @@ async function deleteFolder(folderId) {
   await loadFolders();
 }
 
+function formatRunLabel(folderName, label) {
+  const parts = [];
+  if (folderName) parts.push(folderName);
+  if (label) parts.push(label);
+  return parts.length ? parts.join(' > ') : null;
+}
+
 /* ── Check for active runs on page load ── */
 async function checkActiveRuns() {
   try {
@@ -328,10 +335,11 @@ async function checkActiveRuns() {
       else if (item.status === 'stopped') { className = 'error'; msg = 'Stopped'; }
       else if (item.status === 'running') { msg = 'Processing...'; }
 
+      const displayLabel = formatRunLabel(item.folderName, item.label) || item.url;
       results.insertAdjacentHTML('beforeend', `
         <div id="${id}" class="result-row ${className}" data-session-id="${esc(item.sessionId || '')}">
           <span class="result-dot"></span>
-          <span class="result-url" title="${esc(item.url)}">${esc(item.url)}</span>
+          <span class="result-url" title="${esc(item.url)}">${esc(displayLabel)}</span>
           <span class="result-msg">${msg}</span>
           <button class="session-stop" type="button" onclick="stopSession('${id}')" ${item.status === 'running' ? '' : 'disabled'}>Stop</button>
         </div>`);
@@ -485,10 +493,11 @@ async function runSelected() {
     const url = item.url;
     const id = `result-${index}`;
     rowIds[url] = id;
+    const displayLabel = formatRunLabel(item.folderName, item.label) || url;
     results.insertAdjacentHTML('beforeend', `
       <div id="${id}" class="result-row running">
         <span class="result-dot"></span>
-        <span class="result-url" title="${esc(url)}">${esc(url)}</span>
+        <span class="result-url" title="${esc(url)}">${esc(displayLabel)}</span>
         <span class="result-msg">Pending...</span>
         <button class="session-stop" type="button" onclick="stopSession('${id}')" disabled>Stop</button>
       </div>`);
@@ -635,16 +644,16 @@ async function runVideoSelected() {
   notice.classList.remove('visible');
   results.classList.add('visible');
 
-  // Append video rows after any existing rows (presentation run may be visible)
   toRun.forEach((item, index) => {
     const url = item.url;
     const id = `video-result-${index}`;
     videoRowIds[url] = id;
+    const displayLabel = formatRunLabel(item.folderName, item.label) || url;
     results.insertAdjacentHTML('beforeend', `
       <div id="${id}" class="result-row running video-row">
         <span class="result-dot"></span>
         <span class="result-label video-tag">Video</span>
-        <span class="result-url" title="${esc(url)}">${esc(url)}</span>
+        <span class="result-url" title="${esc(url)}">${esc(displayLabel)}</span>
         <span class="result-msg">Pending...</span>
       </div>`);
   });

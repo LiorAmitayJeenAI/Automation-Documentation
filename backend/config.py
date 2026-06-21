@@ -39,6 +39,18 @@ SP_EXPORT_BASE = os.getenv(
 JEEN_USERNAME = os.getenv("JEEN_USERNAME", "")
 JEEN_PASSWORD = os.getenv("JEEN_PASSWORD", "")
 
+JEEN_USERNAME_HE = os.getenv("JEEN_USERNAME_HE", JEEN_USERNAME)
+JEEN_PASSWORD_HE = os.getenv("JEEN_PASSWORD_HE", JEEN_PASSWORD)
+JEEN_USERNAME_EN = os.getenv("JEEN_USERNAME_EN", "")
+JEEN_PASSWORD_EN = os.getenv("JEEN_PASSWORD_EN", "")
+
+
+def get_jeen_credentials(language: str = "he") -> tuple[str, str]:
+    """Return (username, password) for the Jeen account whose UI matches *language*."""
+    if language == "en" and JEEN_USERNAME_EN:
+        return JEEN_USERNAME_EN, JEEN_PASSWORD_EN
+    return JEEN_USERNAME_HE, JEEN_PASSWORD_HE
+
 REGULAR_URL = os.getenv("REGULAR_URL", "https://jeenai.app")
 ADMIN_URL = os.getenv("ADMIN_URL", "https://admin.jeenai.app")
 

@@ -4,10 +4,11 @@
  * Frame 0 here = start of the output timeline (Sequence offset handled by TutorialVideo).
  *
  * Layout (1920×1080):
- *   0–80px      branding bar (JEEN + title)
- *   80–950px    recording with slow camera zoom
- *   950–1040px  caption pill area (gradient background, below the frame)
- *   cross-dissolve overlay on first/last DISSOLVE_FRAMES frames
+ *   Full-frame gradient background (pink → red-orange → golden).
+ *   Top bar (56px): logo + black title text over the gradient.
+ *   Recording area fills remaining space with 6px gradient margin on sides/bottom.
+ *   Caption pill overlays the bottom of the recording.
+ *   Cross-dissolve overlay on first/last DISSOLVE_FRAMES frames.
  */
 import React from 'react';
 import {
@@ -18,6 +19,9 @@ import {COLORS, DISSOLVE_FRAMES} from '../constants';
 import {FONT_FAMILY} from '../fonts';
 import {SubtitleCue, VideoSegment} from '../types';
 
+const TOP_BAR_H = 56;
+const BORDER_W = 6;
+
 interface Props {
   recordedVideoFilename: string;
   segments: VideoSegment[];
@@ -26,10 +30,6 @@ interface Props {
   title: string;
   durationInFrames: number;
 }
-
-const TOP_BAR   = 80;   // px reserved above the browser frame for branding
-const MARGIN_H  = 70;   // px left/right margin around the browser frame
-const FRAME_BTM = 130;  // px reserved below the browser frame for caption pill
 
 
 export const VideoSection: React.FC<Props> = ({
@@ -74,11 +74,6 @@ export const VideoSection: React.FC<Props> = ({
       )
     : 0;
 
-  // ── Slow camera zoom: 1.0 → 1.04 across the full clip ──
-  const scale = interpolate(frame, [0, durationInFrames], [1.0, 1.04], {
-    extrapolateRight: 'clamp',
-  });
-
   // ── Cross-dissolve overlay: fades in at start and out at end of segment ──
   const dissolveIn  = interpolate(frame, [0, DISSOLVE_FRAMES], [1, 0], {extrapolateRight: 'clamp'});
   const dissolveOut = interpolate(
@@ -92,128 +87,141 @@ export const VideoSection: React.FC<Props> = ({
   const videoSrc = staticFile(recordedVideoFilename);
 
   return (
-    <AbsoluteFill style={{background: COLORS.bgGradient}}>
+    <AbsoluteFill style={{background: COLORS.bgGradient, flexDirection: 'column', display: 'flex'}}>
 
-      {/* ── Branding bar — on background, above the browser frame ── */}
+      {/* ── Top bar: logo + title (gradient background inherited from parent) ── */}
       <div
         style={{
-          position: 'absolute',
-          top: 0, left: 0, right: 0,
-          height: TOP_BAR,
+          height: TOP_BAR_H,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 80px',
-          zIndex: 10,
+          padding: '0 28px',
+          flexShrink: 0,
+          overflow: 'visible',
+          zIndex: 5,
         }}
       >
         <Img
           src={staticFile('jeen-logo.png')}
-          style={{width: 100, height: 'auto'}}
+          style={{height: 80, width: 'auto', flexShrink: 0}}
         />
-        <div style={{
-          color: COLORS.textMuted,
-          fontSize: 18,
-          fontFamily: FONT_FAMILY,
-          fontWeight: 500,
-          direction: isHeb ? 'rtl' : 'ltr',
-          maxWidth: 860,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}>
+        <div
+          style={{
+            flex: 1,
+            textAlign: 'center',
+            color: '#000000',
+            fontSize: 26,
+            fontFamily: FONT_FAMILY,
+            fontWeight: 500,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            padding: '0 20px',
+          }}
+        >
           {title}
         </div>
+        <div style={{width: 100, flexShrink: 0}} />
       </div>
 
-      {/* ── Video segments (jump-cuts) — only visible-content portions ── */}
+      {/* ── Recording area (gradient border visible as padding around it) ── */}
       <div
         style={{
-          position: 'absolute',
-          top: TOP_BAR,
-          left: MARGIN_H,
-          right: MARGIN_H,
-          bottom: FRAME_BTM,
-          borderRadius: 16,
+          flex: 1,
+          marginLeft: BORDER_W,
+          marginRight: BORDER_W,
+          marginBottom: BORDER_W,
+          position: 'relative',
           overflow: 'hidden',
-          boxShadow: '0 40px 120px rgba(0,0,0,0.5)',
+          borderRadius: 4,
+          minHeight: 0,
         }}
       >
-        <div style={{
-          width: '100%',
-          height: '100%',
-          transform: `scale(${scale})`,
-          transformOrigin: 'center center',
-        }}>
-          {segments.map((seg, i) => (
-            <Sequence
-              key={`seg-${i}`}
-              from={seg.outputStartFrame}
-              durationInFrames={seg.durationFrames}
-            >
-              <Sequence from={-seg.sourceStartFrame}>
-                <OffthreadVideo
-                  src={videoSrc}
-                  style={{width: '100%', height: '100%', objectFit: 'contain'}}
-                />
-              </Sequence>
+
+        {/* ── Video segments (jump-cuts) ── */}
+        {segments.map((seg, i) => (
+          <Sequence
+            key={`seg-${i}`}
+            from={seg.outputStartFrame}
+            durationInFrames={seg.durationFrames}
+          >
+            <Sequence from={-seg.sourceStartFrame}>
+              <OffthreadVideo
+                src={videoSrc}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  background: COLORS.bgGradient,
+                }}
+              />
             </Sequence>
-          ))}
-        </div>
+          </Sequence>
+        ))}
+
+        {/* ── Caption pill — overlaid at bottom of recording area ── */}
+        {activeCue && captionText && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 40,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              maxWidth: '70%',
+              padding: '14px 36px',
+              background: COLORS.narrationBg,
+              borderRadius: 14,
+              border: `1px solid ${COLORS.border}`,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+              opacity: subtitleOpacity,
+              direction: isHeb ? 'rtl' : 'ltr',
+              textAlign: isHeb ? 'right' : 'left',
+              zIndex: 10,
+            }}
+          >
+            <p style={{
+              color: COLORS.textLight,
+              fontSize: 28,
+              fontFamily: FONT_FAMILY,
+              fontWeight: 500,
+              margin: 0,
+              lineHeight: 1.45,
+              whiteSpace: 'normal',
+              wordBreak: 'break-word',
+            }}>
+              {captionText}
+            </p>
+          </div>
+        )}
+
+        {/* ── Cross-dissolve overlay — fades in/out at edges ── */}
+        {dissolveOpacity > 0 && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: COLORS.bgGradient,
+              opacity: dissolveOpacity,
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+
       </div>
 
-      {/* ── Per-step voiceover ── */}
+      {/* ── Per-step voiceover (audio tracks, no visual) ── */}
       {cues.map((cue, i) =>
         cue.audioFilename ? (
           <Sequence key={`audio-${i}`} from={cue.startFrame}>
             <Audio src={staticFile(cue.audioFilename)} />
           </Sequence>
         ) : null
-      )}
-
-      {/* ── Caption pill — centered below the frame ── */}
-      {activeCue && captionText && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 40,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            maxWidth: '70%',
-            padding: '14px 36px',
-            background: COLORS.narrationBg,
-            borderRadius: 14,
-            border: `1px solid ${COLORS.border}`,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-            opacity: subtitleOpacity,
-            direction: isHeb ? 'rtl' : 'ltr',
-            textAlign: isHeb ? 'right' : 'left',
-          }}
-        >
-          <p style={{
-            color: COLORS.textLight,
-            fontSize: 28,
-            fontFamily: FONT_FAMILY,
-            fontWeight: 500,
-            margin: 0,
-            lineHeight: 1.45,
-            whiteSpace: 'normal',
-            wordBreak: 'break-word',
-          }}>
-            {captionText}
-          </p>
-        </div>
-      )}
-
-      {/* ── Cross-dissolve overlay — branded background fades in/out at edges ── */}
-      {dissolveOpacity > 0 && (
-        <AbsoluteFill
-          style={{
-            background: COLORS.bgGradient,
-            opacity: dissolveOpacity,
-            pointerEvents: 'none',
-          }}
-        />
       )}
 
     </AbsoluteFill>

@@ -48,7 +48,6 @@ export const EndSlide: React.FC<Props> = ({frame, language}) => {
           direction: isHeb ? 'rtl' : 'ltr',
         }}
       >
-        jeenai.app
       </div>
 
       <div

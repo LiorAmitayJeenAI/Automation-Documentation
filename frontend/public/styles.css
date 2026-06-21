@@ -1027,8 +1027,9 @@ tr:last-child td {
 
 .result-url {
   overflow: hidden;
-  direction: ltr;
-  color: var(--accent);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1287,19 +1288,6 @@ tr:last-child td {
   transform: rotate(90deg);
 }
 
-.part-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 13px;
-  color: #fff;
-  background: linear-gradient(135deg, #dfaadf 0%, #e85c50 52%, #f4ad51 100%);
-  font-size: 14px;
-  font-weight: 850;
-  box-shadow: 0 10px 24px rgba(232, 92, 80, 0.16);
-}
 
 .part-heading {
   min-width: 0;
@@ -1574,10 +1562,6 @@ tr:last-child td {
     padding: 12px;
   }
 
-  .part-badge {
-    width: 34px;
-    height: 34px;
-  }
 
   .part-chevron {
     display: none;

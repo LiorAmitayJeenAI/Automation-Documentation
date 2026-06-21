@@ -19,7 +19,7 @@ from urllib.parse import urlparse
 
 from playwright.async_api import async_playwright, Page, BrowserContext
 
-from backend.config import JEEN_USERNAME, JEEN_PASSWORD, VIDEO_DIR
+from backend.config import VIDEO_DIR
 from backend.services.screenshots import (
     _login,
     _enter_admin_app,
@@ -28,6 +28,7 @@ from backend.services.screenshots import (
     _expand_variants,
     _find_clickable,
     _find_input,
+    _resolve_clickable_with_retry,
     DESTRUCTIVE_TEXT,
     PAGE_LOAD_WAIT_MS,
     RENDER_SETTLE_MS,
@@ -291,13 +292,7 @@ async def _run_interactions_visible(
                 raise RuntimeError(f"refusing destructive interaction: {text!r}")
 
             candidates = _expand_variants(text, variant_groups)
-            element = None
-            for candidate in candidates:
-                if DESTRUCTIVE_TEXT.search(candidate):
-                    continue
-                element = await _find_clickable(page, candidate)
-                if element is not None:
-                    break
+            element = await _resolve_clickable_with_retry(page, candidates)
             if element is None:
                 raise RuntimeError(f"no visible clickable element for {candidates!r}")
 
@@ -339,6 +334,7 @@ async def record_product_video(
     link_type: str = "regular",
     session_id: str = "default",
     audio_results: list[dict | None] | None = None,
+    language: str = "he",
 ) -> dict:
     """
     Record a real browser session following the video_script steps.
@@ -386,7 +382,7 @@ async def record_product_video(
             ignore_https_errors=True,
         )
         login_page = await login_context.new_page()
-        await _login(login_page)
+        await _login(login_page, language=language)
         if link_type == "admin":
             login_page = await _enter_admin_app(login_page, base_url)
         storage_state = await login_context.storage_state()
@@ -470,7 +466,10 @@ async def record_product_video(
 
                 await _wait_for_page_ready(page, interactions, variant_groups)
 
-                # Run interactions with visible cursor, highlight ring, and ripple
+                # Run interactions with visible cursor, highlight ring, and ripple.
+                # If they fail we still record the plain page, but flag the step so
+                # the pipeline can rewrite its narration to match what is actually
+                # shown (the base page, not the tab/panel that never opened).
                 if interactions:
                     try:
                         await _run_interactions_visible(page, interactions, variant_groups)
@@ -479,6 +478,7 @@ async def record_product_video(
                         logger.warning(
                             "Step %d interactions failed (%s) — capturing plain page", i + 1, exc
                         )
+                        step = {**step, "interaction_failed": True}
 
                 # One final spinner check after interactions (clicks may trigger
                 # new loading states, e.g. opening a modal with a skeleton).

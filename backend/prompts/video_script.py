@@ -198,7 +198,19 @@ You may use three types of interactions inside a step:
     → Pause for the given milliseconds to let content render. Use after clicks that
       trigger animations or async loading (500–1500 ms is usually enough).
 
-ALLOWED INTERACTIONS:
+CRITICAL — NEVER GUESS BUTTON LABELS:
+- You may ONLY add a click interaction when the target route has a "clickable buttons"
+  list below AND the exact label you click appears verbatim in that route's list.
+- If a route has NO "clickable buttons" list, do NOT add any click interactions for it —
+  generate a plain page view (no interactions) for that URL instead.
+- Never invent, translate, paraphrase, or guess a label. A guessed label will silently
+  fail at recording time and the viewer will see the wrong screen while the narration
+  describes something that never appeared. This is the single worst failure mode — avoid it.
+- If a feature's documentation describes tabs/panels but the route has no matching
+  clickable buttons listed, describe the feature from its base page only; do not fabricate
+  clicks to reach tabs that are not in the verified list.
+
+ALLOWED INTERACTIONS (only with verified labels from the clickable buttons list):
 - Opening modals, panels, drawers, tabs, dropdowns
 - Filling text inputs, search boxes, name fields with demo data
 - Selecting options in dropdowns or radio groups (via click)
