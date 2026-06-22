@@ -299,11 +299,17 @@ async function deleteFolder(folderId) {
   await loadFolders();
 }
 
+function parsePartTitle(label) {
+  const match = String(label || '').match(/^Part\s*\d+\s*[-–—]?\s*(.+)$/i);
+  return match ? match[1].trim() : (label || '');
+}
+
 function formatRunLabel(folderName, label) {
-  const parts = [];
-  if (folderName) parts.push(folderName);
-  if (label) parts.push(label);
-  return parts.length ? parts.join(' > ') : null;
+  if (!folderName && !label) return null;
+  const title = parsePartTitle(label) || label || '';
+  if (!folderName) return esc(title);
+  if (!title) return esc(folderName);
+  return `<span class="run-label-folder">${esc(folderName)}</span>${esc(title)}`;
 }
 
 /* ── Check for active runs on page load ── */
@@ -318,9 +324,11 @@ async function checkActiveRuns() {
     isRunning = true;
     rowIds = {};
 
+    const frame = document.getElementById('resultsFrame');
     const results = document.getElementById('results');
     const notice = document.getElementById('successNotice');
     notice.classList.remove('visible');
+    frame.classList.add('visible');
     results.classList.add('visible');
     results.innerHTML = '';
 
@@ -335,16 +343,17 @@ async function checkActiveRuns() {
       else if (item.status === 'stopped') { className = 'error'; msg = 'Stopped'; }
       else if (item.status === 'running') { msg = 'Processing...'; }
 
-      const displayLabel = formatRunLabel(item.folderName, item.label) || item.url;
+      const displayLabel = formatRunLabel(item.folderName, item.label) || esc(item.url);
       results.insertAdjacentHTML('beforeend', `
         <div id="${id}" class="result-row ${className}" data-session-id="${esc(item.sessionId || '')}">
           <span class="result-dot"></span>
-          <span class="result-url" title="${esc(item.url)}">${esc(displayLabel)}</span>
+          <span class="result-url" title="${esc(item.url)}">${displayLabel}</span>
           <span class="result-msg">${msg}</span>
           <button class="session-stop" type="button" onclick="stopSession('${id}')" ${item.status === 'running' ? '' : 'disabled'}>Stop</button>
         </div>`);
     });
 
+    updateProgress();
     syncRunButton();
     connectToRunEvents(run.runId);
   } catch {}
@@ -379,6 +388,40 @@ function connectToRunEvents(runId) {
     });
 }
 
+function updateProgress() {
+  const rows = document.querySelectorAll('#results .result-row');
+  const total = rows.length;
+  const done = document.querySelectorAll('#results .result-row.done').length;
+  const errored = document.querySelectorAll('#results .result-row.error').length;
+  const completed = done + errored;
+
+  const textEl = document.getElementById('progressText');
+  const barEl = document.getElementById('progressBar');
+  if (!textEl || !barEl) return;
+
+  textEl.textContent = `${done} of ${total} completed`;
+  const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+  barEl.style.width = pct + '%';
+  barEl.classList.toggle('complete', completed === total && done > 0);
+}
+
+function buildActionLinks(result) {
+  const gammaUrl = result?.gamma_url || null;
+  const sharepointUrl = result?.sharepoint_url || null;
+  let html = '';
+  if (gammaUrl || sharepointUrl) {
+    html += '<span class="result-actions">';
+    if (gammaUrl) {
+      html += `<a class="result-action primary" href="${esc(gammaUrl)}" target="_blank" rel="noopener">Open Presentation</a>`;
+    }
+    if (sharepointUrl) {
+      html += `<a class="result-action" href="${esc(sharepointUrl)}" target="_blank" rel="noopener">Open PDF</a>`;
+    }
+    html += '</span>';
+  }
+  return html;
+}
+
 function handleRunMessage(message) {
   if (message.status === 'snapshot') return;
 
@@ -406,27 +449,33 @@ function handleRunMessage(message) {
   if (message.status === 'done') {
     row.className = 'result-row done';
     row.querySelector('.result-msg').textContent = 'Completed';
-    disableSessionStop(row);
+    const stopBtn = row.querySelector('.session-stop');
+    if (stopBtn) stopBtn.remove();
+    const links = buildActionLinks(message.result);
+    if (links) row.insertAdjacentHTML('beforeend', links);
+    updateProgress();
   }
 
   if (message.status === 'error') {
     row.className = 'result-row error';
     row.querySelector('.result-msg').textContent = message.error || 'Failed';
     disableSessionStop(row);
+    updateProgress();
   }
 
   if (message.status === 'stopped') {
-    row.className = 'result-row error';
-    row.querySelector('.result-msg').textContent = 'Stopped';
-    disableSessionStop(row);
+    if (row) row.remove();
+    updateProgress();
+    const results = document.getElementById('results');
+    if (!results.querySelector('.result-row')) {
+      finishRun();
+    }
   }
 }
 
 function finishRun() {
   if (!isRunning) return;
-  const notice = document.getElementById('successNotice');
-  const hasSuccess = document.querySelectorAll('.result-row.done').length > 0;
-  if (hasSuccess) notice.classList.add('visible');
+  updateProgress();
   isRunning = false;
   currentRunId = null;
   syncRunButton();
@@ -481,23 +530,26 @@ async function runSelected() {
   const toRun = getSelectedItems();
   if (!toRun.length || isRunning) return;
 
+  const frame = document.getElementById('resultsFrame');
   const results = document.getElementById('results');
   const notice = document.getElementById('successNotice');
   rowIds = {};
 
   notice.classList.remove('visible');
+  frame.classList.add('visible');
   results.classList.add('visible');
   results.innerHTML = '';
+  updateProgress();
 
   toRun.forEach((item, index) => {
     const url = item.url;
     const id = `result-${index}`;
     rowIds[url] = id;
-    const displayLabel = formatRunLabel(item.folderName, item.label) || url;
+    const displayLabel = formatRunLabel(item.folderName, item.label) || esc(url);
     results.insertAdjacentHTML('beforeend', `
       <div id="${id}" class="result-row running">
         <span class="result-dot"></span>
-        <span class="result-url" title="${esc(url)}">${esc(displayLabel)}</span>
+        <span class="result-url" title="${esc(url)}">${displayLabel}</span>
         <span class="result-msg">Pending...</span>
         <button class="session-stop" type="button" onclick="stopSession('${id}')" disabled>Stop</button>
       </div>`);
@@ -599,6 +651,9 @@ async function stopGeneration() {
   try {
     await fetch(`/api/runs/${encodeURIComponent(currentRunId)}/stop`, { method: 'POST' });
   } catch {}
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('resultsFrame').classList.remove('visible');
+  finishRun();
 }
 
 async function stopSession(rowId) {
@@ -637,23 +692,26 @@ async function runVideoSelected() {
   const toRun = getSelectedItems();
   if (!toRun.length || isVideoRunning) return;
 
+  const frame = document.getElementById('resultsFrame');
   const results = document.getElementById('results');
   const notice = document.getElementById('successNotice');
   videoRowIds = {};
 
   notice.classList.remove('visible');
+  frame.classList.add('visible');
   results.classList.add('visible');
+  updateProgress();
 
   toRun.forEach((item, index) => {
     const url = item.url;
     const id = `video-result-${index}`;
     videoRowIds[url] = id;
-    const displayLabel = formatRunLabel(item.folderName, item.label) || url;
+    const displayLabel = formatRunLabel(item.folderName, item.label) || esc(url);
     results.insertAdjacentHTML('beforeend', `
       <div id="${id}" class="result-row running video-row">
         <span class="result-dot"></span>
         <span class="result-label video-tag">Video</span>
-        <span class="result-url" title="${esc(url)}">${esc(displayLabel)}</span>
+        <span class="result-url" title="${esc(url)}">${displayLabel}</span>
         <span class="result-msg">Pending...</span>
       </div>`);
   });
@@ -737,23 +795,32 @@ function handleVideoRunMessage(message) {
     msgEl.textContent = message.video_url ? 'Done — Video ready' : 'Done';
     if (message.video_url) {
       row.insertAdjacentHTML('beforeend',
-        `<a class="text-link" href="${esc(message.video_url)}" target="_blank" rel="noopener">Open Video</a>`
+        `<span class="result-actions"><a class="result-action primary" href="${esc(message.video_url)}" target="_blank" rel="noopener">Open Video</a></span>`
       );
     }
+    updateProgress();
   }
 
   if (message.status === 'error') {
     row.className = 'result-row error video-row';
     msgEl.textContent = message.error || 'Failed';
     console.error('[video] error:', message.error);
+    updateProgress();
+  }
+
+  if (message.status === 'stopped') {
+    if (row) row.remove();
+    updateProgress();
+    const results = document.getElementById('results');
+    if (!results.querySelector('.result-row')) {
+      finishVideoRun();
+    }
   }
 }
 
 function finishVideoRun() {
   if (!isVideoRunning) return;
-  const notice = document.getElementById('successNotice');
-  const hasSuccess = document.querySelectorAll('.video-row.done').length > 0;
-  if (hasSuccess) notice.classList.add('visible');
+  updateProgress();
   isVideoRunning = false;
   currentVideoRunId = null;
   syncRunButton();
@@ -764,4 +831,7 @@ async function stopVideoGeneration() {
   try {
     await fetch(`/api/video-runs/${encodeURIComponent(currentVideoRunId)}/stop`, { method: 'POST' });
   } catch {}
+  document.querySelectorAll('.video-row').forEach(row => row.remove());
+  document.getElementById('resultsFrame').classList.remove('visible');
+  finishVideoRun();
 }

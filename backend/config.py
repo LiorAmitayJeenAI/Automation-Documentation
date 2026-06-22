@@ -28,6 +28,7 @@ SP_TENANT_ID = _require("SP_TENANT_ID")
 SP_CLIENT_ID = _require("SP_CLIENT_ID")
 SP_SITE_URL = os.getenv("SP_SITE_URL", "https://jeenai365.sharepoint.com/sites/JEEN.AI")
 SP_FOLDER_PATH = os.getenv("SP_FOLDER_PATH", "Testing/LiorAmitay/JeenTutorial")
+SP_VIDEO_FOLDER_PATH = os.getenv("SP_VIDEO_FOLDER_PATH", "Testing/LiorAmitay/JeenVideos")
 SP_SCREENSHOTS_FOLDER = os.getenv("SP_SCREENSHOTS_FOLDER", "Testing/LiorAmitay")
 # Base folder under which "Save to SharePoint" creates new timestamped export
 # folders. This path is relative to the SharePoint document library root.

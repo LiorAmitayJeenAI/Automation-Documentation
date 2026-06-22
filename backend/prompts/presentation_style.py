@@ -61,7 +61,8 @@ Slide readability:
 Visual style:
 * Match the visual type to the actual content of each slide.
 * Use technology-oriented visuals for technical topics such as AI agents, workflows, integrations, APIs, automation, tools, and platform capabilities.
-* Prefer diagrams, workflow visuals, abstract AI concepts, process illustrations, and product-oriented imagery for technical explanations.
+* Prefer architecture diagrams, workflow diagrams, process flows, and product-oriented visuals for technical explanations.
+* Avoid decorative infographic artwork, conceptual illustrations, and artistic diagram styles.
 * Do not overuse people-centric imagery across the presentation.
 * Most technical slides should prioritize technology, workflow, or product-oriented visuals over human imagery.
 * Maintain a consistent modern professional visual identity across the presentation.

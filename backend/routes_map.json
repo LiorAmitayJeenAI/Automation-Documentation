@@ -123,13 +123,13 @@
       {
         "variants": [
           "שותף איתי",
-          "Shared with me"
+          "Shared with Me"
         ]
       },
       {
         "variants": [
           "משותף על ידי הארגון",
-          "Shared by the organization"
+          "Shared by Organization"
         ]
       },
       {
@@ -211,7 +211,7 @@
       {
         "variants": [
           "בחר תהליכים",
-          "Select processes"
+          "Select Processes"
         ]
       },
       {
@@ -241,7 +241,7 @@
       {
         "variants": [
           "הגדר טבלת המרה",
-          "Configure conversion table"
+          "Configure Conversion Table"
         ]
       }
     ]
@@ -291,7 +291,7 @@
       {
         "variants": [
           "בחר תהליכים",
-          "Select processes"
+          "Select Processes"
         ]
       },
       {
@@ -321,7 +321,7 @@
       {
         "variants": [
           "הגדר טבלת המרה",
-          "Configure conversion table"
+          "Configure Conversion Table"
         ]
       }
     ]
@@ -352,76 +352,26 @@
     "clickable_elements": [
       {
         "variants": [
-          "פעיל",
-          "dropdown-trigger",
-          "Active"
+          "דלג",
+          "Skip"
         ]
       },
       {
         "variants": [
-          "יצירה",
-          "Create"
+          "תבניות נוספות",
+          "More Templates"
         ]
       },
       {
         "variants": [
-          "Brain",
-          "Menu"
+          "Voice input",
+          "קלט קולי"
         ]
       },
       {
         "variants": [
-          "העלאת תמונה",
-          "Upload Image"
-        ]
-      },
-      {
-        "variants": [
-          "הסרה",
-          "Remove"
-        ]
-      },
-      {
-        "variants": [
-          "בחר תהליכים",
-          "Select processes"
-        ]
-      },
-      {
-        "variants": [
-          "הוסף",
-          "Add"
-        ]
-      },
-      {
-        "variants": [
-          "0 קבצים",
-          "0 files"
-        ]
-      },
-      {
-        "variants": [
-          "העלאת קובץ",
-          "Upload File"
-        ]
-      },
-      {
-        "variants": [
-          "ערוך",
-          "Edit"
-        ]
-      },
-      {
-        "variants": [
-          "הגדר טבלת המרה",
-          "Configure conversion table"
-        ]
-      },
-      {
-        "variants": [
-          "GPT 5.1 - Azure OpenAI\nמומלץ",
-          "dropdown-trigger",
-          "GPT 5.1 - Azure OpenAI\nRecommended"
+          "Submit",
+          "שלח"
         ]
       }
     ]
@@ -445,7 +395,7 @@
       {
         "variants": [
           "שותפו איתי",
-          "Shared with me"
+          "Shared with Me"
         ]
       },
       {
@@ -538,14 +488,14 @@
       {
         "variants": [
           "שותף איתי",
-          "Shared with me"
+          "Shared with Me"
         ]
       },
       {
         "variants": [
           "העלה או גרור",
           "sources-page-primary-action-upload",
-          "Upload or drag"
+          "Upload or Drag"
         ]
       },
       {

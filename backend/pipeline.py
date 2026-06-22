@@ -232,16 +232,22 @@ async def run_pipeline(
     if pdf_url:
         yield PipelineEvent("pdf_upload", "running", "Uploading PDF to SharePoint...")
         try:
-            # Build a stable, unique file name from the Confluence page id and
-            # presentation title. The Gamma export name is derived from the deck
-            # title (often just the part number, e.g. "2.pdf") and collides
-            # across tutorials, overwriting previously uploaded PDFs.
-            page_id = confluence.extract_page_id(confluence_url)
-            slug = re.sub(r"[^a-zA-Z0-9]+", "-", presentation_title).strip("-")[:60]
-            if page_id:
-                file_name = f"{page_id}-{slug}.pdf" if slug else f"{page_id}.pdf"
+            def _sanitize(s: str) -> str:
+                s = re.sub(r"[^\w&\-]", "-", s.strip(), flags=re.UNICODE)
+                return re.sub(r"-{2,}", "-", s).strip("-")
+
+            lang = language.lower()
+            name_parts = [_sanitize(p) for p in [folder_name, part_name] if p and p.strip()]
+            if name_parts:
+                file_stem = "-".join(name_parts)
+                file_name = f"{lang}-{file_stem}.pdf"
             else:
-                file_name = f"{slug or 'presentation'}.pdf"
+                page_id = confluence.extract_page_id(confluence_url)
+                slug = re.sub(r"[^a-zA-Z0-9&]+", "-", presentation_title).strip("-")[:60]
+                if page_id:
+                    file_name = f"{lang}-{page_id}-{slug}.pdf" if slug else f"{lang}-{page_id}.pdf"
+                else:
+                    file_name = f"{lang}-{slug or 'presentation'}.pdf"
 
             upload_result = await sharepoint.download_url_and_upload(
                 pdf_url, file_name, SP_FOLDER_PATH, session_id=session_id,

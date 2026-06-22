@@ -17,7 +17,7 @@ import logging
 import re
 from typing import AsyncGenerator
 
-from backend.config import REGULAR_URL, ADMIN_URL, SP_FOLDER_PATH
+from backend.config import REGULAR_URL, ADMIN_URL, SP_VIDEO_FOLDER_PATH
 from backend.services import confluence, llm, sharepoint
 from backend.services import recorder, video, tts
 
@@ -36,14 +36,15 @@ class VideoEvent:
 
 
 def _make_file_stem(folder_name: str, part_name: str, session_id: str, language: str = "") -> str:
-    """Build a clean file stem from folder + part name + language, falling back to session_id."""
+    """Build a clean file stem like ``he-Admin-&-control-Part-5-Organization-System-Prompt``."""
     def sanitize(s: str) -> str:
-        return re.sub(r"[^\w\-]", "_", s.strip(), flags=re.UNICODE).strip("_")[:80]
+        s = re.sub(r"[^\w&\-]", "-", s.strip(), flags=re.UNICODE)
+        return re.sub(r"-{2,}", "-", s).strip("-")
 
     parts = [sanitize(p) for p in [folder_name, part_name] if p and p.strip()]
-    stem = "_".join(parts) if parts else session_id
+    stem = "-".join(parts) if parts else session_id
     if language:
-        stem = f"{stem}_{language}"
+        stem = f"{language.lower()}-{stem}"
     return stem
 
 
@@ -230,7 +231,7 @@ async def run_video_pipeline(
         page_id = confluence.extract_page_id(confluence_url)
         slug = re.sub(r"[^a-zA-Z0-9]+", "-", title).strip("-")[:60]
         upload_list = await sharepoint.upload_local_files(
-            [mp4_path], SP_FOLDER_PATH, session_id=session_id,
+            [mp4_path], SP_VIDEO_FOLDER_PATH, session_id=session_id,
         )
         if upload_list:
             video_url = upload_list[0].get("webUrl")

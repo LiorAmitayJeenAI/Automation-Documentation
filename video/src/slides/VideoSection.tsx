@@ -6,7 +6,7 @@
  * Layout (1920×1080):
  *   Full-frame gradient background (pink → red-orange → golden).
  *   Top bar (56px): logo + black title text over the gradient.
- *   Recording area fills remaining space with 6px gradient margin on sides/bottom.
+ *   Recording area fills remaining space with 6px gradient margin on sides.
  *   Caption pill overlays the bottom of the recording.
  *   Cross-dissolve overlay on first/last DISSOLVE_FRAMES frames.
  */
@@ -130,7 +130,6 @@ export const VideoSection: React.FC<Props> = ({
           flex: 1,
           marginLeft: BORDER_W,
           marginRight: BORDER_W,
-          marginBottom: BORDER_W,
           position: 'relative',
           overflow: 'hidden',
           borderRadius: 4,
@@ -214,6 +213,9 @@ export const VideoSection: React.FC<Props> = ({
         )}
 
       </div>
+
+      {/* ── Bottom bar: plain gradient frame (mirrors top bar height) ── */}
+      <div style={{height: TOP_BAR_H, flexShrink: 0}} />
 
       {/* ── Per-step voiceover (audio tracks, no visual) ── */}
       {cues.map((cue, i) =>
