@@ -1,35 +1,111 @@
 [
   {
-    "id": "mqnrta5xqs6ep",
-    "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383615000/JeenAI+FinOps+Documentation+2026-04",
-    "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383615000/JeenAI+FinOps+Documentation+2026-04",
-    "label": "JeenAI FinOps Documentation 2026-04",
+    "id": "mqs0mmh1nxfk5",
+    "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/502071300/Part+3+-+Skill+Structure+Best+Practices+and+FAQ",
+    "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/502071300/Part+3+-+Skill+Structure+Best+Practices+and+FAQ",
+    "label": "Part 3 - Skill Structure, Best Practices and FAQ",
+    "status": "done",
+    "language": "en",
+    "sessionId": "tutorial-run-1782302350224-rlavq4",
+    "gammaUrl": "https://gamma.app/docs/f9rnem8k6rt4pp1",
+    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/en-Skills-Part-3-Skill-Structure-Best-Practices-and-FAQ.pdf",
+    "videoUrl": null,
+    "createdAt": "2026-06-24T11:54:19.330Z",
+    "lastUpdatedAt": "2026-06-24T12:02:27.510Z",
+    "lastGeneratedAt": "2026-06-24T12:02:27.506Z",
+    "error": null,
+    "history": [
+      {
+        "status": "done",
+        "timestamp": "2026-06-24T12:02:27.510Z",
+        "language": "en",
+        "sessionId": "tutorial-run-1782302350224-rlavq4",
+        "gammaUrl": "https://gamma.app/docs/f9rnem8k6rt4pp1",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/en-Skills-Part-3-Skill-Structure-Best-Practices-and-FAQ.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-24T11:59:10.226Z",
+        "language": "en",
+        "sessionId": "tutorial-run-1782302350224-rlavq4",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      }
+    ]
+  },
+  {
+    "id": "mqs0mmgwtm51m",
+    "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/502005766/Part+2+-+Creating+Using+and+Managing+Skills",
+    "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/502005766/Part+2+-+Creating+Using+and+Managing+Skills",
+    "label": "Part 2 - Creating, Using and Managing Skills",
+    "status": "done",
+    "language": "en",
+    "sessionId": "tutorial-run-1782302181820-fuf1ap",
+    "gammaUrl": "https://gamma.app/docs/ayomba1ioxgmtd8",
+    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/en-Skills-Part-2-Creating-Using-and-Managing-Skills.pdf",
+    "videoUrl": null,
+    "createdAt": "2026-06-24T11:54:19.325Z",
+    "lastUpdatedAt": "2026-06-24T11:59:10.221Z",
+    "lastGeneratedAt": "2026-06-24T11:59:10.218Z",
+    "error": null,
+    "history": [
+      {
+        "status": "done",
+        "timestamp": "2026-06-24T11:59:10.221Z",
+        "language": "en",
+        "sessionId": "tutorial-run-1782302181820-fuf1ap",
+        "gammaUrl": "https://gamma.app/docs/ayomba1ioxgmtd8",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/en-Skills-Part-2-Creating-Using-and-Managing-Skills.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-24T11:56:21.821Z",
+        "language": "en",
+        "sessionId": "tutorial-run-1782302181820-fuf1ap",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      }
+    ]
+  },
+  {
+    "id": "mqs00pzivsw82",
+    "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/502071300/Part+3+-+Skill+Structure+Best+Practices+and+FAQ",
+    "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/502071300/Part+3+-+Skill+Structure+Best+Practices+and+FAQ",
+    "label": "Part 3 - Skill Structure, Best Practices and FAQ",
     "status": "done",
     "language": "he",
-    "sessionId": "tutorial-run-1782045388727-u73sx0",
-    "gammaUrl": "https://gamma.app/docs/dl1xecmfgw3ikkv",
-    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenVideos/383615000-JeenAI-FinOps-2026-04.pdf",
+    "sessionId": "tutorial-run-1782301447184-ie20yu",
+    "gammaUrl": "https://gamma.app/docs/1w3guel87ynzb52",
+    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Skills-Part-3-Skill-Structure-Best-Practices-and-FAQ.pdf",
     "videoUrl": null,
-    "createdAt": "2026-06-21T12:36:28.720Z",
-    "lastUpdatedAt": "2026-06-21T12:40:06.853Z",
-    "lastGeneratedAt": "2026-06-21T12:40:06.851Z",
+    "createdAt": "2026-06-24T11:37:17.452Z",
+    "lastUpdatedAt": "2026-06-24T11:47:11.073Z",
+    "lastGeneratedAt": "2026-06-24T11:47:11.070Z",
     "error": null,
     "history": [
       {
         "status": "done",
-        "timestamp": "2026-06-21T12:40:06.853Z",
+        "timestamp": "2026-06-24T11:47:11.073Z",
         "language": "he",
-        "sessionId": "tutorial-run-1782045388727-u73sx0",
-        "gammaUrl": "https://gamma.app/docs/dl1xecmfgw3ikkv",
-        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenVideos/383615000-JeenAI-FinOps-2026-04.pdf",
+        "sessionId": "tutorial-run-1782301447184-ie20yu",
+        "gammaUrl": "https://gamma.app/docs/1w3guel87ynzb52",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Skills-Part-3-Skill-Structure-Best-Practices-and-FAQ.pdf",
         "videoUrl": null,
         "error": null
       },
       {
         "status": "running",
-        "timestamp": "2026-06-21T12:36:28.728Z",
+        "timestamp": "2026-06-24T11:44:07.185Z",
         "language": "he",
-        "sessionId": "tutorial-run-1782045388727-u73sx0",
+        "sessionId": "tutorial-run-1782301447184-ie20yu",
         "gammaUrl": null,
         "sharepointUrl": null,
         "videoUrl": null,
@@ -38,71 +114,39 @@
     ]
   },
   {
-    "id": "mqf2k27t4imyg",
-    "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/445906946/Jeen+for+Outlook+Product+Spec",
-    "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/445906946/Jeen+for+Outlook+Product+Spec",
-    "label": "Jeen for Outlook — Product Spec",
+    "id": "mqs00pzev8m1c",
+    "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/502005766/Part+2+-+Creating+Using+and+Managing+Skills",
+    "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/502005766/Part+2+-+Creating+Using+and+Managing+Skills",
+    "label": "Part 2 - Creating, Using and Managing Skills",
     "status": "done",
-    "language": "en",
-    "sessionId": "tutorial-run-1781519783503-r1kvjb",
-    "gammaUrl": "https://gamma.app/docs/dfw1re3bqobhrvd",
-    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/445906946-Jeen-for-Outlook-Product-Spec.pdf",
-    "createdAt": "2026-06-15T10:27:18.711Z",
-    "lastUpdatedAt": "2026-06-15T10:39:08.538Z",
-    "lastGeneratedAt": "2026-06-15T10:39:08.537Z",
+    "language": "he",
+    "sessionId": "tutorial-run-1782301244916-psgqnr",
+    "gammaUrl": "https://gamma.app/docs/0dvbkxq97ny192e",
+    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Skills-Part-2-Creating-Using-and-Managing-Skills.pdf",
+    "videoUrl": null,
+    "createdAt": "2026-06-24T11:37:17.447Z",
+    "lastUpdatedAt": "2026-06-24T11:44:07.180Z",
+    "lastGeneratedAt": "2026-06-24T11:44:07.177Z",
     "error": null,
     "history": [
       {
         "status": "done",
-        "timestamp": "2026-06-15T10:39:08.538Z",
-        "language": "en",
-        "sessionId": "tutorial-run-1781519783503-r1kvjb",
-        "gammaUrl": "https://gamma.app/docs/dfw1re3bqobhrvd",
-        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/445906946-Jeen-for-Outlook-Product-Spec.pdf",
+        "timestamp": "2026-06-24T11:44:07.181Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782301244916-psgqnr",
+        "gammaUrl": "https://gamma.app/docs/0dvbkxq97ny192e",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Skills-Part-2-Creating-Using-and-Managing-Skills.pdf",
+        "videoUrl": null,
         "error": null
       },
       {
         "status": "running",
-        "timestamp": "2026-06-15T10:36:23.504Z",
-        "language": "en",
-        "sessionId": "tutorial-run-1781519783503-r1kvjb",
+        "timestamp": "2026-06-24T11:40:44.918Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782301244916-psgqnr",
         "gammaUrl": null,
         "sharepointUrl": null,
-        "error": null
-      }
-    ]
-  },
-  {
-    "id": "mqf2k27oue68h",
-    "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/443678721/Jeen+for+Excel+Product+Spec",
-    "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/443678721/Jeen+for+Excel+Product+Spec",
-    "label": "Jeen for Excel — Product Spec",
-    "status": "done",
-    "language": "en",
-    "sessionId": "tutorial-run-1781519622431-4k3gu0",
-    "gammaUrl": "https://gamma.app/docs/j4qn28p9rntf9kb",
-    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/443678721-Jeen-for-Excel-Product-Spec.pdf",
-    "createdAt": "2026-06-15T10:27:18.705Z",
-    "lastUpdatedAt": "2026-06-15T10:36:23.502Z",
-    "lastGeneratedAt": "2026-06-15T10:36:23.501Z",
-    "error": null,
-    "history": [
-      {
-        "status": "done",
-        "timestamp": "2026-06-15T10:36:23.502Z",
-        "language": "en",
-        "sessionId": "tutorial-run-1781519622431-4k3gu0",
-        "gammaUrl": "https://gamma.app/docs/j4qn28p9rntf9kb",
-        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/443678721-Jeen-for-Excel-Product-Spec.pdf",
-        "error": null
-      },
-      {
-        "status": "running",
-        "timestamp": "2026-06-15T10:33:42.432Z",
-        "language": "en",
-        "sessionId": "tutorial-run-1781519622431-4k3gu0",
-        "gammaUrl": null,
-        "sharepointUrl": null,
+        "videoUrl": null,
         "error": null
       }
     ]
@@ -111,7 +155,7 @@
     "id": "mqf2k27jei88h",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/384172040/Part+1+-+MCPs+Connectors",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/384172040/Part+1+-+MCPs+Connectors",
-    "label": "Part 1 - MCPs & Connectors",
+    "label": "Part 1 -\u00a0MCPs & Connectors",
     "status": "done",
     "language": "en",
     "sessionId": "tutorial-run-1781519441507-rcsco0",
@@ -136,41 +180,6 @@
         "timestamp": "2026-06-15T10:30:41.508Z",
         "language": "en",
         "sessionId": "tutorial-run-1781519441507-rcsco0",
-        "gammaUrl": null,
-        "sharepointUrl": null,
-        "error": null
-      }
-    ]
-  },
-  {
-    "id": "mqf2k27erobiw",
-    "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382468165/Part+1+-+Skills",
-    "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382468165/Part+1+-+Skills",
-    "label": "Part 1 - Skills",
-    "status": "done",
-    "language": "en",
-    "sessionId": "tutorial-run-1781519238714-j41cto",
-    "gammaUrl": "https://gamma.app/docs/2umf7q9nd1wt10s",
-    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/382468165-Part-1-Skills.pdf",
-    "createdAt": "2026-06-15T10:27:18.695Z",
-    "lastUpdatedAt": "2026-06-15T10:30:41.506Z",
-    "lastGeneratedAt": "2026-06-15T10:30:41.505Z",
-    "error": null,
-    "history": [
-      {
-        "status": "done",
-        "timestamp": "2026-06-15T10:30:41.506Z",
-        "language": "en",
-        "sessionId": "tutorial-run-1781519238714-j41cto",
-        "gammaUrl": "https://gamma.app/docs/2umf7q9nd1wt10s",
-        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/382468165-Part-1-Skills.pdf",
-        "error": null
-      },
-      {
-        "status": "running",
-        "timestamp": "2026-06-15T10:27:18.715Z",
-        "language": "en",
-        "sessionId": "tutorial-run-1781519238714-j41cto",
         "gammaUrl": null,
         "sharepointUrl": null,
         "error": null
@@ -286,7 +295,7 @@
     "id": "mqf0wetikq8mp",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382763067/Part+6+-+Guardrails",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382763067/Part+6+-+Guardrails",
-    "label": "Part 6 - Guardrails",
+    "label": "Part 6 -\u00a0Guardrails",
     "status": "done",
     "language": "en",
     "sessionId": "tutorial-run-1781517315468-ng95r7",
@@ -749,14 +758,34 @@
     "label": "Part 3 - Excel files",
     "status": "done",
     "language": "en",
-    "sessionId": "tutorial-run-1782122427306-ol7lhv",
-    "gammaUrl": "https://gamma.app/docs/01axcyfl9vl6yhl",
-    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/Knowledge___Sources_Part_3_-_Excel_files_en.pdf",
+    "sessionId": "tutorial-run-1782204424091-psvfk9",
+    "gammaUrl": "https://gamma.app/docs/hso7wqnj2q3wh2c",
+    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/en-Knowledge-%26-Sources-Part-3-Excel-files.pdf",
     "createdAt": "2026-06-15T09:07:13.650Z",
-    "lastUpdatedAt": "2026-06-22T10:02:46.606Z",
-    "lastGeneratedAt": "2026-06-22T10:02:46.604Z",
+    "lastUpdatedAt": "2026-06-23T08:49:32.731Z",
+    "lastGeneratedAt": "2026-06-23T08:49:32.727Z",
     "error": null,
     "history": [
+      {
+        "status": "done",
+        "timestamp": "2026-06-23T08:49:32.731Z",
+        "language": "en",
+        "sessionId": "tutorial-run-1782204424091-psvfk9",
+        "gammaUrl": "https://gamma.app/docs/hso7wqnj2q3wh2c",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/en-Knowledge-%26-Sources-Part-3-Excel-files.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-23T08:47:04.091Z",
+        "language": "en",
+        "sessionId": "tutorial-run-1782204424091-psvfk9",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
       {
         "status": "done",
         "timestamp": "2026-06-22T10:02:46.606Z",
@@ -822,7 +851,7 @@
     "id": "mqezp2lthry1h",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383189041/Part+2+-+RAG+Mechanism",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383189041/Part+2+-+RAG+Mechanism",
-    "label": "Part 2 - RAG Mechanism",
+    "label": "Part 2 -\u00a0RAG\u00a0Mechanism",
     "status": "done",
     "language": "en",
     "sessionId": "tutorial-run-1781514603499-7sscpd",
@@ -857,7 +886,7 @@
     "id": "mqezp2lpxdssc",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/384073751/Part+1+-+Uploading+and+Processing+Documents",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/384073751/Part+1+-+Uploading+and+Processing+Documents",
-    "label": "Part 1 - Uploading and Processing Documents",
+    "label": "Part 1 -\u00a0Uploading and Processing Documents",
     "status": "done",
     "language": "en",
     "sessionId": "tutorial-run-1781514433655-gy6jqd",
@@ -962,7 +991,7 @@
     "id": "mqez1hr40o51t",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382763087/Part+6+-+Agent+in+Workspace",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382763087/Part+6+-+Agent+in+Workspace",
-    "label": "Part 6 - Agent in Workspace",
+    "label": "Part 6 -\u00a0Agent in\u00a0Workspace",
     "status": "done",
     "language": "en",
     "sessionId": "tutorial-run-1781513891616-i5yarj",
@@ -997,7 +1026,7 @@
     "id": "mqez1hr1uly41",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383549465/Part+5+-+Basic+Chat+Usage",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383549465/Part+5+-+Basic+Chat+Usage",
-    "label": "Part 5 - Basic Chat Usage",
+    "label": "Part 5 -\u00a0Basic Chat Usage",
     "status": "done",
     "language": "en",
     "sessionId": "tutorial-run-1781513707357-gnd6yc",
@@ -1032,7 +1061,7 @@
     "id": "mqez1hqxhpg3d",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382468185/Part+4+-+Chat+Workspace+Overview",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382468185/Part+4+-+Chat+Workspace+Overview",
-    "label": "Part 4 - Chat Workspace Overview",
+    "label": "Part 4 -\u00a0Chat Workspace Overview",
     "status": "done",
     "language": "en",
     "sessionId": "tutorial-run-1781513495608-nh9m6z",
@@ -1067,7 +1096,7 @@
     "id": "mqez1hqrsi5ql",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383615020/Part+3+-+Side+Menu",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383615020/Part+3+-+Side+Menu",
-    "label": "Part 3 - Side Menu",
+    "label": "Part 3 -\u00a0Side Menu",
     "status": "done",
     "language": "en",
     "sessionId": "tutorial-run-1781513333541-wlkyx2",
@@ -1127,76 +1156,6 @@
         "timestamp": "2026-06-15T08:45:50.801Z",
         "language": "en",
         "sessionId": "tutorial-run-1781513150799-b81fld",
-        "gammaUrl": null,
-        "sharepointUrl": null,
-        "error": null
-      }
-    ]
-  },
-  {
-    "id": "mqewlf034gvcp",
-    "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/445906946/Jeen+for+Outlook+Product+Spec",
-    "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/445906946/Jeen+for+Outlook+Product+Spec",
-    "label": "Jeen for Outlook — Product Spec",
-    "status": "done",
-    "language": "he",
-    "sessionId": "tutorial-run-1781509398717-ojuidp",
-    "gammaUrl": "https://gamma.app/docs/6rgojxs9iiua84n",
-    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/445906946-Jeen-for-Outlook.pdf",
-    "createdAt": "2026-06-15T07:40:24.241Z",
-    "lastUpdatedAt": "2026-06-15T07:46:57.477Z",
-    "lastGeneratedAt": "2026-06-15T07:46:57.474Z",
-    "error": null,
-    "history": [
-      {
-        "status": "done",
-        "timestamp": "2026-06-15T07:46:57.477Z",
-        "language": "he",
-        "sessionId": "tutorial-run-1781509398717-ojuidp",
-        "gammaUrl": "https://gamma.app/docs/6rgojxs9iiua84n",
-        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/445906946-Jeen-for-Outlook.pdf",
-        "error": null
-      },
-      {
-        "status": "running",
-        "timestamp": "2026-06-15T07:43:18.718Z",
-        "language": "he",
-        "sessionId": "tutorial-run-1781509398717-ojuidp",
-        "gammaUrl": null,
-        "sharepointUrl": null,
-        "error": null
-      }
-    ]
-  },
-  {
-    "id": "mqewlf00u6p87",
-    "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/443678721/Jeen+for+Excel+Product+Spec",
-    "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/443678721/Jeen+for+Excel+Product+Spec",
-    "label": "Jeen for Excel — Product Spec",
-    "status": "done",
-    "language": "he",
-    "sessionId": "tutorial-run-1781509224243-mf1pju",
-    "gammaUrl": "https://gamma.app/docs/uxzsuk56m9utg2t",
-    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/443678721-Jeen-for-Excel.pdf",
-    "createdAt": "2026-06-15T07:40:24.238Z",
-    "lastUpdatedAt": "2026-06-15T07:43:18.716Z",
-    "lastGeneratedAt": "2026-06-15T07:43:18.716Z",
-    "error": null,
-    "history": [
-      {
-        "status": "done",
-        "timestamp": "2026-06-15T07:43:18.716Z",
-        "language": "he",
-        "sessionId": "tutorial-run-1781509224243-mf1pju",
-        "gammaUrl": "https://gamma.app/docs/uxzsuk56m9utg2t",
-        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/443678721-Jeen-for-Excel.pdf",
-        "error": null
-      },
-      {
-        "status": "running",
-        "timestamp": "2026-06-15T07:40:24.244Z",
-        "language": "he",
-        "sessionId": "tutorial-run-1781509224243-mf1pju",
         "gammaUrl": null,
         "sharepointUrl": null,
         "error": null
@@ -1277,7 +1236,7 @@
     "id": "mqew1as1t5y3b",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382763067/Part+6+-+Guardrails",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382763067/Part+6+-+Guardrails",
-    "label": "Part 6 - Guardrails",
+    "label": "Part 6 -\u00a0Guardrails",
     "status": "done",
     "language": "he",
     "sessionId": "tutorial-run-1782138234268-reg96p",
@@ -1644,7 +1603,7 @@
     "id": "mqetu0z2fy2wf",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/384172040/Part+1+-+MCPs+Connectors",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/384172040/Part+1+-+MCPs+Connectors",
-    "label": "Part 1 - MCPs & Connectors",
+    "label": "Part 1 -\u00a0MCPs & Connectors",
     "status": "done",
     "language": "he",
     "sessionId": "tutorial-run-1781504837693-u4s10c",
@@ -1676,68 +1635,11 @@
     ]
   },
   {
-    "id": "mqetu0yy328li",
-    "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382468165/Part+1+-+Skills",
-    "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382468165/Part+1+-+Skills",
-    "label": "Part 1 - Skills",
-    "status": "done",
-    "language": "he",
-    "sessionId": "tutorial-run-1782139446182-wca9s8",
-    "gammaUrl": "https://gamma.app/docs/7cz1c9s13ryl0wt",
-    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Skills-Part-1-Skills.pdf",
-    "createdAt": "2026-06-15T06:23:07.109Z",
-    "lastUpdatedAt": "2026-06-22T14:48:08.713Z",
-    "lastGeneratedAt": "2026-06-22T14:48:08.710Z",
-    "error": null,
-    "history": [
-      {
-        "status": "done",
-        "timestamp": "2026-06-22T14:48:08.713Z",
-        "language": "he",
-        "sessionId": "tutorial-run-1782139446182-wca9s8",
-        "gammaUrl": "https://gamma.app/docs/7cz1c9s13ryl0wt",
-        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Skills-Part-1-Skills.pdf",
-        "videoUrl": null,
-        "error": null
-      },
-      {
-        "status": "running",
-        "timestamp": "2026-06-22T14:44:06.184Z",
-        "language": "he",
-        "sessionId": "tutorial-run-1782139446182-wca9s8",
-        "gammaUrl": null,
-        "sharepointUrl": null,
-        "videoUrl": null,
-        "error": null
-      },
-      {
-        "status": "done",
-        "timestamp": "2026-06-15T06:27:17.692Z",
-        "language": "he",
-        "sessionId": "tutorial-run-1781504587119-fffni2",
-        "gammaUrl": "https://gamma.app/docs/w6ayqxbtz6s4lix",
-        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/382468165-1-Skills.pdf",
-        "error": null
-      },
-      {
-        "status": "running",
-        "timestamp": "2026-06-15T06:23:07.120Z",
-        "language": "he",
-        "sessionId": "tutorial-run-1781504587119-fffni2",
-        "gammaUrl": null,
-        "sharepointUrl": null,
-        "error": null
-      }
-    ],
-    "videoStatus": "done",
-    "videoUrl": null
-  },
-  {
     "id": "mqdw6hdbympdg",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383025198/Part+7+-+Best+practice+-+Cortex+agent+creation",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383025198/Part+7+-+Best+practice+-+Cortex+agent+creation",
     "label": "Part 7 - Best practice - Cortex agent creation",
-    "status": "running",
+    "status": "done",
     "language": "he",
     "sessionId": "tutorial-run-1782112352578-ob5zcs",
     "gammaUrl": "https://gamma.app/docs/pfwh9q8vvmtntfz",
@@ -1919,12 +1821,12 @@
     "label": "Part 2 - Spark Agent",
     "status": "done",
     "language": "he",
-    "sessionId": "tutorial-run-1781447330175-j8r4tf",
+    "sessionId": "video-run-1782296646938-akprsy",
     "gammaUrl": "https://gamma.app/docs/7uljnmbtc1f04qi",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383025178-2-Spark-Agent.pdf",
     "createdAt": "2026-06-14T14:28:50.173Z",
-    "lastUpdatedAt": "2026-06-21T07:38:35.869Z",
-    "lastGeneratedAt": "2026-06-14T14:32:25.246Z",
+    "lastUpdatedAt": "2026-06-24T10:29:07.315Z",
+    "lastGeneratedAt": "2026-06-24T10:29:07.313Z",
     "error": null,
     "history": [
       {
@@ -1947,7 +1849,7 @@
       }
     ],
     "videoStatus": "done",
-    "videoUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/Agent_Part_2_-_Spark_Agent.mp4"
+    "videoUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenVideos/he-Agent-Part-2-Spark-Agent.mp4"
   },
   {
     "id": "mqdvkohoc30i3",
@@ -2013,14 +1915,34 @@
     "label": "Part 3 - Excel files",
     "status": "done",
     "language": "he",
-    "sessionId": "tutorial-run-1782047482824-zlxtew",
+    "sessionId": "tutorial-run-1782203960245-vc5t1w",
     "gammaUrl": "https://gamma.app/docs/7xt2mj5re21hupq",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenVideos/383025218-3-Excel.pdf",
     "createdAt": "2026-06-14T13:29:51.987Z",
-    "lastUpdatedAt": "2026-06-21T13:14:36.472Z",
+    "lastUpdatedAt": "2026-06-23T08:39:51.035Z",
     "lastGeneratedAt": "2026-06-21T13:14:36.468Z",
     "error": null,
     "history": [
+      {
+        "status": "stopped",
+        "timestamp": "2026-06-23T08:39:51.035Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782203960245-vc5t1w",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": "Generation stopped by user"
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-23T08:39:20.247Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782203960245-vc5t1w",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
       {
         "status": "done",
         "timestamp": "2026-06-21T13:14:36.472Z",
@@ -2066,17 +1988,37 @@
     "id": "mqdtmz5ec7bdz",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383189041/Part+2+-+RAG+Mechanism",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383189041/Part+2+-+RAG+Mechanism",
-    "label": "Part 2 - RAG Mechanism",
+    "label": "Part 2 -\u00a0RAG\u00a0Mechanism",
     "status": "done",
     "language": "he",
-    "sessionId": "tutorial-run-1781697158207-o8durg",
-    "gammaUrl": "https://gamma.app/docs/vgd6nuhzv14qo65",
-    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383189041-2-RAG.pdf",
+    "sessionId": "tutorial-run-1782204692303-rsi57i",
+    "gammaUrl": "https://gamma.app/docs/arwehh3kwpe0bwi",
+    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Knowledge-%26-Sources-Part-2-RAG-Mechanism.pdf",
     "createdAt": "2026-06-14T13:29:51.984Z",
-    "lastUpdatedAt": "2026-06-17T11:56:31.020Z",
-    "lastGeneratedAt": "2026-06-17T11:56:31.017Z",
+    "lastUpdatedAt": "2026-06-23T08:55:49.387Z",
+    "lastGeneratedAt": "2026-06-23T08:55:49.385Z",
     "error": null,
     "history": [
+      {
+        "status": "done",
+        "timestamp": "2026-06-23T08:55:49.387Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782204692303-rsi57i",
+        "gammaUrl": "https://gamma.app/docs/arwehh3kwpe0bwi",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Knowledge-%26-Sources-Part-2-RAG-Mechanism.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-23T08:51:32.304Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782204692303-rsi57i",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
       {
         "status": "done",
         "timestamp": "2026-06-17T11:56:31.020Z",
@@ -2162,7 +2104,7 @@
     "id": "mqdtmz5baan12",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/384073751/Part+1+-+Uploading+and+Processing+Documents",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/384073751/Part+1+-+Uploading+and+Processing+Documents",
-    "label": "Part 1 - Uploading and Processing Documents",
+    "label": "Part 1 -\u00a0Uploading and Processing Documents",
     "status": "done",
     "language": "he",
     "sessionId": "tutorial-run-1781443957837-b5ciri",
@@ -2365,17 +2307,57 @@
     "id": "mqdqvy95ucfc3",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383549465/Part+5+-+Basic+Chat+Usage",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383549465/Part+5+-+Basic+Chat+Usage",
-    "label": "Part 5 - Basic Chat Usage",
+    "label": "Part 5 -\u00a0Basic Chat Usage",
     "status": "done",
     "language": "he",
-    "sessionId": "tutorial-run-1781512430996-sr1ll2",
-    "gammaUrl": "https://gamma.app/docs/0ju7k6jya1hnbfg",
-    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383549465-5.pdf",
+    "sessionId": "tutorial-run-1782310445700-n3accs",
+    "gammaUrl": "https://gamma.app/docs/kqw6zgtm8i7o9x9",
+    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Workspace-Part-5-Basic-Chat-Usage.pdf",
     "createdAt": "2026-06-14T12:12:51.876Z",
-    "lastUpdatedAt": "2026-06-15T08:33:51.522Z",
-    "lastGeneratedAt": "2026-06-14T12:17:19.236Z",
-    "error": "Generation stopped by user",
+    "lastUpdatedAt": "2026-06-24T14:18:14.265Z",
+    "lastGeneratedAt": "2026-06-24T14:18:14.260Z",
+    "error": null,
     "history": [
+      {
+        "status": "done",
+        "timestamp": "2026-06-24T14:18:14.265Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782310445700-n3accs",
+        "gammaUrl": "https://gamma.app/docs/kqw6zgtm8i7o9x9",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Workspace-Part-5-Basic-Chat-Usage.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-24T14:14:05.701Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782310445700-n3accs",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "stopped",
+        "timestamp": "2026-06-24T13:34:54.883Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782308009890-hubog7",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": "Generation stopped by user"
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-24T13:33:29.891Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782308009890-hubog7",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
       {
         "status": "pending",
         "timestamp": "2026-06-15T08:33:51.522Z",
@@ -2412,13 +2394,14 @@
         "sharepointUrl": null,
         "error": null
       }
-    ]
+    ],
+    "videoUrl": null
   },
   {
     "id": "mqdqpzt1dfowg",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382468185/Part+4+-+Chat+Workspace+Overview",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382468185/Part+4+-+Chat+Workspace+Overview",
-    "label": "Part 4 - Chat Workspace Overview",
+    "label": "Part 4 -\u00a0Chat Workspace Overview",
     "status": "done",
     "language": "he",
     "sessionId": "tutorial-run-1782137163626-syspw1",
@@ -2533,14 +2516,74 @@
     "label": "Part 2 - User Profile",
     "status": "done",
     "language": "he",
-    "sessionId": "tutorial-run-1781697567755-xkch7k",
-    "gammaUrl": "https://gamma.app/docs/8dndilyggwfxw15",
-    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/384204884-2.pdf",
+    "sessionId": "tutorial-run-1782309198905-u02nca",
+    "gammaUrl": "https://gamma.app/docs/3d47h99dlx4qage",
+    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Workspace-Part-2-User-Profile.pdf",
     "createdAt": "2026-06-14T12:08:13.948Z",
-    "lastUpdatedAt": "2026-06-17T12:02:03.549Z",
-    "lastGeneratedAt": "2026-06-17T12:02:03.548Z",
+    "lastUpdatedAt": "2026-06-24T13:56:11.495Z",
+    "lastGeneratedAt": "2026-06-24T13:56:11.492Z",
     "error": null,
     "history": [
+      {
+        "status": "done",
+        "timestamp": "2026-06-24T13:56:11.495Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782309198905-u02nca",
+        "gammaUrl": "https://gamma.app/docs/3d47h99dlx4qage",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Workspace-Part-2-User-Profile.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-24T13:53:18.908Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782309198905-u02nca",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "done",
+        "timestamp": "2026-06-24T13:46:40.117Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782308641296-cp9c3p",
+        "gammaUrl": "https://gamma.app/docs/3nhjepovt9cl8v2",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Workspace-Part-2-User-Profile.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-24T13:44:01.298Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782308641296-cp9c3p",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "done",
+        "timestamp": "2026-06-24T13:33:29.888Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782307850383-vu28hz",
+        "gammaUrl": "https://gamma.app/docs/9u5nxdzb9et4n19",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Workspace-Part-2-User-Profile.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-24T13:30:50.384Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782307850383-vu28hz",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
       {
         "status": "done",
         "timestamp": "2026-06-17T12:02:03.549Z",
@@ -2820,15 +2863,15 @@
     "id": "mqdq4kie260c3",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383615020/Part+3+-+Side+Menu",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/383615020/Part+3+-+Side+Menu",
-    "label": "Part 3 - Side Menu",
+    "label": "Part 3 -\u00a0Side Menu",
     "status": "done",
     "language": "he",
-    "sessionId": "video-run-1782121371861-zg8wye",
+    "sessionId": "video-run-1782290722223-amzzen",
     "gammaUrl": "https://gamma.app/docs/dhfi0tfzywsj9fb",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383615020-3.pdf",
     "createdAt": "2026-06-14T11:51:34.354Z",
-    "lastUpdatedAt": "2026-06-22T09:47:00.484Z",
-    "lastGeneratedAt": "2026-06-22T09:47:00.480Z",
+    "lastUpdatedAt": "2026-06-24T08:49:32.041Z",
+    "lastGeneratedAt": "2026-06-24T08:49:32.039Z",
     "error": null,
     "history": [
       {
@@ -2928,7 +2971,7 @@
         "error": null
       }
     ],
-    "videoUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenVideos/Workspace_Part_3_-_Side_Menu_he.mp4"
+    "videoUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenVideos/he-Workspace-Part-3-Side-Menu.mp4"
   },
   {
     "id": "mqdpcf4upxu6s",
@@ -3016,12 +3059,12 @@
     "label": "Part 3 - Cortex Agent",
     "status": "done",
     "language": "he",
-    "sessionId": "video-run-1782049503147-3rrfjd",
+    "sessionId": "video-run-1782293305178-kmnor4",
     "gammaUrl": "https://gamma.app/docs/2d9vxrdzkoesiz9",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/384270339-3-Cortex.pdf",
     "createdAt": "2026-06-14T10:06:49.170Z",
-    "lastUpdatedAt": "2026-06-21T13:50:01.510Z",
-    "lastGeneratedAt": "2026-06-21T13:50:01.506Z",
+    "lastUpdatedAt": "2026-06-24T09:33:28.092Z",
+    "lastGeneratedAt": "2026-06-24T09:33:28.088Z",
     "error": null,
     "history": [
       {
@@ -3062,23 +3105,73 @@
       }
     ],
     "videoStatus": "done",
-    "videoUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenVideos/Agent_Part_3_-_Cortex_Agent_he.mp4"
+    "videoUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenVideos/he-Agent-Part-3-Cortex-Agent.mp4"
   },
   {
     "id": "mqdl237no6vc2",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382763087/Part+6+-+Agent+in+Workspace",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382763087/Part+6+-+Agent+in+Workspace",
-    "label": "Part 6 - Agent in Workspace",
+    "label": "Part 6 -\u00a0Agent in\u00a0Workspace",
     "status": "done",
     "language": "he",
-    "sessionId": "tutorial-run-1781512431523-el2hly",
-    "gammaUrl": "https://gamma.app/docs/e44puovt5j0lel8",
-    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/382763087-6-Agent.pdf",
+    "sessionId": "tutorial-run-1782312072931-gaiw6p",
+    "gammaUrl": "https://gamma.app/docs/gsqqpw2os4rzpj5",
+    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Workspace-Part-6-Agent-in-Workspace.pdf",
     "createdAt": "2026-06-14T09:29:40.543Z",
-    "lastUpdatedAt": "2026-06-15T08:33:51.913Z",
-    "lastGeneratedAt": "2026-06-14T09:33:39.334Z",
-    "error": "Generation stopped by user",
+    "lastUpdatedAt": "2026-06-24T14:44:01.983Z",
+    "lastGeneratedAt": "2026-06-24T14:44:01.982Z",
+    "error": null,
     "history": [
+      {
+        "status": "done",
+        "timestamp": "2026-06-24T14:44:01.983Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782312072931-gaiw6p",
+        "gammaUrl": "https://gamma.app/docs/gsqqpw2os4rzpj5",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Workspace-Part-6-Agent-in-Workspace.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-24T14:41:12.932Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782312072931-gaiw6p",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "done",
+        "timestamp": "2026-06-24T14:21:41.305Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782310694269-gu1amy",
+        "gammaUrl": "https://gamma.app/docs/nexhxds2nygx7m2",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Workspace-Part-6-Agent-in-Workspace.pdf",
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "running",
+        "timestamp": "2026-06-24T14:18:14.271Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782310694269-gu1amy",
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": null
+      },
+      {
+        "status": "stopped",
+        "timestamp": "2026-06-24T13:34:54.884Z",
+        "language": "he",
+        "sessionId": null,
+        "gammaUrl": null,
+        "sharepointUrl": null,
+        "videoUrl": null,
+        "error": "Generation stopped by user"
+      },
       {
         "status": "pending",
         "timestamp": "2026-06-15T08:33:51.913Z",
@@ -3115,13 +3208,14 @@
         "sharepointUrl": null,
         "error": null
       }
-    ]
+    ],
+    "videoUrl": null
   },
   {
     "id": "mqdkv8i2f7ynz",
     "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382337056/Part+1+-+Introduction+to+Workspace",
     "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382337056/Part+1+-+Introduction+to+Workspace",
-    "label": "Part 1 - Introduction to Workspace",
+    "label": "Part 1 -\u00a0Introduction to Workspace",
     "status": "done",
     "language": "en",
     "sessionId": "tutorial-run-1781512302651-845ame",
@@ -3276,5 +3370,61 @@
       }
     ],
     "videoUrl": null
+  },
+  {
+    "id": "mqs0mmgqm1wqq",
+    "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382468165/Part+1-+Skills+Fundamentals",
+    "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382468165/Part+1-+Skills+Fundamentals",
+    "label": "Part 1- Skills Fundamentals",
+    "status": "done",
+    "language": "en",
+    "sessionId": "tutorial-run-1782302350224-rlavq4",
+    "gammaUrl": "https://gamma.app/docs/Part-1-Skills-Fundamentals-m26tmd1ti0fcvhq",
+    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/en-Skills-Part-1-Skills-Fundamentals.pdf",
+    "videoUrl": null,
+    "createdAt": "2026-06-24T11:54:19.320Z",
+    "lastUpdatedAt": "2026-06-24T12:02:27.510Z",
+    "lastGeneratedAt": "2026-06-24T12:02:27.506Z",
+    "error": null,
+    "history": [
+      {
+        "status": "done",
+        "timestamp": "2026-06-24T12:02:27.510Z",
+        "language": "en",
+        "sessionId": "tutorial-run-1782302350224-rlavq4",
+        "gammaUrl": "https://gamma.app/docs/Part-1-Skills-Fundamentals-m26tmd1ti0fcvhq",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/en-Skills-Part-1-Skills-Fundamentals.pdf",
+        "videoUrl": null,
+        "error": null
+      }
+    ]
+  },
+  {
+    "id": "mqs00pz9ycz0i",
+    "url": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382468165/Part+1-+Skills+Fundamentals",
+    "confluenceUrl": "https://jeenai.atlassian.net/wiki/spaces/GKC/pages/382468165/Part+1-+Skills+Fundamentals",
+    "label": "Part 1- Skills Fundamentals",
+    "status": "done",
+    "language": "he",
+    "sessionId": "tutorial-run-1782301244916-psgqnr",
+    "gammaUrl": "https://gamma.app/docs/1-Skills-bkk1yfxvullw538",
+    "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Skills-Part-1-Skills-Fundamentals.pdf",
+    "videoUrl": null,
+    "createdAt": "2026-06-24T11:37:17.440Z",
+    "lastUpdatedAt": "2026-06-24T11:47:11.073Z",
+    "lastGeneratedAt": "2026-06-24T11:47:11.070Z",
+    "error": null,
+    "history": [
+      {
+        "status": "done",
+        "timestamp": "2026-06-24T11:47:11.073Z",
+        "language": "he",
+        "sessionId": "tutorial-run-1782301244916-psgqnr",
+        "gammaUrl": "https://gamma.app/docs/1-Skills-bkk1yfxvullw538",
+        "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Skills-Part-1-Skills-Fundamentals.pdf",
+        "videoUrl": null,
+        "error": null
+      }
+    ]
   }
 ]

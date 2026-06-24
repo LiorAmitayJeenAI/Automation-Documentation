@@ -1,0 +1,42 @@
+{
+  "run_id": "clips-run-1782289220247",
+  "webm_path": "/Users/lioramitay/Documents/GitHub/Automation-Documentation/video/public/recordings/clips-run-1782289220247.webm",
+  "webm_public": "recordings/clips-run-1782289220247.webm",
+  "mechanism": "cdp",
+  "fps": 30,
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "bitrate_bps": 1200000,
+  "total_seconds": 8.308,
+  "base_url": "https://jeenai.app",
+  "link_type": "regular",
+  "language": "he",
+  "events": [
+    {
+      "type": "navigate",
+      "step_index": 0,
+      "url": "https://jeenai.app",
+      "action": "home",
+      "status": 200,
+      "t_start": 0.0,
+      "t_end": 0.287
+    },
+    {
+      "type": "page_ready",
+      "url": "https://jeenai.app",
+      "t": 5.303
+    }
+  ],
+  "steps": [
+    {
+      "step_index": 0,
+      "url": "https://jeenai.app",
+      "action": "home",
+      "t_visible": 5.303,
+      "settle_s": 2.5
+    }
+  ],
+  "failed_steps": []
+}

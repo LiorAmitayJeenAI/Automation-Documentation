@@ -132,9 +132,15 @@ async def generate_presentation(
 
     image_options: dict[str, Any] = {
         "source": "aiGenerated",
-        "model": "gpt-image-2",
+        "model": "gpt-image-2-mini",
         "style": (
-            "Natural office photo of people interacting casually, soft daylight, genuine expressions, clean modern workspace, blurred background, no screens or phones or robots."
+            "Photorealistic candid photograph of real human people working or collaborating in a modern office. "
+            "EVERY image must be a realistic photo that prominently features real people. "
+            "Soft natural daylight, genuine expressions, clean modern workspace, shallow depth of field, blurred background. "
+            "No screens, phones, or robots. "
+            "This is a real photograph — it is NOT an illustration, drawing, sketch, line art, cartoon, painting, 3D render, "
+            "diagram, flowchart, process flow, chart, graph, infographic, schematic, icon, or any artwork containing text. "
+            "Never depict objects, concepts, or scenes without people — people are always the subject."
         ),
     }
 

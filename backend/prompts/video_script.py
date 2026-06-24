@@ -36,6 +36,9 @@ NARRATION RULES
   Describe what the viewer sees and what it means for them. Base it strictly on the
   documentation — do NOT describe features not mentioned there. Narrate only the critical
   actions of THIS feature; never introduce or reference adjacent or unrelated features.
+  The narration must describe only what is visible on the current screen after the step's
+  interactions are complete. Do not mention objects, lists, pages, forms, or results that
+  are not currently visible.
   When a fill interaction types demo data, mention the field name and why (e.g. "כאן נותנים שם לסוכן").
 
 - "caption": a SHORT Hebrew phrase — 5 to 8 words maximum. This is displayed on screen
@@ -93,6 +96,9 @@ NARRATION RULES
   Describe what the viewer sees and what it means for them. Base it strictly on the
   documentation — do NOT describe features not mentioned there. Narrate only the critical
   actions of THIS feature; never introduce or reference adjacent or unrelated features.
+  The narration must describe only what is visible on the current screen after the step's
+  interactions are complete. Do not mention objects, lists, pages, forms, or results that
+  are not currently visible.
   When a fill interaction types demo data, mention the field name and why (e.g. "Here we name the agent").
 
 - "caption": a SHORT English phrase — 5 to 8 words maximum. This is displayed on screen
@@ -153,7 +159,7 @@ without detours into unrelated areas.
 ═══════════════════════════════════════
 FOCUS & RELEVANCE — MOST IMPORTANT
 ═══════════════════════════════════════
-1. First, identify the single feature the documentation is about. Build the entire video
+1. First, identify the single feature the documentation is about. Explain the feature in a few words so the customer understands its purpose. Build the entire video
    as the shortest critical path a customer follows to use that feature.
 2. Include ONLY steps that are essential to understanding and using that feature.
 3. Do NOT open tabs, panels, sub-sections, dropdowns, or routes that are not central to
@@ -168,13 +174,18 @@ FOCUS & RELEVANCE — MOST IMPORTANT
 STEP PROGRESSION — CRITICAL RULES
 ═══════════════════════════════════════
 1. Each step MUST advance the story. Never show the same screen twice.
-2. Every URL in your script MUST be unique — you may NOT repeat a URL across steps
+2. The visible screen MUST match the narration and caption for that step. When you talk
+   about a specific thing that should be visible in the video, first show the screen where
+   that thing appears. For example, do not talk about a list of agents while showing some
+   unrelated page; show the agents list page first, then continue into the creation flow.
+   Whatever is in the background must support exactly what the viewer hears.
+3. Every URL in your script MUST be unique — you may NOT repeat a URL across steps
    UNLESS the repeated step includes interactions that visually change the screen
    (open a modal, fill a field, reveal a panel). If you cannot change the screen,
    use a DIFFERENT URL or omit the step entirely.
-3. NEVER include a login, sign-in, authentication, or password step. The viewer is
+4. NEVER include a login, sign-in, authentication, or password step. The viewer is
    already logged in; the video must start directly on the product.
-4. Plan the steps as a logical user journey:
+5. Plan the steps as a logical user journey:
    - Start at the main list or overview page of the feature
    - Navigate into specific items or flows
    - Show relevant interactions along the way
@@ -241,10 +252,8 @@ STEP COUNT AND settle_ms
   rather than padding to reach 7. The full video must feel under one minute. Keep
   narrations short and punchy — every extra second of speech extends the video.
 - settle_ms: how long the browser pauses on the screen after all interactions finish.
-  Use 2500 for simple static views, 3000–3500 for pages with many elements or after
-  interactions that reveal new content. Keep it tight — shorter is better.
-
-The "interactions" field is optional — omit it entirely if the plain page view is enough.
+  Use 3000–3500 after interactions that reveal new content (opening a tab, clicking a
+  button that shows a panel). Use 2500 only for scroll-only steps. Keep it tight.
 
 ═══════════════════════════════════════
 ALLOWED ROUTES

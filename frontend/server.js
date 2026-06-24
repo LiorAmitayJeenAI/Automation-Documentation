@@ -216,10 +216,12 @@ function handleStoppedTutorial(url, updates) {
 
   if (!existing) return;
 
-  const wasPreviouslyGenerated = existing.gammaUrl || existing.sharepointUrl;
+  const wasPreviouslyGenerated = existing.gammaUrl || existing.sharepointUrl || existing.videoUrl;
 
   if (wasPreviouslyGenerated) {
     const history = Array.isArray(existing.history) ? existing.history : [];
+    existing.status = 'done';
+    existing.error = null;
     existing.history = [
       historyEntry('stopped', updates),
       ...history,
@@ -861,7 +863,8 @@ async function executeVideoRun(runId, runItems, language) {
 
   for (const item of runItems) {
     if (run.controller.signal.aborted) {
-      run.emitter.emit('event', { url: item.url, status: 'error', folderName: item.folderName, label: item.label, error: 'Stopped by user' });
+      handleStoppedTutorial(item.url, { language, sessionId: null, error: 'Stopped by user' });
+      run.emitter.emit('event', { url: item.url, status: 'stopped', folderName: item.folderName, label: item.label, error: 'Stopped by user' });
       continue;
     }
 
@@ -905,7 +908,8 @@ async function executeVideoRun(runId, runItems, language) {
     } catch (err) {
       if (run.controller.signal.aborted || err.name === 'AbortError') {
         console.log(`[video-run] ${runId} — stopped by user  url=${url}`);
-        run.emitter.emit('event', { url, status: 'error', folderName: item.folderName, label: item.label, error: 'Stopped by user' });
+        handleStoppedTutorial(url, { language, sessionId, error: 'Stopped by user' });
+        run.emitter.emit('event', { url, status: 'stopped', folderName: item.folderName, label: item.label, error: 'Stopped by user' });
       } else {
         console.error(`[video-run] ${runId} — error  url=${url}:`, err.message);
         run.emitter.emit('event', { url, status: 'error', folderName: item.folderName, label: item.label, error: err.message });
@@ -1025,11 +1029,12 @@ app.get('/api/tutorials', (req, res) => {
   res.json(loadTutorials());
 });
 
-/* ── Save all tutorial PDFs to a new SharePoint folder ── */
-function callExportPdfsBackend(folderName, pdfUrls) {
+/* ── Save all tutorial PDFs + Videos + Excel to SharePoint ── */
+
+function callBackendJson(apiPath, payload) {
   return new Promise((resolve, reject) => {
-    const parsed = new URL(`${PYTHON_BACKEND_URL}/api/export-pdfs-to-sharepoint`);
-    const body = JSON.stringify({ folder_name: folderName, pdf_urls: pdfUrls });
+    const parsed = new URL(`${PYTHON_BACKEND_URL}${apiPath}`);
+    const body = JSON.stringify(payload);
 
     const request = http.request(
       {
@@ -1073,42 +1078,120 @@ function callExportPdfsBackend(folderName, pdfUrls) {
   });
 }
 
-function exportFolderName(date = new Date()) {
+function exportFolderName(type = 'Presentations', date = new Date()) {
   const pad = (n) => String(n).padStart(2, '0');
-  const stamp = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
-    + ` ${pad(date.getHours())}:${pad(date.getMinutes())}`;
-  return `PDF Gamma ${stamp}`;
+  const stamp = `${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()}`;
+  return `${type} ${stamp}`;
+}
+
+function buildExcelBuffer(tutorials, foldersData) {
+  const folderMap = new Map();
+  for (const folder of (foldersData?.folders || [])) {
+    for (const page of folder.pages) {
+      folderMap.set(page.url, folder.name);
+    }
+  }
+
+  const rows = tutorials.map((t) => ({
+    Folder: folderMap.get(t.url || t.confluenceUrl) || '',
+    Title: t.label || 'Untitled',
+    Language: t.language ? t.language.toUpperCase() : '-',
+    'Confluence URL': t.confluenceUrl || t.url || '',
+    'Gamma URL': t.gammaUrl || '',
+    'PDF URL': t.sharepointUrl || '',
+    'Video URL': t.videoUrl || '',
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Tutorials');
+  return XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
 }
 
 app.post('/api/export-sharepoint', async (req, res) => {
   const list = loadTutorials();
-  const seen = new Set();
+
+  const pdfSeen = new Set();
   const pdfUrls = [];
+  const videoSeen = new Set();
+  const videoUrls = [];
+
   for (const t of list) {
-    const url = t.sharepointUrl;
-    if (!url || seen.has(url)) continue;
-    seen.add(url);
-    pdfUrls.push(url);
+    if (t.sharepointUrl && !pdfSeen.has(t.sharepointUrl)) {
+      pdfSeen.add(t.sharepointUrl);
+      pdfUrls.push(t.sharepointUrl);
+    }
+    if (t.videoUrl && !videoSeen.has(t.videoUrl)) {
+      videoSeen.add(t.videoUrl);
+      videoUrls.push(t.videoUrl);
+    }
   }
 
-  if (!pdfUrls.length) {
-    return res.status(400).json({ error: 'No presentations with a PDF to export.' });
+  if (!pdfUrls.length && !videoUrls.length) {
+    return res.status(400).json({ error: 'No presentations or videos to export.' });
   }
 
-  const folderName = exportFolderName();
+  const now = new Date();
+  const pdfFolder = exportFolderName('Presentations', now);
+  const videoFolder = exportFolderName('Videos', now);
 
+  const result = {
+    pdfFolderName: null, pdfFolderUrl: null, pdfCount: 0,
+    videoFolderName: null, videoFolderUrl: null, videoCount: 0,
+    excelUrl: null,
+    errors: [],
+  };
+
+  // 1. Sync PDFs
+  if (pdfUrls.length) {
+    try {
+      const pdfResult = await callBackendJson('/api/sync-export-folder', {
+        prefix: 'Presentations',
+        folder_name: pdfFolder,
+        current_urls: pdfUrls,
+      });
+      result.pdfFolderName = pdfFolder;
+      result.pdfFolderUrl = pdfResult.folderUrl || null;
+      result.pdfCount = pdfResult.uploaded || 0;
+    } catch (err) {
+      result.errors.push(`PDFs: ${err?.message || 'failed'}`);
+    }
+  }
+
+  // 2. Sync Videos
+  if (videoUrls.length) {
+    try {
+      const vidResult = await callBackendJson('/api/sync-export-folder', {
+        prefix: 'Videos',
+        folder_name: videoFolder,
+        current_urls: videoUrls,
+      });
+      result.videoFolderName = videoFolder;
+      result.videoFolderUrl = vidResult.folderUrl || null;
+      result.videoCount = vidResult.uploaded || 0;
+    } catch (err) {
+      result.errors.push(`Videos: ${err?.message || 'failed'}`);
+    }
+  }
+
+  // 3. Upload Excel
   try {
-    const result = await callExportPdfsBackend(folderName, pdfUrls);
-    res.json({
-      folderName,
-      folderUrl: result.folderUrl || null,
-      count: Array.isArray(result.uploaded) ? result.uploaded.length : 0,
-      skipped: result.skipped || 0,
+    const foldersData = loadFoldersRaw();
+    const excelBuf = buildExcelBuffer(list, foldersData);
+    const excelResult = await callBackendJson('/api/upload-excel-to-sharepoint', {
+      file_name: 'tutorials-library.xlsx',
+      file_base64: excelBuf.toString('base64'),
     });
+    result.excelUrl = excelResult.webUrl || null;
   } catch (err) {
-    const statusCode = err?.statusCode || 500;
-    res.status(statusCode).json({ error: err?.message || 'SharePoint export failed.' });
+    result.errors.push(`Excel: ${err?.message || 'failed'}`);
   }
+
+  if (result.errors.length && !result.pdfCount && !result.videoCount && !result.excelUrl) {
+    return res.status(500).json({ error: result.errors.join('; ') });
+  }
+
+  res.json(result);
 });
 
 app.delete('/api/tutorials/:id', (req, res) => {

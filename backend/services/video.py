@@ -58,6 +58,7 @@ async def render_video(
 
     step_timings: list[float] = recording_result.get("step_timings", [])
     step_settles: list[float] = recording_result.get("step_settles", [])
+    step_leads: list[float] = recording_result.get("step_leads", [])
     recorded_steps: list[dict] = recording_result.get("recorded_steps", [])
     recorded_audio: list[dict | None] = recording_result.get("recorded_audio", [])
     failed_steps: list[dict] = recording_result.get("failed_steps", [])
@@ -87,8 +88,28 @@ async def render_video(
 
     for idx, timing in enumerate(step_timings):
         settle_s = step_settles[idx] if idx < len(step_settles) else 2.0
-        source_start_frame = math.floor(timing * FPS)
-        segment_duration_frames = math.ceil(settle_s * FPS)
+        lead_s = step_leads[idx] if idx < len(step_leads) else 0.0
+        # Start the segment lead_s earlier so the interaction animation (cursor
+        # glide, highlight ring, click ripple, the press itself) is shown.
+        source_start_frame = max(0, math.floor((timing - lead_s) * FPS))
+        # Duration hugs the narration so voice and picture stay in sync: the
+        # narration starts WITH the segment and plays over the interaction. We
+        # only extend past the narration if the interaction itself runs longer
+        # (so a long press is never cut), with a small pad in that case.
+        #
+        # Crucially, size to the FINAL audio length, not just the recorder's
+        # settle: when narration is re-voiced after recording (e.g. a failed
+        # interaction), the new clip can be longer than the settle the recorder
+        # used. Without this, the clip overruns into the next step's narration
+        # and the two voices overlap.
+        audio_for_step = recorded_audio[idx] if idx < len(recorded_audio) else None
+        audio_s = (
+            audio_for_step["duration_s"]
+            if audio_for_step and audio_for_step.get("duration_s")
+            else 0.0
+        )
+        segment_seconds = max(settle_s, audio_s + 0.2, lead_s + 0.3)
+        segment_duration_frames = math.ceil(segment_seconds * FPS)
 
         segments.append({
             "sourceStartFrame": source_start_frame,
@@ -110,6 +131,8 @@ async def render_video(
                 shutil.copy2(src, dest_audio)
                 audio_filename = f"audio/{session_id}/{src.name}"
 
+        # Narration starts WITH the segment (no offset) so the voice is in sync
+        # with the picture and plays over the interaction as it happens.
         cue: dict = {
             "startFrame": seg["outputStartFrame"],
             "text": step.get("narration", ""),

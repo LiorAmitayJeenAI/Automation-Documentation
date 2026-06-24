@@ -29,13 +29,17 @@ RENDER_SETTLE_MS = 1500
 
 # Selector for the apps/grid menu button in the regular app header, and the
 # visible labels of the tile that navigates to the admin app.
-APPS_MENU_BUTTON_SELECTOR = 'button[aria-label="User interface controls menu"]'
+APPS_MENU_ARIA_LABEL = "User interface controls menu"
+APPS_MENU_BUTTON_SELECTOR = f'button[aria-label="{APPS_MENU_ARIA_LABEL}"]'
 ADMIN_TILE_LABELS = ("Admin", "ניהול")
 SIDEBAR_SWAP_BUTTON_SELECTOR = "button[data-sidebar-swap], [data-sidebar-swap]"
 SIDEBAR_SWAP_LABELS = {
     "פתח תפריט",
     "open sidebar",
     "sidebar menu",
+    "menu",
+    "תפריט",
+    "open menu",
 }
 
 # Button text that would persist/destroy data — never clicked during interactions,
@@ -56,6 +60,23 @@ ERROR_PAGE_MARKERS = (
     "does not exist",
     "something went wrong",
 )
+
+# Generic markers for a loading/loader overlay. Used to (a) wait for the loader
+# to disappear before capturing and (b) skip the page if it is still loading.
+LOADER_SELECTORS = (
+    '[aria-busy="true"]',
+    '[role="progressbar"]',
+    '[class*="loader" i]',
+    '[class*="spinner" i]',
+    '[class*="loading" i]',
+)
+LOADER_TEXT_MARKERS = (
+    "loading",
+    "please wait",
+    "טוען",
+    "אנא המתן",
+)
+LOADER_WAIT_MS = 8000
 
 
 def _sanitize_filename(action: str) -> str:
@@ -90,6 +111,53 @@ async def _looks_like_error_page(page: Page) -> str | None:
     for marker in ERROR_PAGE_MARKERS:
         if marker in lowered:
             return f"error marker found: '{marker}'"
+
+    return None
+
+
+async def _wait_for_loader_gone(page: Page, timeout_ms: int = LOADER_WAIT_MS) -> None:
+    """
+    Wait for any visible loading/loader overlay to disappear before capturing.
+
+    For each loader selector, if it is currently visible, wait up to timeout_ms
+    for it to become hidden. Each check is wrapped in try/except so a missing
+    selector or one that never resolves never raises — it just lets the capture
+    proceed (the later skip check decides whether the page is still loading).
+    """
+    for selector in LOADER_SELECTORS:
+        try:
+            loc = page.locator(selector).first
+            if await loc.count() and await loc.is_visible():
+                await loc.wait_for(state="hidden", timeout=timeout_ms)
+        except Exception:
+            continue
+
+
+async def _looks_like_loader_page(page: Page) -> str | None:
+    """
+    Return a reason string if the page still looks like a loading/loader screen,
+    otherwise None. Used as a final skip gate after waiting for the loader.
+    """
+    for selector in LOADER_SELECTORS:
+        try:
+            loc = page.locator(selector).first
+            if await loc.count() and await loc.is_visible():
+                return f"loader still visible: '{selector}'"
+        except Exception:
+            continue
+
+    try:
+        body_text = (await page.inner_text("body")).strip()
+    except Exception:
+        body_text = ""
+
+    lowered = body_text.lower()
+    # Only treat text as a loader signal when the page is otherwise near-empty,
+    # so a normal page that merely contains the word "loading" isn't skipped.
+    if len(lowered) < 40:
+        for marker in LOADER_TEXT_MARKERS:
+            if marker in lowered:
+                return f"loader text marker found: '{marker}'"
 
     return None
 
@@ -336,14 +404,25 @@ async def _find_clickable(page: Page, text: str):
     for locator in candidates:
         if locator is None:
             continue
-        element = locator.first
         try:
-            if await element.count() == 0:
-                continue
-            if await element.is_visible():
-                return element
+            count = await locator.count()
         except Exception:
             continue
+        for i in range(count):
+            element = locator.nth(i)
+            try:
+                if not await element.is_visible():
+                    continue
+                # Never resolve to the apps/admin "User interface controls menu"
+                # button via a generic match — a substring label like "menu"
+                # would otherwise hit it instead of the real target. That button
+                # is only reachable through the explicit admin-entry flow.
+                aria = await element.get_attribute("aria-label")
+                if aria == APPS_MENU_ARIA_LABEL:
+                    continue
+                return element
+            except Exception:
+                continue
     return None
 
 
@@ -539,6 +618,10 @@ async def take_screenshots(
                     pass
                 await page.wait_for_timeout(RENDER_SETTLE_MS)
 
+                # Give any loading/loader overlay a chance to disappear before
+                # we judge or capture the page.
+                await _wait_for_loader_gone(page)
+
                 final_url = page.url
                 if final_url.rstrip("/") != url.rstrip("/"):
                     logger.warning(
@@ -563,6 +646,15 @@ async def take_screenshots(
                     logger.warning(
                         "Screenshot %d/%d: skipping %s — %s | action: '%s' | body preview: %s",
                         i + 1, len(screenshot_script), url, error_reason, action, repr(body_preview),
+                    )
+                    continue
+
+                # Skip pages that are still showing a loading/loader screen
+                loader_reason = await _looks_like_loader_page(page)
+                if loader_reason:
+                    logger.warning(
+                        "Screenshot %d/%d: skipping %s — %s | action: '%s'",
+                        i + 1, len(screenshot_script), url, loader_reason, action,
                     )
                     continue
 

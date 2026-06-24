@@ -8,6 +8,7 @@ and returns gamma_url + sharepoint_url upon completion.
 from __future__ import annotations
 
 import asyncio
+import base64
 import json
 import logging
 from typing import AsyncGenerator
@@ -22,6 +23,7 @@ from backend.config import (
     BACKEND_PORT,
     SP_SCREENSHOTS_FOLDER,
     SP_EXPORT_BASE,
+    SP_EXCEL_EXPORT_PATH,
     REGULAR_URL,
     ADMIN_URL,
 )
@@ -63,6 +65,19 @@ class DiscoverRoutesRequest(BaseModel):
 class ExportPdfsRequest(BaseModel):
     folder_name: str
     pdf_urls: list[str]
+    session_id: str = "default_session"
+
+
+class SyncExportFolderRequest(BaseModel):
+    prefix: str
+    folder_name: str
+    current_urls: list[str]
+    session_id: str = "default_session"
+
+
+class UploadExcelRequest(BaseModel):
+    file_name: str = "tutorials-library.xlsx"
+    file_base64: str
     session_id: str = "default_session"
 
 
@@ -108,6 +123,82 @@ async def export_pdfs_to_sharepoint(req: ExportPdfsRequest):
         return JSONResponse(status_code=401, content={"error": str(exc)})
     except Exception as exc:
         logger.error("SharePoint export failed: %s", exc)
+        return JSONResponse(status_code=500, content={"error": str(exc)})
+
+
+@app.post("/api/sync-export-folder")
+async def sync_export_folder(req: SyncExportFolderRequest):
+    """
+    Date-based export with carry-forward.
+
+    1. List subfolders under SP_EXPORT_BASE that start with *prefix*.
+    2. Find the most recent one that is NOT *folder_name* (previous date).
+    3. Copy all files from that previous folder into today's folder.
+    4. Copy/overwrite the caller-supplied *current_urls* into today's folder.
+
+    Returns {"folderUrl", "uploaded", "carried_forward", "skipped"}.
+    """
+    if not req.current_urls and not req.prefix:
+        return JSONResponse(status_code=400, content={"error": "Nothing to export"})
+
+    dest_folder = f"{SP_EXPORT_BASE.strip('/')}/{req.folder_name.strip('/')}"
+    carried = {"copied": 0, "skipped": 0}
+
+    try:
+        subfolders = await sharepoint.list_subfolders(
+            SP_EXPORT_BASE, session_id=req.session_id,
+        )
+        matching = sorted(
+            [f for f in subfolders if f.startswith(req.prefix) and f != req.folder_name],
+        )
+        if matching:
+            prev_folder = f"{SP_EXPORT_BASE.strip('/')}/{matching[-1]}"
+            logger.info("Carrying forward from %s → %s", prev_folder, dest_folder)
+            carried = await sharepoint.copy_folder_contents(
+                prev_folder, dest_folder, session_id=req.session_id,
+            )
+
+        upload_result = await sharepoint.copy_pdfs_to_folder(
+            req.current_urls, dest_folder, session_id=req.session_id,
+        )
+
+        return {
+            "folderUrl": upload_result.get("folderUrl"),
+            "uploaded": len(upload_result.get("uploaded", [])),
+            "carried_forward": carried.get("copied", 0),
+            "skipped": upload_result.get("skipped", 0) + carried.get("skipped", 0),
+        }
+
+    except RuntimeError as exc:
+        logger.warning("SharePoint sync auth required: %s", exc)
+        return JSONResponse(status_code=401, content={"error": str(exc)})
+    except Exception as exc:
+        logger.error("SharePoint sync failed: %s", exc)
+        return JSONResponse(status_code=500, content={"error": str(exc)})
+
+
+@app.post("/api/upload-excel-to-sharepoint")
+async def upload_excel_to_sharepoint(req: UploadExcelRequest):
+    """
+    Upload a base64-encoded Excel file to SP_EXCEL_EXPORT_PATH.
+    Returns {"webUrl"} on success.
+    """
+    try:
+        file_bytes = base64.b64decode(req.file_base64)
+    except Exception:
+        return JSONResponse(status_code=400, content={"error": "Invalid base64 data"})
+
+    try:
+        result = await sharepoint.upload_file_bytes(
+            file_bytes, req.file_name, SP_EXCEL_EXPORT_PATH,
+            session_id=req.session_id,
+        )
+        return {"webUrl": result.get("webUrl")}
+    except RuntimeError as exc:
+        logger.warning("SharePoint Excel upload auth required: %s", exc)
+        return JSONResponse(status_code=401, content={"error": str(exc)})
+    except Exception as exc:
+        logger.error("SharePoint Excel upload failed: %s", exc)
         return JSONResponse(status_code=500, content={"error": str(exc)})
 
 

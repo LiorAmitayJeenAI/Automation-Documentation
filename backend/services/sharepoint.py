@@ -511,3 +511,94 @@ async def copy_pdfs_to_folder(
             logger.info("Copied %s to %s (%d bytes)", file_name, dest_folder, len(content))
 
     return {"folderUrl": folder_url, "uploaded": uploaded, "skipped": skipped}
+
+
+async def list_subfolders(
+    parent_folder: str,
+    session_id: str = "default_session",
+) -> list[str]:
+    """
+    List all subfolder names directly under *parent_folder*.
+    Returns folder names sorted alphabetically.
+    """
+    token = _ensure_token(session_id=session_id)
+    _, drive_id = _get_drive_id(token)
+    parent_folder = parent_folder.strip("/")
+
+    url = f"{GRAPH_V1}/drives/{drive_id}/root:/{quote(parent_folder)}:/children"
+
+    folders: list[str] = []
+    async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
+        resp = await client.get(url, headers={"Authorization": f"Bearer {token}"})
+        if resp.status_code == 404:
+            return []
+        resp.raise_for_status()
+
+        for item in resp.json().get("value", []):
+            if "folder" in item:
+                folders.append(item["name"])
+
+    folders.sort()
+    return folders
+
+
+async def copy_folder_contents(
+    source_folder: str,
+    dest_folder: str,
+    session_id: str = "default_session",
+) -> dict:
+    """
+    Copy every file from *source_folder* into *dest_folder* (both are
+    drive-relative paths). Existing files in dest with the same name are
+    overwritten.  Returns {"copied": int, "skipped": int}.
+    """
+    token = _ensure_token(session_id=session_id)
+    _, drive_id = _get_drive_id(token)
+    source_folder = source_folder.strip("/")
+    dest_folder = dest_folder.strip("/")
+
+    list_url = f"{GRAPH_V1}/drives/{drive_id}/root:/{quote(source_folder)}:/children"
+
+    copied = 0
+    skipped = 0
+
+    async with httpx.AsyncClient(timeout=_UPLOAD_TIMEOUT) as client:
+        resp = await client.get(list_url, headers={"Authorization": f"Bearer {token}"})
+        if resp.status_code == 404:
+            return {"copied": 0, "skipped": 0}
+        resp.raise_for_status()
+
+        items = [i for i in resp.json().get("value", []) if "file" in i]
+
+        for item in items:
+            file_name = item["name"]
+            rel_path = f"{source_folder}/{file_name}"
+
+            dl_url = f"{GRAPH_V1}/drives/{drive_id}/root:/{quote(rel_path)}:/content"
+            dl_resp = await client.get(
+                dl_url,
+                headers={"Authorization": f"Bearer {token}"},
+                follow_redirects=True,
+            )
+            if dl_resp.status_code >= 400:
+                logger.warning("carry-forward: skip %s (download %s)", file_name, dl_resp.status_code)
+                skipped += 1
+                continue
+
+            up_url = (
+                f"{GRAPH_V1}/drives/{drive_id}"
+                f"/root:/{quote(dest_folder)}/{quote(file_name)}:/content"
+            )
+            up_resp = await client.put(
+                up_url,
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/octet-stream",
+                },
+                content=dl_resp.content,
+            )
+            up_resp.raise_for_status()
+            copied += 1
+            logger.info("Carried forward %s → %s (%d bytes)", file_name, dest_folder, len(dl_resp.content))
+
+    return {"copied": copied, "skipped": skipped}

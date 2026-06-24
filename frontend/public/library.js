@@ -74,16 +74,27 @@ async function saveToSharePoint() {
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      alert(data.error || 'Failed to save PDFs to SharePoint.');
+      alert(data.error || 'Failed to save to SharePoint.');
       return;
     }
 
-    const lines = [`Saved ${data.count} PDF${data.count !== 1 ? 's' : ''} to SharePoint folder "${data.folderName}".`];
-    if (data.skipped) lines.push(`${data.skipped} file${data.skipped !== 1 ? 's were' : ' was'} skipped.`);
-    if (data.folderUrl) lines.push(`\nOpen folder:\n${data.folderUrl}`);
+    const lines = [];
+    if (data.pdfCount) {
+      lines.push(`Saved ${data.pdfCount} presentation${data.pdfCount !== 1 ? 's' : ''} to "${data.pdfFolderName}".`);
+    }
+    if (data.videoCount) {
+      lines.push(`Saved ${data.videoCount} video${data.videoCount !== 1 ? 's' : ''} to "${data.videoFolderName}".`);
+    }
+    if (data.excelUrl) {
+      lines.push('Excel summary uploaded.');
+    }
+    if (data.pdfFolderUrl) lines.push(`\nPresentations folder:\n${data.pdfFolderUrl}`);
+    if (data.videoFolderUrl) lines.push(`\nVideos folder:\n${data.videoFolderUrl}`);
+    if (data.errors?.length) lines.push(`\nWarnings: ${data.errors.join('; ')}`);
+    if (!lines.length) lines.push('Nothing was exported.');
     alert(lines.join('\n'));
   } catch (err) {
-    alert('Failed to save PDFs to SharePoint. Check the server logs.');
+    alert('Failed to save to SharePoint. Check the server logs.');
   } finally {
     if (saveBtn) {
       saveBtn.disabled = false;

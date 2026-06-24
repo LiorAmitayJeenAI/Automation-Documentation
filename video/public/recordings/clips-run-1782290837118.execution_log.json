@@ -1,0 +1,190 @@
+{
+  "run_id": "clips-run-1782290837118",
+  "webm_path": "/Users/lioramitay/Documents/GitHub/Automation-Documentation/video/public/recordings/clips-run-1782290837118.webm",
+  "webm_public": "recordings/clips-run-1782290837118.webm",
+  "mechanism": "cdp",
+  "fps": 30,
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "bitrate_bps": 1200000,
+  "total_seconds": 61.836,
+  "base_url": "https://jeenai.app",
+  "link_type": "regular",
+  "language": "he",
+  "events": [
+    {
+      "type": "navigate",
+      "step_index": 0,
+      "url": "https://jeenai.app/",
+      "action": "Open the side menu from chat workspace",
+      "status": 200,
+      "t_start": 0.0,
+      "t_end": 0.276
+    },
+    {
+      "type": "click",
+      "text": "תפריט",
+      "candidates": [
+        "תפריט",
+        "Menu"
+      ],
+      "bbox": {
+        "x": 1872,
+        "y": 20,
+        "width": 32,
+        "height": 32
+      },
+      "t_move": 5.829,
+      "t_highlight": 6.184,
+      "t_click": 6.241
+    },
+    {
+      "type": "wait",
+      "ms": 1000,
+      "t": 7.752
+    },
+    {
+      "type": "page_ready",
+      "url": "https://jeenai.app/",
+      "t": 10.266
+    },
+    {
+      "type": "navigate",
+      "step_index": 1,
+      "url": "https://jeenai.app/history",
+      "action": "Show history list and tag filter",
+      "status": 200,
+      "t_start": 13.768,
+      "t_end": 14.095
+    },
+    {
+      "type": "click",
+      "text": "filter-tags",
+      "candidates": [
+        "filter-tags"
+      ],
+      "bbox": {
+        "x": 16,
+        "y": 76.5,
+        "width": 32,
+        "height": 32
+      },
+      "t_move": 19.773,
+      "t_highlight": 20.161,
+      "t_click": 20.21
+    },
+    {
+      "type": "wait",
+      "ms": 1000,
+      "t": 21.731
+    },
+    {
+      "type": "page_ready",
+      "url": "https://jeenai.app/history",
+      "t": 24.259
+    },
+    {
+      "type": "navigate",
+      "step_index": 2,
+      "url": "https://jeenai.app/agents",
+      "action": "Show agents management page",
+      "status": 200,
+      "t_start": 27.766,
+      "t_end": 28.074
+    },
+    {
+      "type": "page_ready",
+      "url": "https://jeenai.app/agents",
+      "t": 33.121
+    },
+    {
+      "type": "navigate",
+      "step_index": 3,
+      "url": "https://jeenai.app/knowledge",
+      "action": "Show knowledge base page",
+      "status": 200,
+      "t_start": 36.131,
+      "t_end": 36.443
+    },
+    {
+      "type": "page_ready",
+      "url": "https://jeenai.app/knowledge",
+      "t": 41.494
+    },
+    {
+      "type": "navigate",
+      "step_index": 4,
+      "url": "https://jeenai.app/skills",
+      "action": "Show skills library page",
+      "status": 200,
+      "t_start": 44.501,
+      "t_end": 44.883
+    },
+    {
+      "type": "page_ready",
+      "url": "https://jeenai.app/skills",
+      "t": 49.919
+    },
+    {
+      "type": "navigate",
+      "step_index": 5,
+      "url": "https://jeenai.app/triggers",
+      "action": "Show triggers configuration page",
+      "status": 200,
+      "t_start": 52.923,
+      "t_end": 53.252
+    },
+    {
+      "type": "page_ready",
+      "url": "https://jeenai.app/triggers",
+      "t": 58.287
+    }
+  ],
+  "steps": [
+    {
+      "step_index": 0,
+      "url": "https://jeenai.app/",
+      "action": "Open the side menu from chat workspace",
+      "t_visible": 10.266,
+      "settle_s": 3.5
+    },
+    {
+      "step_index": 1,
+      "url": "https://jeenai.app/history",
+      "action": "Show history list and tag filter",
+      "t_visible": 24.259,
+      "settle_s": 3.5
+    },
+    {
+      "step_index": 2,
+      "url": "https://jeenai.app/agents",
+      "action": "Show agents management page",
+      "t_visible": 33.121,
+      "settle_s": 3.0
+    },
+    {
+      "step_index": 3,
+      "url": "https://jeenai.app/knowledge",
+      "action": "Show knowledge base page",
+      "t_visible": 41.494,
+      "settle_s": 3.0
+    },
+    {
+      "step_index": 4,
+      "url": "https://jeenai.app/skills",
+      "action": "Show skills library page",
+      "t_visible": 49.919,
+      "settle_s": 3.0
+    },
+    {
+      "step_index": 5,
+      "url": "https://jeenai.app/triggers",
+      "action": "Show triggers configuration page",
+      "t_visible": 58.287,
+      "settle_s": 3.0
+    }
+  ],
+  "failed_steps": []
+}

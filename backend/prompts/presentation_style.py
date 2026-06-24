@@ -60,11 +60,10 @@ Slide readability:
 
 Visual style:
 * Match the visual type to the actual content of each slide.
-* Use technology-oriented visuals for technical topics such as AI agents, workflows, integrations, APIs, automation, tools, and platform capabilities.
-* Prefer architecture diagrams, workflow diagrams, process flows, and product-oriented visuals for technical explanations.
-* Avoid decorative infographic artwork, conceptual illustrations, and artistic diagram styles.
-* Do not overuse people-centric imagery across the presentation.
-* Most technical slides should prioritize technology, workflow, or product-oriented visuals over human imagery.
+* All AI-generated images MUST be natural, realistic photographs of people (for example, people working or collaborating in a modern office).
+* NEVER AI-generate diagrams, flowcharts, process flows, charts, graphs, infographics, schematics, drawings, conceptual illustrations, or any abstract/artistic artwork.
+* This restriction applies ONLY to AI-generated imagery — it does NOT apply to provided screenshots.
+* When explaining technical topics, structure the slide content as clear workflow steps or process flows using text and layout rather than asking for an AI-generated illustration of them.
 * Maintain a consistent modern professional visual identity across the presentation.
 
 Presentation style:
@@ -75,6 +74,7 @@ Presentation style:
 
 Screenshots and visual assets:
 * Use provided screenshots when relevant to the slide content — workflows, UI screens, platform features, or product behavior.
+* Provided screenshots may contain flows, diagrams, menus, charts, or UI — embed them exactly as provided; the no-diagram rule above never applies to screenshots.
 * Prefer real product screenshots over generated imagery when available.
 * Place screenshots near the related explanation on the most relevant slide.
 * Do not force all screenshots — only use what genuinely improves understanding.

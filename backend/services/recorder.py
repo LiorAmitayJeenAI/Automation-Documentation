@@ -367,6 +367,7 @@ async def record_product_video(
     audio_results = audio_results or []
     step_timings: list[float] = []
     step_settles: list[float] = []  # actual settle duration (seconds) per recorded step
+    step_leads: list[float] = []  # interaction-animation lead (seconds) before content settles
     recorded_steps: list[dict] = []
     recorded_audio: list[dict | None] = []
     failed_steps: list[dict] = []
@@ -470,7 +471,13 @@ async def record_product_video(
                 # If they fail we still record the plain page, but flag the step so
                 # the pipeline can rewrite its narration to match what is actually
                 # shown (the base page, not the tab/panel that never opened).
+                # Mark when the (painted) page is ready so the jump-cut editor can
+                # keep the interaction animation that plays between now and the
+                # post-interaction settle stamp below.
+                lead_start = time.time()
+                ran_interactions = False
                 if interactions:
+                    ran_interactions = True
                     try:
                         await _run_interactions_visible(page, interactions, variant_groups)
                         await page.wait_for_timeout(RENDER_SETTLE_MS)
@@ -485,9 +492,14 @@ async def record_product_video(
                 await wait_until_no_spinner(page)
 
                 # Mark the moment the content is fully visible — this is the subtitle cue start
+                content_visible_time = time.time()
                 seen_urls.add(url_key)
-                step_timings.append(time.time() - record_start)
+                step_timings.append(content_visible_time - record_start)
                 step_settles.append(settle_ms / 1000.0)
+                # Lead = how long the interaction animation (cursor glide, ring,
+                # ripple, press) took. The editor extends the segment backward by
+                # this much so the button press is visible in the final video.
+                step_leads.append(content_visible_time - lead_start if ran_interactions else 0.0)
                 recorded_steps.append(step)
                 recorded_audio.append(audio)
 
@@ -518,6 +530,7 @@ async def record_product_video(
         "webm_path": str(webm_path),
         "step_timings": step_timings,
         "step_settles": step_settles,
+        "step_leads": step_leads,
         "total_seconds": total_seconds,
         "recorded_steps": recorded_steps,
         "recorded_audio": recorded_audio,

@@ -30,11 +30,16 @@ SP_SITE_URL = os.getenv("SP_SITE_URL", "https://jeenai365.sharepoint.com/sites/J
 SP_FOLDER_PATH = os.getenv("SP_FOLDER_PATH", "Testing/LiorAmitay/JeenTutorial")
 SP_VIDEO_FOLDER_PATH = os.getenv("SP_VIDEO_FOLDER_PATH", "Testing/LiorAmitay/JeenVideos")
 SP_SCREENSHOTS_FOLDER = os.getenv("SP_SCREENSHOTS_FOLDER", "Testing/LiorAmitay")
-# Base folder under which "Save to SharePoint" creates new timestamped export
-# folders. This path is relative to the SharePoint document library root.
+# Base folder under which "Save to SharePoint" creates date-based export
+# subfolders (e.g. "Presentations 24-06-2026", "Videos 24-06-2026").
 SP_EXPORT_BASE = os.getenv(
     "SP_EXPORT_BASE",
-    "jeen tutorial/tutorial automation/automation output",
+    "jeen tutorial/Tutorial Automation/Automation Output",
+)
+# Folder where the summary Excel file is uploaded on "Save to SharePoint".
+SP_EXCEL_EXPORT_PATH = os.getenv(
+    "SP_EXCEL_EXPORT_PATH",
+    "jeen tutorial/Tutorial Automation",
 )
 
 JEEN_USERNAME = os.getenv("JEEN_USERNAME", "")

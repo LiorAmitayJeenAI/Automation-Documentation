@@ -1,0 +1,239 @@
+{
+  "run_id": "clips-run-1782296786294",
+  "webm_path": "/Users/lioramitay/Documents/GitHub/Automation-Documentation/video/public/recordings/clips-run-1782296786294.webm",
+  "webm_public": "recordings/clips-run-1782296786294.webm",
+  "mechanism": "cdp",
+  "fps": 30,
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "bitrate_bps": 1200000,
+  "total_seconds": 113.424,
+  "base_url": "https://jeenai.app",
+  "link_type": "regular",
+  "language": "he",
+  "events": [
+    {
+      "type": "navigate",
+      "step_index": 0,
+      "url": "https://jeenai.app/agents",
+      "action": "Open agent creation options from the agents list",
+      "status": 200,
+      "t_start": 0.0,
+      "t_end": 0.343
+    },
+    {
+      "type": "click",
+      "text": "צור סוכן",
+      "candidates": [
+        "צור סוכן",
+        "agents-page-primary-action-add",
+        "Create Agent"
+      ],
+      "bbox": {
+        "x": 1328.4,
+        "y": 336,
+        "width": 47.6,
+        "height": 19
+      },
+      "t_move": 5.972,
+      "t_highlight": 6.336,
+      "t_click": 6.391
+    },
+    {
+      "type": "wait",
+      "ms": 1000,
+      "t": 7.901
+    },
+    {
+      "type": "page_ready",
+      "url": "https://jeenai.app/agents",
+      "t": 10.415
+    },
+    {
+      "type": "navigate",
+      "step_index": 1,
+      "url": "https://jeenai.app/agent-configuration/new",
+      "action": "Describe the Spark agent purpose and submit",
+      "status": 200,
+      "t_start": 21.067,
+      "t_end": 21.47
+    },
+    {
+      "type": "click",
+      "text": "דלג",
+      "candidates": [
+        "דלג",
+        "Skip"
+      ],
+      "bbox": {
+        "x": 16,
+        "y": 69.5,
+        "width": 57.0,
+        "height": 32
+      },
+      "t_move": 26.832,
+      "t_highlight": 27.185,
+      "t_click": 27.207
+    },
+    {
+      "type": "wait",
+      "ms": 700,
+      "t": 28.712
+    },
+    {
+      "type": "page_ready",
+      "url": "https://jeenai.app/agent-configuration/new",
+      "t": 29.447
+    },
+    {
+      "type": "navigate",
+      "step_index": 2,
+      "url": "https://jeenai.app/agent-configuration/new",
+      "action": "Test the newly created Spark agent in preview",
+      "status": 200,
+      "t_start": 41.124,
+      "t_end": 41.72
+    },
+    {
+      "type": "page_ready",
+      "url": "https://jeenai.app/agent-configuration/new",
+      "t": 46.914
+    },
+    {
+      "type": "navigate",
+      "step_index": 3,
+      "url": "https://jeenai.app/agent-configuration/b6f06945-ba74-4c86-8950-be90547055cb",
+      "action": "Show the Spark agent configuration page",
+      "status": 200,
+      "t_start": 57.315,
+      "t_end": 57.895
+    },
+    {
+      "type": "page_ready",
+      "url": "https://jeenai.app/agent-configuration/b6f06945-ba74-4c86-8950-be90547055cb",
+      "t": 63.025
+    },
+    {
+      "type": "navigate",
+      "step_index": 4,
+      "url": "https://jeenai.app/agent-configuration/b6f06945-ba74-4c86-8950-be90547055cb",
+      "action": "Fill core Spark agent configuration fields",
+      "status": 200,
+      "t_start": 73.921,
+      "t_end": 74.592
+    },
+    {
+      "type": "fill",
+      "label": "שם",
+      "bbox": {
+        "x": 889.6,
+        "y": 360,
+        "width": 982.3,
+        "height": 40
+      },
+      "t_start": 79.705,
+      "t_end": 80.783
+    },
+    {
+      "type": "fill",
+      "label": "תיאור",
+      "bbox": {
+        "x": 889.6,
+        "y": 446,
+        "width": 982.3,
+        "height": 40
+      },
+      "t_start": 80.81,
+      "t_end": 81.981
+    },
+    {
+      "type": "page_ready",
+      "url": "https://jeenai.app/agent-configuration/b6f06945-ba74-4c86-8950-be90547055cb",
+      "t": 82.088
+    },
+    {
+      "type": "navigate",
+      "step_index": 5,
+      "url": "https://jeenai.app/agent-configuration/b6f06945-ba74-4c86-8950-be90547055cb",
+      "action": "Open the Spark agent status menu",
+      "status": 200,
+      "t_start": 92.177,
+      "t_end": 92.733
+    },
+    {
+      "type": "click",
+      "text": "פעיל",
+      "candidates": [
+        "פעיל",
+        "dropdown-trigger",
+        "Active"
+      ],
+      "bbox": {
+        "x": 386.1,
+        "y": 76,
+        "width": 28.2,
+        "height": 19
+      },
+      "t_move": 98.3,
+      "t_highlight": 98.662,
+      "t_click": 98.695
+    },
+    {
+      "type": "wait",
+      "ms": 700,
+      "t": 100.221
+    },
+    {
+      "type": "page_ready",
+      "url": "https://jeenai.app/agent-configuration/b6f06945-ba74-4c86-8950-be90547055cb",
+      "t": 102.439
+    }
+  ],
+  "steps": [
+    {
+      "step_index": 0,
+      "url": "https://jeenai.app/agents",
+      "action": "Open agent creation options from the agents list",
+      "t_visible": 10.415,
+      "settle_s": 10.649
+    },
+    {
+      "step_index": 1,
+      "url": "https://jeenai.app/agent-configuration/new",
+      "action": "Describe the Spark agent purpose and submit",
+      "t_visible": 29.447,
+      "settle_s": 11.668
+    },
+    {
+      "step_index": 2,
+      "url": "https://jeenai.app/agent-configuration/new",
+      "action": "Test the newly created Spark agent in preview",
+      "t_visible": 46.914,
+      "settle_s": 10.388
+    },
+    {
+      "step_index": 3,
+      "url": "https://jeenai.app/agent-configuration/b6f06945-ba74-4c86-8950-be90547055cb",
+      "action": "Show the Spark agent configuration page",
+      "t_visible": 63.025,
+      "settle_s": 10.884
+    },
+    {
+      "step_index": 4,
+      "url": "https://jeenai.app/agent-configuration/b6f06945-ba74-4c86-8950-be90547055cb",
+      "action": "Fill core Spark agent configuration fields",
+      "t_visible": 82.088,
+      "settle_s": 10.074
+    },
+    {
+      "step_index": 5,
+      "url": "https://jeenai.app/agent-configuration/b6f06945-ba74-4c86-8950-be90547055cb",
+      "action": "Open the Spark agent status menu",
+      "t_visible": 102.439,
+      "settle_s": 10.466
+    }
+  ],
+  "failed_steps": []
+}
