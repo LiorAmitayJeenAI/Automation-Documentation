@@ -28,6 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const modal = document.getElementById('addPageModal');
   modal.addEventListener('click', e => { if (e.target === modal) closeAddModal(); });
 
+  document.getElementById('updateRoutesCheck').addEventListener('change', function () {
+    document.getElementById('routeTypePicks').classList.toggle('hidden', !this.checked);
+  });
+
   bindSegment('langSegment', value => { language = value; });
   loadFolders();
   checkActiveRuns();
@@ -483,7 +487,10 @@ function finishRun() {
 
 /* ── Run generation ── */
 function getLinkTypeForFolder(folderName) {
-  return String(folderName).toLowerCase().includes('admin') ? 'admin' : 'regular';
+  const name = String(folderName).toLowerCase();
+  if (name.includes('finops')) return 'finops';
+  if (name.includes('admin')) return 'admin';
+  return 'regular';
 }
 
 function getSelectedItems() {
@@ -507,6 +514,12 @@ function getSelectedItems() {
 
 function getSelectedLinkTypes(items) {
   return [...new Set(items.map(item => item.linkType))];
+}
+
+function getRouteTypePicks() {
+  const checks = document.querySelectorAll('#routeTypePicks input[type="checkbox"]:checked');
+  const types = [...checks].map(c => c.value);
+  return types.length ? types : ['regular'];
 }
 
 function runFolder(folderId) {
@@ -559,7 +572,7 @@ async function runSelected() {
   syncRunButton();
 
   if (document.getElementById('updateRoutesCheck').checked) {
-    const discoverProceeded = await runRouteDiscovery(getSelectedLinkTypes(toRun));
+    const discoverProceeded = await runRouteDiscovery(getRouteTypePicks());
     if (!discoverProceeded) {
       isRunning = false;
       syncRunButton();
@@ -608,7 +621,7 @@ async function runSelected() {
 async function runRouteDiscovery(linkTypes) {
   const results = document.getElementById('results');
   const rowId = 'route-discovery-row';
-  const typeLabel = linkTypes.length > 1 ? 'regular and admin' : linkTypes[0];
+  const typeLabel = linkTypes.length > 1 ? linkTypes.join(' and ') : linkTypes[0];
   results.insertAdjacentHTML('afterbegin', `
     <div id="${rowId}" class="result-row running">
       <span class="result-dot"></span>
@@ -718,6 +731,15 @@ async function runVideoSelected() {
 
   isVideoRunning = true;
   syncRunButton();
+
+  if (document.getElementById('updateRoutesCheck').checked) {
+    const discoverProceeded = await runRouteDiscovery(getRouteTypePicks());
+    if (!discoverProceeded) {
+      isVideoRunning = false;
+      syncRunButton();
+      return;
+    }
+  }
 
   try {
     const response = await fetch('/api/run-video', {

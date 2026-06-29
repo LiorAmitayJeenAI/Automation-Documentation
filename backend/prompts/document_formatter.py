@@ -36,6 +36,7 @@ screenshot_script value:
   - Each step is one of:
     - {{"type": "click", "text": "<exact button text>"}} — click an element located by its text. The "text" value MUST be copied verbatim from the "clickable buttons" list shown for that exact route below. Some buttons list two language variants separated by " / " (e.g. "צור סוכן" / "Create agent") — pick exactly ONE of the listed variants, copied verbatim. Do NOT invent, guess, paraphrase, or translate button text.
     - {{"type": "wait", "ms": <number>}} — wait for the given milliseconds for content to render.
+  - Opener buttons (parent -> child): some buttons in the "clickable buttons" list show "(opens -> ...)". The labels after "opens ->" are CHILD buttons that appear ONLY after clicking the parent. To capture a child, emit the parent click first, then the child click, as two steps (e.g. [{{"type": "click", "text": "צור סוכן"}}, {{"type": "wait", "ms": 1000}}, {{"type": "click", "text": "Spark"}}]). NEVER click a child label without its parent click appearing before it.
   - If the route has no "clickable buttons" list, or the button you need is not in that route's list, do NOT add an interaction for that screenshot.
   - Only use non-destructive interactions whose purpose is to REVEAL a view (open a modal/panel/tab). For example: clicking a 'create agent' / 'צור סוכן' button to show the agent-type options modal.
   - NEVER include steps that save, submit, create, delete, upload, or otherwise persist a real entity. Open the view only — never complete the action.

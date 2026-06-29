@@ -16,6 +16,7 @@ Triggered on demand from the Generate Tutorials page when the
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import re
@@ -30,6 +31,11 @@ from backend.config import (
     AZURE_OPENAI_ENDPOINT,
     AZURE_OPENAI_DEPLOYMENT,
     AZURE_OPENAI_API_VERSION,
+    MAX_CLICKABLE_ELEMENTS,
+    CAPTURE_CHILD_BUTTONS,
+    MAX_OPENERS_PER_PAGE,
+    MAX_CHILDREN_PER_OPENER,
+    CRAWLER_PAGE_TIMEOUT_S,
 )
 from backend.services.screenshots import _login, _enter_admin_app, _looks_like_error_page
 
@@ -41,14 +47,18 @@ MAX_PAGES = 50
 PAGE_LOAD_WAIT_MS = 5000
 RENDER_SETTLE_MS = 2000
 
-# Cap on how many clickable elements we keep/persist per route. Keeps the
-# routes_map.json and the document-formatter prompt small while still giving
-# the LLM a real menu of buttons to choose from.
-MAX_CLICKABLE_ELEMENTS = 12
+# Cap on how many clickable elements we keep/persist per route, plus the child
+# button discovery knobs, all live in backend.config so they can be tuned via
+# env without code changes. Keeping the persisted list small keeps both
+# routes_map.json and the LLM prompt lean while still giving the LLM a real menu
+# of buttons to choose from.
 
-# Words in button/element text that indicate dangerous actions to avoid clicking
+# Words in button/element text that indicate dangerous actions to avoid clicking.
+# Upload/import are intentionally NOT listed: the file-picker guard
+# (_install_filechooser_guard) cancels any native dialog with no files selected,
+# so opening an upload panel is safe and lets us discover its "Advanced Options".
 _DANGEROUS_WORDS = re.compile(
-    r"\b(delete|remove|create|upload|import|export|logout|sign.?out|צור|מחק|העלה)\b",
+    r"\b(delete|remove|create|export|logout|sign.?out|צור|מחק)\b",
     re.IGNORECASE,
 )
 
@@ -99,7 +109,11 @@ def _is_support_path(path: str) -> bool:
 
 
 def _normalize_link_type(value: str | None) -> str:
-    return "admin" if value == "admin" else "regular"
+    if value == "admin":
+        return "admin"
+    if value == "finops":
+        return "finops"
+    return "regular"
 
 
 def _route_link_type(route: dict) -> str:
@@ -126,21 +140,152 @@ async def _gather_page_info(page: Page) -> dict:
 
     try:
         buttons = await page.eval_on_selector_all(
-            "button, [role='tab'], [role='button'], [role='menuitem']",
-            "els => {"
-            "  const chrome = 'nav, header, aside, [role=\\\"navigation\\\"], "
-            "[role=\\\"banner\\\"], [class*=\\\"sidebar\\\"], [class*=\\\"side-menu\\\"], "
-            "[class*=\\\"header\\\"], [aria-label=\\\"User interface controls menu\\\"]';"
-            "  const out = els"
-            "    .filter(e => !e.closest(chrome))"
-            "    .map(e => ({"
-            "      text: (e.innerText || '').trim().slice(0, 60),"
-            "      aria: (e.getAttribute('aria-label') || '').trim().slice(0, 60)"
-            "    }))"
-            "    .filter(b => b.text || b.aria);"
-            "  out.sort((a, b) => (b.text ? 1 : 0) - (a.text ? 1 : 0));"
-            "  return out.slice(0, 40);"
-            "}",
+            "button, [role='tab'], [role='button'], [role='menuitem'], "
+            "div[aria-label='avatar'], div[aria-label='expandable-section-header']",
+            """els => {
+              // App chrome (sidebar/header/nav). These buttons are never clicked
+              // by the screenshot/video LLM, so they are dropped to free slots for
+              // real, page-specific action buttons.
+              const chrome = 'nav, header, aside, [role="navigation"], '
+                + '[role="banner"], [class*="sidebar"], [class*="side-menu"], '
+                + '[class*="header"], [aria-label="User interface controls menu"]';
+              // Loose nav/avatar/logo items that often live OUTSIDE a recognized
+              // chrome container yet are still chrome (Home, the account avatar,
+              // the product logo, notifications, search). Dropped by label.
+              const CHROME_LABELS = new Set([
+                'home', 'בית', 'דף הבית', 'menu', 'תפריט',
+                'jeen admin', 'jeen', 'notifications', 'התראות',
+                'search', 'חיפוש', 'avatar'
+              ]);
+              const isAvatar = t => /^[A-Z]{1,3}$/.test((t || '').trim());
+              const isOpener = e => e.hasAttribute('aria-haspopup')
+                || e.getAttribute('aria-expanded') !== null;
+              // In-place expandable section headers (e.g. "Advanced Options" in
+              // upload flows) toggle a sub-panel but expose no aria-haspopup/
+              // aria-expanded, so recognize them explicitly as openers.
+              const isExpandable = e =>
+                (e.getAttribute('aria-label') || '') === 'expandable-section-header';
+              // Upload triggers open an upload modal/panel (which holds
+              // "Advanced Options") on click. They are safe to click because the
+              // file-picker guard cancels any native dialog, so treat them as
+              // openers. Detected by an associated <input type=file> OR by an
+              // upload-related aria-label/text (drop zones and upload buttons
+              // often have no file input until clicked).
+              const isUploadTrigger = e => {
+                if (e.querySelector && e.querySelector('input[type="file"]')) return true;
+                const wrap = e.closest('label, [class*="upload"], [class*="dropzone"], [class*="drop-zone"]');
+                if (wrap && wrap.querySelector('input[type="file"]')) return true;
+                const sig = ((e.getAttribute('aria-label') || '') + ' '
+                  + (e.innerText || '')).toLowerCase();
+                return /upload|העל|גרור/.test(sig);
+              };
+              // Header/nav menu openers we DO want to keep (their child menus
+              // are captured by _capture_child_buttons): the account avatar,
+              // notifications, and the app switcher. We keep these even though
+              // they live in chrome, because their CHILDREN are real features
+              // a tutorial may need to click. Returns a stable label, or '' when
+              // the element is not a recognized chrome opener.
+              const APPS_ARIA = 'User interface controls menu';
+              const CHROME_TRIGGER = new Set(['notifications', 'התראות', 'avatar']);
+              const chromeTrigger = e => {
+                const aria = (e.getAttribute('aria-label') || '').trim();
+                const text = (e.innerText || '').trim();
+                if (aria === APPS_ARIA) return aria;
+                if (aria === 'avatar' || e.closest('div[aria-label="avatar"]')) return 'avatar';
+                if (CHROME_TRIGGER.has((text || aria).toLowerCase())) return aria || text;
+                // Any other in-chrome opener (e.g. a header dropdown) is kept too.
+                if (isOpener(e) && e.closest(chrome)) return aria || text;
+                return '';
+              };
+              // Rank buttons so the most useful survive the per-route cap: boost
+              // page content and "opener" buttons (those that reveal menus/panels)
+              // and buttons that carry real text over icon-only ones.
+              const score = e => {
+                let s = 0;
+                if (e.closest('main, [class*="content"]')) s += 3;
+                if (isOpener(e)) s += 2;
+                if ((e.innerText || '').trim()) s += 1;
+                return s;
+              };
+              const toObj = e => {
+                const trigger = chromeTrigger(e);
+                const rawText = (e.innerText || '').trim().slice(0, 60);
+                const aria = (e.getAttribute('aria-label') || '').trim().slice(0, 60);
+                // Detect expanded state: aria-expanded OR visual signals
+                // (sibling/child panel visible, chevron rotated).
+                const ariaExp = e.getAttribute('aria-expanded') === 'true';
+                const hasVisiblePanel = (() => {
+                  const id = e.getAttribute('aria-controls');
+                  if (id) {
+                    const panel = document.getElementById(id);
+                    if (panel) {
+                      const style = window.getComputedStyle(panel);
+                      return style.display !== 'none' && style.visibility !== 'hidden'
+                        && panel.offsetHeight > 0;
+                    }
+                  }
+                  // Check next sibling as a fallback panel target
+                  const sib = e.nextElementSibling;
+                  if (sib && (sib.getAttribute('role') === 'region'
+                    || sib.getAttribute('role') === 'tabpanel'
+                    || sib.classList.contains('panel')
+                    || sib.classList.contains('dropdown-menu')
+                    || sib.classList.contains('collapse'))) {
+                    const style = window.getComputedStyle(sib);
+                    return style.display !== 'none' && style.visibility !== 'hidden'
+                      && sib.offsetHeight > 0;
+                  }
+                  // Accordion pattern: button with chevron icon whose parent
+                  // wrapper has a visible next sibling (the content panel).
+                  const hasChevron = !!e.querySelector('svg[class*="chevron"], svg[class*="arrow"], svg[class*="caret"]');
+                  if (hasChevron) {
+                    const wrapper = e.closest('div');
+                    if (wrapper) {
+                      const wrapSib = wrapper.nextElementSibling;
+                      if (wrapSib && wrapSib.offsetHeight > 10) {
+                        return true;
+                      }
+                    }
+                  }
+                  return false;
+                })();
+                const isExpanded = ariaExp || hasVisiblePanel;
+                return {
+                  // For avatar triggers, drop the per-user initials (e.g. "JD")
+                  // and store only the stable 'avatar' label.
+                  text: trigger === 'avatar' ? '' : rawText,
+                  aria: trigger === 'avatar' ? 'avatar' : aria,
+                  // Recognized chrome openers are clickable openers regardless of
+                  // whether they expose aria-haspopup/aria-expanded.
+                  opener: isOpener(e) || !!trigger || isExpandable(e) || isUploadTrigger(e),
+                  expanded: isExpanded,
+                  chrome: !!trigger,
+                  score: score(e),
+                };
+              };
+              const seen = new Set();
+              const out = [];
+              els
+                .map(e => ({ e, b: toObj(e) }))
+                // Keep normal page buttons (outside chrome) plus recognized
+                // chrome openers (profile/avatar, notifications, app switcher).
+                .filter(({ e, b }) => b.chrome || !e.closest(chrome))
+                .map(({ b }) => b)
+                .filter(b => b.text || b.aria)
+                .filter(b => {
+                  if (b.chrome) return true;
+                  const l = (b.text || b.aria).toLowerCase();
+                  return !CHROME_LABELS.has(l) && !isAvatar(b.text);
+                })
+                .sort((a, b) => b.score - a.score)
+                .forEach(b => {
+                  const key = (b.text || b.aria).toLowerCase();
+                  if (seen.has(key)) return;
+                  seen.add(key);
+                  out.push(b);
+                });
+              return out.slice(0, 40);
+            }""",
         )
     except Exception:
         buttons = []
@@ -169,12 +314,207 @@ async def _wait_for_page_ready(page: Page) -> None:
 async def _navigate_and_settle(page: Page, url: str) -> int | None:
     """Navigate to url, wait for render, return HTTP status or None."""
     try:
-        response = await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+        response = await page.goto(url, wait_until="domcontentloaded", timeout=60000)
     except Exception as exc:
         logger.warning("Failed to navigate to %s: %s", url, exc)
         return None
     await _wait_for_page_ready(page)
     return response.status if response else None
+
+
+async def _gather_revealed_items(page: Page) -> list[dict]:
+    """
+    Collect the items revealed inside an open menu / dropdown / dialog / popover,
+    WITHOUT the chrome filter that _gather_page_info applies. Popups usually live
+    in a portal at the document root (e.g. role="menu"), so the chrome filter
+    would otherwise drop legitimate child items (a profile menu's language /
+    settings entries, etc.). Returns [{text, aria}, ...].
+    """
+    try:
+        return await page.eval_on_selector_all(
+            '[role="menu"] [role="menuitem"], [role="menu"] button, '
+            '[role="menu"] a, [role="listbox"] [role="option"], '
+            '[role="dialog"] button, [role="dialog"] [role="menuitem"], '
+            '[role="dialog"] div[aria-label="expandable-section-header"], '
+            '[class*="popover"] button, [class*="popover"] [role="menuitem"], '
+            '[class*="dropdown"] button, [class*="dropdown"] [role="menuitem"], '
+            'div[aria-label="expandable-section-header"]',
+            """els => {
+              const seen = new Set();
+              const out = [];
+              for (const e of els) {
+                const r = e.getBoundingClientRect();
+                if (r.width <= 0 || r.height <= 0) continue;
+                const text = (e.innerText || '').trim().slice(0, 60);
+                const aria = (e.getAttribute('aria-label') || '').trim().slice(0, 60);
+                if (!text && !aria) continue;
+                const key = (text || aria).toLowerCase();
+                if (seen.has(key)) continue;
+                seen.add(key);
+                out.push({ text, aria });
+              }
+              return out.slice(0, 40);
+            }""",
+        )
+    except Exception:
+        return []
+
+
+async def _expand_expandable_children(
+    page: Page, children: list[dict], before: set[str],
+) -> None:
+    """
+    While an opener's panel/modal is still open, expand any expandable-section-
+    header child (e.g. "Advanced Options") and record the sub-options it reveals
+    as nested `opens` on that child (mutates *children* in place).
+
+    Sub-options already visible in the panel (and base-page labels) are excluded
+    via *seen* so only the genuinely newly revealed controls are kept.
+    """
+    seen = set(before) | {
+        (c.get("text") or c.get("aria") or "").lower()
+        for c in children
+        if (c.get("text") or c.get("aria"))
+    }
+    for child in children:
+        if (child.get("aria") or "") != "expandable-section-header":
+            continue
+        child_label = (child.get("text") or "").strip()
+        if not child_label:
+            continue
+        try:
+            header = page.get_by_text(child_label, exact=True).first
+            if not await header.is_visible(timeout=1500):
+                continue
+            await header.click(timeout=2500)
+            await page.wait_for_timeout(RENDER_SETTLE_MS)
+            revealed = await _gather_revealed_items(page)
+            sub = [
+                b for b in revealed
+                if (b.get("text") or b.get("aria") or "").lower() not in seen
+                and not _DANGEROUS_WORDS.search(b.get("text") or b.get("aria") or "")
+            ]
+            if sub:
+                child["opens"] = sub[:MAX_CHILDREN_PER_OPENER]
+                seen.update(
+                    (b.get("text") or b.get("aria") or "").lower() for b in sub
+                )
+        except Exception as exc:
+            logger.debug(
+                "Expanding section '%s' failed: %s", child_label, exc
+            )
+
+
+async def _capture_child_buttons(page: Page, base_origin: str, info: dict) -> None:
+    """
+    For each safe "opener" button on the route, click it, diff the buttons that
+    appear, and record the newly revealed buttons as nested `opens` on the parent
+    button (mutates info["buttons"] in place). Depth is limited to 1 — children
+    only, except in-place expandable sections (e.g. "Advanced Options") whose
+    sub-options are captured one level deeper via _expand_expandable_children.
+
+    State is reset between openers (Escape, then re-navigate to the route) so an
+    open dropdown/modal does not bleed into the next opener's diff. Openers that
+    navigate away (real links, not in-place toggles) are skipped, destructive
+    openers are refused, and the opener / child counts are capped to keep crawl
+    time and routes_map.json bounded.
+    """
+    path = info.get("path")
+    if not path:
+        return
+
+    base_buttons = info.get("buttons") or []
+    before = {
+        (b.get("text") or b.get("aria") or "").lower()
+        for b in base_buttons
+        if (b.get("text") or b.get("aria"))
+    }
+
+    openers = [
+        b for b in base_buttons
+        if b.get("opener")
+        and (b.get("text") or b.get("aria"))
+        and not _DANGEROUS_WORDS.search(b.get("text") or b.get("aria") or "")
+    ]
+    if not openers:
+        return
+
+    route_url = f"{base_origin}{path}"
+    for parent in openers[:MAX_OPENERS_PER_PAGE]:
+        text_label = (parent.get("text") or "").strip()
+        aria_label = (parent.get("aria") or "").strip()
+        label = text_label or aria_label
+        try:
+            initial_path = _normalize_path(page.url, base_origin)
+
+            # Locate the opener. Visible-text match first; fall back to an
+            # aria-label selector for icon-only openers (avatar, notifications,
+            # app switcher) that have no clickable text.
+            locator = None
+            if text_label:
+                candidate = page.get_by_text(text_label, exact=True).first
+                try:
+                    if await candidate.is_visible(timeout=2000):
+                        locator = candidate
+                except Exception:
+                    locator = None
+            if locator is None and aria_label:
+                escaped = aria_label.replace('"', '\\"')
+                candidate = page.locator(f'[aria-label="{escaped}"]').first
+                try:
+                    if await candidate.is_visible(timeout=2000):
+                        locator = candidate
+                except Exception:
+                    locator = None
+            if locator is None:
+                continue
+
+            await locator.click(timeout=3000)
+            await page.wait_for_timeout(RENDER_SETTLE_MS)
+
+            # An opener that changed the URL is a navigation link, not an in-place
+            # toggle — skip it (its target route is captured on its own).
+            if _normalize_path(page.url, base_origin) != initial_path:
+                await _navigate_and_settle(page, route_url)
+                continue
+
+            # Prefer the popup-aware capture (keeps menu items the chrome filter
+            # would drop); fall back to a full-page diff if nothing was found.
+            revealed = await _gather_revealed_items(page)
+            if not revealed:
+                after = await _gather_page_info(page)
+                revealed = after.get("buttons") or []
+
+            new_children = [
+                b for b in revealed
+                if (b.get("text") or b.get("aria") or "").lower() not in before
+                and not _DANGEROUS_WORDS.search(b.get("text") or b.get("aria") or "")
+            ]
+            if new_children:
+                capped = new_children[:MAX_CHILDREN_PER_OPENER]
+                # Depth-2 (only for in-place expandable sections such as
+                # "Advanced Options"): while the panel is still open, expand each
+                # expandable-section-header child and record its sub-options so
+                # they are not lost. Limited to these headers to keep crawl time
+                # and routes_map.json bounded.
+                await _expand_expandable_children(page, capped, before)
+                parent["opens"] = capped
+                logger.info(
+                    "Opener '%s' on %s revealed %d child button(s)",
+                    label, path, len(parent["opens"]),
+                )
+        except Exception as exc:
+            logger.debug(
+                "Child capture for opener '%s' on %s failed: %s", label, path, exc
+            )
+
+        # Reset so the next opener starts from a clean page state.
+        try:
+            await page.keyboard.press("Escape")
+            await page.wait_for_timeout(300)
+        except Exception:
+            pass
+        await _navigate_and_settle(page, route_url)
 
 
 # ── Link collection (standard <a href>) ──
@@ -403,13 +743,88 @@ async def _discover_entity_pages(page: Page, base_origin: str, list_path: str) -
 _LIST_PAGES = {"/agents", "/skills", "/triggers", "/knowledge", "/integrations/connect"}
 
 
-async def crawl_routes(base_url: str, link_type: str = "regular") -> list[dict]:
+async def _process_page(
+    page: Page, path: str, base_origin: str,
+    to_visit: list[str], discovered: dict[str, dict],
+) -> None:
+    """Process a single page: navigate, gather info, capture child buttons, collect links."""
+    url = f"{base_origin}{path}"
+    logger.info("_process_page: navigating to %s", url)
+    status = await _navigate_and_settle(page, url)
+    if status is not None and status >= 400:
+        logger.info("Skipping %s — HTTP %d", url, status)
+        return
+
+    error_reason = await _looks_like_error_page(page)
+    if error_reason:
+        logger.info("Skipping %s — %s", url, error_reason)
+        return
+
+    final_path = _normalize_path(page.url, base_origin) or path
+    if final_path not in discovered:
+        logger.info("_process_page: gathering info for %s", final_path)
+        info = await _gather_page_info(page)
+        info["path"] = final_path
+        discovered[final_path] = info
+        logger.info("_process_page: page %s saved (discovered %d)", final_path, len(discovered))
+        if CAPTURE_CHILD_BUTTONS:
+            logger.info("_process_page: capturing child buttons for %s", final_path)
+            await _capture_child_buttons(page, base_origin, info)
+            logger.info("_process_page: child buttons done for %s", final_path)
+
+    page_links = await _collect_href_links(page, base_origin)
+    new_links = [l for l in page_links if not _is_support_path(l) and l not in discovered and l not in to_visit]
+    if new_links:
+        logger.info("_process_page: found %d new links on %s", len(new_links), final_path)
+    for link in new_links:
+        to_visit.append(link)
+
+
+async def _process_entity_page(
+    page: Page, ep: str, base_origin: str, discovered: dict[str, dict],
+) -> None:
+    """Process a single entity page: navigate, gather info, capture child buttons."""
+    logger.info("_process_entity_page: navigating to %s", ep)
+    status = await _navigate_and_settle(page, f"{base_origin}{ep}")
+    if status is not None and status >= 400:
+        logger.info("_process_entity_page: skipping %s — HTTP %d", ep, status)
+        return
+    error_reason = await _looks_like_error_page(page)
+    if error_reason:
+        logger.info("_process_entity_page: skipping %s — %s", ep, error_reason)
+        return
+    final_ep = _normalize_path(page.url, base_origin) or ep
+    if final_ep not in discovered:
+        logger.info("_process_entity_page: gathering info for %s", final_ep)
+        info = await _gather_page_info(page)
+        info["path"] = final_ep
+        discovered[final_ep] = info
+        logger.info("_process_entity_page: page %s saved (discovered %d)", final_ep, len(discovered))
+        if CAPTURE_CHILD_BUTTONS:
+            logger.info("_process_entity_page: capturing child buttons for %s", final_ep)
+            await _capture_child_buttons(page, base_origin, info)
+            logger.info("_process_entity_page: child buttons done for %s", final_ep)
+
+
+def _install_filechooser_guard(page: Page) -> None:
+    """Auto-dismiss native OS file pickers so clicking an upload trigger can never
+    freeze the crawler. The dialog is cancelled with no files selected, so nothing
+    is ever uploaded."""
+    page.on("filechooser", lambda chooser: asyncio.ensure_future(chooser.set_files([])))
+
+
+async def crawl_routes(
+    base_url: str, link_type: str = "regular", target_paths: list[str] | None = None,
+) -> list[dict]:
     """
     Crawl the product using three strategies:
     1. Click sidebar/nav items and observe URL changes
     2. Collect standard <a href> links from each page
     3. Click entity cards on known list pages
     Then visit each discovered path to gather page info.
+
+    When *target_paths* is provided (e.g. ["/agents"]), only those paths (and
+    their entity sub-pages) are crawled — the broad discovery phases are skipped.
     """
     parsed_base = urlparse(base_url)
     base_origin = f"{parsed_base.scheme}://{parsed_base.netloc}"
@@ -418,6 +833,8 @@ async def crawl_routes(base_url: str, link_type: str = "regular") -> list[dict]:
     all_paths: set[str] = set()
     discovered: dict[str, dict] = {}
 
+    targeted = bool(target_paths)
+
     async with async_playwright() as pw:
         browser: Browser = await pw.chromium.launch(headless=True)
         context = await browser.new_context(
@@ -425,41 +842,48 @@ async def crawl_routes(base_url: str, link_type: str = "regular") -> list[dict]:
             ignore_https_errors=True,
         )
         page = await context.new_page()
+        _install_filechooser_guard(page)
 
-        await _login(page)
+        await _login(page, base_url=base_url, link_type=normalized_link_type)
 
         if normalized_link_type == "admin":
             page = await _enter_admin_app(page, base_url)
+            _install_filechooser_guard(page)
 
-        # ── Strategy 1: Click sidebar items ──
-        logger.info("Phase 1: Discovering routes via sidebar interaction...")
-        home_url = f"{base_origin}/"
-        await _navigate_and_settle(page, home_url)
-        sidebar_paths = await _discover_sidebar_routes(page, base_origin)
-        all_paths.update(sidebar_paths)
-        logger.info("Sidebar discovery found %d paths: %s", len(sidebar_paths), sidebar_paths)
+        if targeted:
+            # Targeted mode: only crawl the specified paths
+            all_paths.update(target_paths)
+            logger.info("Targeted crawl: %d path(s) requested — %s", len(target_paths), target_paths)
+        else:
+            # ── Strategy 1: Click sidebar items ──
+            logger.info("Phase 1: Discovering routes via sidebar interaction...")
+            home_url = f"{base_origin}/"
+            await _navigate_and_settle(page, home_url)
+            sidebar_paths = await _discover_sidebar_routes(page, base_origin)
+            all_paths.update(sidebar_paths)
+            logger.info("Sidebar discovery found %d paths: %s", len(sidebar_paths), sidebar_paths)
 
-        # ── Strategy 2: Collect <a href> links from home page ──
-        await _navigate_and_settle(page, home_url)
-        href_paths = await _collect_href_links(page, base_origin)
-        all_paths.update(href_paths)
-        if href_paths:
-            logger.info("Home page href links: %d paths", len(href_paths))
+            # ── Strategy 2: Collect <a href> links from home page ──
+            await _navigate_and_settle(page, home_url)
+            href_paths = await _collect_href_links(page, base_origin)
+            all_paths.update(href_paths)
+            if href_paths:
+                logger.info("Home page href links: %d paths", len(href_paths))
 
-        # Also seed with existing known routes so we can discover links within them
-        # (support/docs articles are skipped — we never screenshot them).
-        existing = _load_existing()
-        for route in existing:
-            if _route_link_type(route) != normalized_link_type:
-                continue
-            path = route.get("path")
-            if path and not _is_support_path(path):
-                all_paths.add(path)
+            # Also seed with existing known routes so we can discover links within them
+            # (support/docs articles are skipped — we never screenshot them).
+            existing = _load_existing()
+            for route in existing:
+                if _route_link_type(route) != normalized_link_type:
+                    continue
+                path = route.get("path")
+                if path and not _is_support_path(path):
+                    all_paths.add(path)
 
-        # Always include root
-        all_paths.add("/")
+            # Always include root
+            all_paths.add("/")
 
-        # ── Visit all discovered paths and collect info + more links ──
+        # ── Visit all discovered/targeted paths and collect info + more links ──
         logger.info("Phase 2: Visiting %d discovered paths...", len(all_paths))
         to_visit = list(all_paths)
 
@@ -474,32 +898,20 @@ async def crawl_routes(base_url: str, link_type: str = "regular") -> list[dict]:
             url = f"{base_origin}{path}"
             logger.info("Visiting %s (discovered %d so far)", url, len(discovered))
 
-            status = await _navigate_and_settle(page, url)
-            if status is not None and status >= 400:
-                logger.info("Skipping %s — HTTP %d", url, status)
+            try:
+                await asyncio.wait_for(
+                    _process_page(page, path, base_origin, to_visit, discovered),
+                    timeout=CRAWLER_PAGE_TIMEOUT_S,
+                )
+            except asyncio.TimeoutError:
+                logger.warning("Page %s exceeded %ds budget — skipping", path, CRAWLER_PAGE_TIMEOUT_S)
                 continue
-
-            error_reason = await _looks_like_error_page(page)
-            if error_reason:
-                logger.info("Skipping %s — %s", url, error_reason)
-                continue
-
-            final_path = _normalize_path(page.url, base_origin) or path
-            if final_path not in discovered:
-                info = await _gather_page_info(page)
-                info["path"] = final_path
-                discovered[final_path] = info
-
-            # Collect any new links found on this page
-            page_links = await _collect_href_links(page, base_origin)
-            for link in page_links:
-                if _is_support_path(link):
-                    continue
-                if link not in discovered and link not in to_visit:
-                    to_visit.append(link)
 
         # ── Strategy 3: Entity page discovery on list pages ──
-        list_pages = _LIST_PAGES & set(discovered.keys())
+        if targeted:
+            list_pages = _LIST_PAGES & set(target_paths)
+        else:
+            list_pages = _LIST_PAGES & set(discovered.keys())
         if list_pages:
             logger.info("Phase 3: Discovering entity pages from %d list pages...", len(list_pages))
             for list_path in list_pages:
@@ -509,17 +921,14 @@ async def crawl_routes(base_url: str, link_type: str = "regular") -> list[dict]:
                 for ep in entity_paths:
                     if ep not in discovered and len(discovered) < MAX_PAGES:
                         logger.info("Visiting entity page %s", ep)
-                        status = await _navigate_and_settle(page, f"{base_origin}{ep}")
-                        if status is not None and status >= 400:
+                        try:
+                            await asyncio.wait_for(
+                                _process_entity_page(page, ep, base_origin, discovered),
+                                timeout=CRAWLER_PAGE_TIMEOUT_S,
+                            )
+                        except asyncio.TimeoutError:
+                            logger.warning("Entity page %s exceeded %ds budget — skipping", ep, CRAWLER_PAGE_TIMEOUT_S)
                             continue
-                        error_reason = await _looks_like_error_page(page)
-                        if error_reason:
-                            continue
-                        final_ep = _normalize_path(page.url, base_origin) or ep
-                        if final_ep not in discovered:
-                            info = await _gather_page_info(page)
-                            info["path"] = final_ep
-                            discovered[final_ep] = info
 
         await browser.close()
 
@@ -591,9 +1000,23 @@ async def _generate_descriptions(new_infos: list[dict]) -> dict[str, str]:
 
 # ── Clickable element inventory ──
 
+# Matches class/test-id-like tokens (lowercase words joined by hyphens, no
+# spaces) such as "dropdown-trigger", "record-meeting-button", "logo-wrapper",
+# "menu-grid-item-icon-container". These leak in from DOM attributes and are not
+# real, human-readable button labels, so they must never be stored or clicked.
+_JUNK_LABEL = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)+$")
+
+
 def _is_noise_label(label: str) -> bool:
-    """True for labels not worth storing (empty, pure number, or overly long)."""
-    return not label or label.isdigit() or len(label) > 40
+    """True for labels not worth storing (empty, pure number, overly long, or a
+    class/test-id-like token rather than a real label)."""
+    label = label.strip()
+    return (
+        not label
+        or label.isdigit()
+        or len(label) > 40
+        or bool(_JUNK_LABEL.match(label))
+    )
 
 
 def _normalize_clickable_elements(buttons: list) -> list[dict]:
@@ -608,8 +1031,11 @@ def _normalize_clickable_elements(buttons: list) -> list[dict]:
 
     - Accepts the object form ({text, aria}), the grouped form ({variants:[...]}),
       and the legacy string form.
-    - Drops empties, pure numbers and overly long labels; dedupes whole buttons
-      by their first variant; caps to MAX_CLICKABLE_ELEMENTS.
+    - Drops empties, pure numbers, overly long labels, and class/test-id tokens.
+    - Dedupes globally across ALL variants (not just the first one): a label that
+      already identifies an earlier button is never reused on a later button, so
+      no single label (e.g. "Menu") can resolve to more than one element on the
+      page. Caps to MAX_CLICKABLE_ELEMENTS.
     """
     seen: set[str] = set()
     groups: list[dict] = []
@@ -630,7 +1056,9 @@ def _normalize_clickable_elements(buttons: list) -> list[dict]:
             if _is_noise_label(label):
                 continue
             key = label.lower()
-            if key in local_seen:
+            # Skip a label already used by this or any earlier button so every
+            # stored label maps to exactly one button.
+            if key in local_seen or key in seen:
                 continue
             local_seen.add(key)
             variants.append(label)
@@ -638,14 +1066,29 @@ def _normalize_clickable_elements(buttons: list) -> list[dict]:
         if not variants:
             continue
 
-        primary = variants[0].lower()
-        if primary in seen:
-            continue
-        seen.add(primary)
+        seen.update(local_seen)
+        group: dict = {"variants": variants}
+        if isinstance(raw, dict) and raw.get("expanded"):
+            group["default_expanded"] = True
+        # Preserve nested child buttons (revealed by clicking this opener),
+        # normalized recursively. Children are deduped within their own menu
+        # scope, not against top-level buttons, since they live in a different
+        # reveal state.
+        child_raw = raw.get("opens") if isinstance(raw, dict) else None
+        if child_raw:
+            child_groups = _normalize_clickable_elements(child_raw)
+            if child_groups:
+                group["opens"] = child_groups
+        groups.append(group)
 
-        groups.append({"variants": variants})
-        if len(groups) >= MAX_CLICKABLE_ELEMENTS:
-            break
+    # Cap the list, but never drop menu openers: groups that reveal child
+    # buttons (`opens`) are kept first so a feature's menu is not pushed out by
+    # page-specific buttons on a button-heavy route. The rest fill the remaining
+    # slots in their original (score) order.
+    if len(groups) > MAX_CLICKABLE_ELEMENTS:
+        with_children = [g for g in groups if g.get("opens")]
+        without_children = [g for g in groups if not g.get("opens")]
+        groups = (with_children + without_children)[:MAX_CLICKABLE_ELEMENTS]
 
     return groups
 
@@ -700,31 +1143,62 @@ async def _translate_labels(labels: list[str]) -> dict[str, str]:
     return {}
 
 
+def _collect_first_variants(groups: list[dict], out: list[str]) -> None:
+    """Collect the primary label of every group, recursing into nested `opens`."""
+    for group in groups:
+        variants = group.get("variants") or []
+        if variants:
+            out.append(variants[0])
+        children = group.get("opens") or []
+        if children:
+            _collect_first_variants(children, out)
+
+
+def _apply_translations(groups: list[dict], translations: dict[str, str]) -> None:
+    """
+    Append the other-language label to each group as an extra variant, recursing
+    into nested `opens`. Collision avoidance is scoped to each menu: top-level
+    buttons share one scope, and each opener's `opens` list is its own scope, so
+    an added variant stays unambiguous where matching actually happens.
+    """
+    existing = {
+        v.lower()
+        for group in groups
+        for v in (group.get("variants") or [])
+    }
+    for group in groups:
+        variants = group.get("variants") or []
+        if variants:
+            translated = translations.get(variants[0], "").strip()
+            if translated:
+                key = translated.lower()
+                if (
+                    key not in {v.lower() for v in variants}
+                    and key not in existing
+                ):
+                    variants.append(translated)
+                    existing.add(key)
+                    group["variants"] = variants
+        children = group.get("opens") or []
+        if children:
+            _apply_translations(children, translations)
+
+
 async def _add_button_translations(clickable_by_path: dict[str, list[dict]]) -> None:
     """
-    For every clickable group across all routes, append the other-language label
-    as an additional variant. Mutates the groups in place.
+    For every clickable group across all routes (including nested child buttons),
+    append the other-language label as an additional variant. Mutates in place.
     """
     all_labels: list[str] = []
     for groups in clickable_by_path.values():
-        for group in groups:
-            variants = group.get("variants") or []
-            if variants:
-                all_labels.append(variants[0])
+        _collect_first_variants(groups, all_labels)
 
     translations = await _translate_labels(all_labels)
     if not translations:
         return
 
     for groups in clickable_by_path.values():
-        for group in groups:
-            variants = group.get("variants") or []
-            if not variants:
-                continue
-            translated = translations.get(variants[0], "").strip()
-            if translated and translated.lower() not in {v.lower() for v in variants}:
-                variants.append(translated)
-            group["variants"] = variants
+        _apply_translations(groups, translations)
 
 
 # ── Merge (add-only) ──
@@ -803,9 +1277,11 @@ def merge_routes(discovered: list[dict], descriptions: dict[str, str], link_type
     return {"added": added, "updated": updated, "total": len(existing)}
 
 
-async def discover_and_merge(base_url: str, link_type: str = "regular") -> dict:
+async def discover_and_merge(
+    base_url: str, link_type: str = "regular", target_paths: list[str] | None = None,
+) -> dict:
     normalized_link_type = _normalize_link_type(link_type)
-    discovered = await crawl_routes(base_url, normalized_link_type)
+    discovered = await crawl_routes(base_url, normalized_link_type, target_paths=target_paths)
 
     existing_keys = {
         _route_key(_route_link_type(route), route["path"])

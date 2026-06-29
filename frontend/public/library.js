@@ -27,50 +27,64 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupExportMenu() {
-  const menuBtn = document.getElementById('exportMenuBtn');
-  const menu = document.getElementById('exportMenu');
-  const saveBtn = document.getElementById('saveSharepointBtn');
-  if (!menuBtn || !menu || !saveBtn) return;
+  const openModalBtn = document.getElementById('openSharepointModalBtn');
+  if (openModalBtn) {
+    openModalBtn.addEventListener('click', () => openSharepointModal());
+  }
 
-  const closeMenu = () => {
-    menu.hidden = true;
-    menuBtn.setAttribute('aria-expanded', 'false');
+  setupSharepointModal();
+}
+
+function setupSharepointModal() {
+  const modal = document.getElementById('sharepointModal');
+  const saveBtn = document.getElementById('spSaveBtn');
+  if (!modal) return;
+
+  const langBoxes = modal.querySelectorAll('input[name="spLang"]');
+  const typeBoxes = modal.querySelectorAll('input[name="spType"]');
+
+  const updateSaveBtn = () => {
+    const hasLang = Array.from(langBoxes).some(cb => cb.checked);
+    const hasType = Array.from(typeBoxes).some(cb => cb.checked);
+    saveBtn.disabled = !(hasLang && hasType);
   };
-  const openMenu = () => {
-    menu.hidden = false;
-    menuBtn.setAttribute('aria-expanded', 'true');
-  };
 
-  menuBtn.addEventListener('click', event => {
-    event.stopPropagation();
-    if (menu.hidden) openMenu(); else closeMenu();
-  });
-
-  document.addEventListener('click', event => {
-    if (!menu.hidden && !menu.contains(event.target) && event.target !== menuBtn) {
-      closeMenu();
-    }
-  });
-
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape') closeMenu();
-  });
+  langBoxes.forEach(cb => cb.addEventListener('change', updateSaveBtn));
+  typeBoxes.forEach(cb => cb.addEventListener('change', updateSaveBtn));
 
   saveBtn.addEventListener('click', () => {
-    closeMenu();
-    saveToSharePoint();
+    const languages = Array.from(langBoxes).filter(cb => cb.checked).map(cb => cb.value);
+    const types = Array.from(typeBoxes).filter(cb => cb.checked).map(cb => cb.value);
+    saveToSharePoint(languages, types, saveBtn);
   });
 }
 
-async function saveToSharePoint() {
-  const saveBtn = document.getElementById('saveSharepointBtn');
-  if (saveBtn) {
-    saveBtn.disabled = true;
-    saveBtn.classList.add('loading');
+function openSharepointModal() {
+  const modal = document.getElementById('sharepointModal');
+  modal.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.checked = false; });
+  document.getElementById('spSaveBtn').disabled = true;
+  modal.classList.add('open');
+}
+
+function closeSharepointModal(event) {
+  const modal = document.getElementById('sharepointModal');
+  if (!event || event.target === modal) {
+    modal.classList.remove('open');
+  }
+}
+
+async function saveToSharePoint(languages, types, triggerBtn) {
+  if (triggerBtn) {
+    triggerBtn.disabled = true;
+    triggerBtn.classList.add('loading');
   }
 
   try {
-    const res = await fetch('/api/export-sharepoint', { method: 'POST' });
+    const res = await fetch('/api/export-sharepoint', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ languages, types }),
+    });
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
@@ -79,26 +93,24 @@ async function saveToSharePoint() {
     }
 
     const lines = [];
-    if (data.pdfCount) {
-      lines.push(`Saved ${data.pdfCount} presentation${data.pdfCount !== 1 ? 's' : ''} to "${data.pdfFolderName}".`);
+    for (const folder of (data.folders || [])) {
+      const typeLabel = folder.type === 'pdf' ? 'presentation' : 'video';
+      const plural = folder.count !== 1 ? 's' : '';
+      lines.push(`Saved ${folder.count} ${typeLabel}${plural} to "${folder.folderName}".`);
+      if (folder.folderUrl) lines.push(folder.folderUrl);
     }
-    if (data.videoCount) {
-      lines.push(`Saved ${data.videoCount} video${data.videoCount !== 1 ? 's' : ''} to "${data.videoFolderName}".`);
-    }
-    if (data.excelUrl) {
-      lines.push('Excel summary uploaded.');
-    }
-    if (data.pdfFolderUrl) lines.push(`\nPresentations folder:\n${data.pdfFolderUrl}`);
-    if (data.videoFolderUrl) lines.push(`\nVideos folder:\n${data.videoFolderUrl}`);
     if (data.errors?.length) lines.push(`\nWarnings: ${data.errors.join('; ')}`);
     if (!lines.length) lines.push('Nothing was exported.');
     alert(lines.join('\n'));
+
+    closeSharepointModal();
+    await loadTutorials();
   } catch (err) {
     alert('Failed to save to SharePoint. Check the server logs.');
   } finally {
-    if (saveBtn) {
-      saveBtn.disabled = false;
-      saveBtn.classList.remove('loading');
+    if (triggerBtn) {
+      triggerBtn.disabled = false;
+      triggerBtn.classList.remove('loading');
     }
   }
 }
@@ -113,8 +125,8 @@ function exportToExcel() {
     Language: tutorial.language ? tutorial.language.toUpperCase() : '-',
     'Confluence URL': page.url || '',
     'Gamma URL': tutorial.gammaUrl || '',
-    'PDF URL': tutorial.sharepointUrl || '',
-    'Video URL': tutorial.videoUrl || '',
+    'PDF URL': tutorial.exportSharepointUrl || tutorial.sharepointUrl || '',
+    'Video URL': tutorial.exportVideoUrl || tutorial.videoUrl || '',
   }));
 
   const ws = XLSX.utils.json_to_sheet(data);
@@ -181,7 +193,7 @@ function rowMatchesFilters(page, tutorial, folder) {
     page.url,
     folder.name,
     tutorial.gammaUrl || '',
-    tutorial.sharepointUrl || '',
+    tutorial.exportSharepointUrl || tutorial.sharepointUrl || '',
   ].join(' ').toLowerCase();
   const searchMatches = !searchTerm || searchable.includes(searchTerm);
 
@@ -331,8 +343,8 @@ function renderLanguageSection(page, tutorial, language) {
       <div class="asset-actions">
         ${assetButton(page.url, 'confluence', 'Confluence')}
         ${assetButton(tutorial?.gammaUrl, 'gamma', 'Gamma')}
-        ${assetButton(tutorial?.sharepointUrl, 'pdf', 'PDF')}
-        ${assetButton(tutorial?.videoUrl, 'video', 'Video')}
+        ${assetButton(tutorial?.exportSharepointUrl || tutorial?.sharepointUrl, 'pdf', 'PDF')}
+        ${assetButton(tutorial?.exportVideoUrl || tutorial?.videoUrl, 'video', 'Video')}
       </div>
     </section>`;
 }
@@ -501,8 +513,8 @@ function showHistory(id) {
           <span>${formatDate(item.timestamp, true)}${item.language ? ` · ${esc(item.language.toUpperCase())}` : ''}</span>
           <span>${item.sessionId ? `Session: ${esc(item.sessionId)}` : 'Session: -'}</span>
           <span>${item.gammaUrl ? `Gamma: ${esc(item.gammaUrl)}` : 'Gamma: -'}</span>
-          <span>${item.sharepointUrl ? `PDF: ${esc(item.sharepointUrl)}` : 'PDF: -'}</span>
-          <span>${item.videoUrl ? `Video: ${esc(item.videoUrl)}` : 'Video: -'}</span>
+          <span>${item.exportSharepointUrl || item.sharepointUrl ? `PDF: ${esc(item.exportSharepointUrl || item.sharepointUrl)}` : 'PDF: -'}</span>
+          <span>${item.exportVideoUrl || item.videoUrl ? `Video: ${esc(item.exportVideoUrl || item.videoUrl)}` : 'Video: -'}</span>
           ${item.error ? `<span>Error: ${esc(item.error)}</span>` : ''}
         </div>`;
     }).join('');

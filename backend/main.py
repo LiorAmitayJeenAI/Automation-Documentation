@@ -26,6 +26,7 @@ from backend.config import (
     SP_EXCEL_EXPORT_PATH,
     REGULAR_URL,
     ADMIN_URL,
+    FINOPS_URL,
 )
 from backend.pipeline import run_pipeline
 from backend.video_pipeline import run_video_pipeline
@@ -60,6 +61,7 @@ class GenerateRequest(BaseModel):
 
 class DiscoverRoutesRequest(BaseModel):
     link_type: str = "regular"
+    target_paths: list[str] | None = None
 
 
 class ExportPdfsRequest(BaseModel):
@@ -92,9 +94,14 @@ async def discover_routes(req: DiscoverRoutesRequest):
     Crawl the product to discover navigable routes and merge any new ones
     (add-only) into routes_map.json. Returns a summary of what was added.
     """
-    base_url = ADMIN_URL if req.link_type == "admin" else REGULAR_URL
+    if req.link_type == "admin":
+        base_url = ADMIN_URL
+    elif req.link_type == "finops":
+        base_url = FINOPS_URL
+    else:
+        base_url = REGULAR_URL
     try:
-        result = await route_crawler.discover_and_merge(base_url, req.link_type)
+        result = await route_crawler.discover_and_merge(base_url, req.link_type, target_paths=req.target_paths)
         return result
     except Exception as exc:
         logger.error("Route discovery failed: %s", exc)
@@ -165,6 +172,7 @@ async def sync_export_folder(req: SyncExportFolderRequest):
         return {
             "folderUrl": upload_result.get("folderUrl"),
             "uploaded": len(upload_result.get("uploaded", [])),
+            "uploadedFiles": upload_result.get("uploaded", []),
             "carried_forward": carried.get("copied", 0),
             "skipped": upload_result.get("skipped", 0) + carried.get("skipped", 0),
         }

@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 _ROUTES_MAP_PATH = Path(__file__).resolve().parent.parent / "routes_map.json"
 
-LOGIN_URL = "https://jeenai.app/login"
+DEFAULT_BASE_URL = "https://jeenai.app"
 PAGE_LOAD_WAIT_MS = 5000
 RENDER_SETTLE_MS = 1500
 
@@ -45,8 +45,8 @@ SIDEBAR_SWAP_LABELS = {
 # Button text that would persist/destroy data — never clicked during interactions,
 # even if the LLM requests it (defense in depth alongside the prompt rule).
 DESTRUCTIVE_TEXT = re.compile(
-    r"\b(delete|remove|save|submit|publish|confirm|deploy|"
-    r"מחק|הסר|שמור|שלח|פרסם|אשר)\b",
+    r"\b(delete|remove|save|submit|publish|confirm|deploy|logout|log.?out|sign.?out|"
+    r"מחק|הסר|שמור|שלח|פרסם|אשר|התנתק)\b",
     re.IGNORECASE,
 )
 
@@ -162,13 +162,13 @@ async def _looks_like_loader_page(page: Page) -> str | None:
     return None
 
 
-async def _submit_credentials(page: Page, language: str = "he") -> None:
+async def _submit_credentials(page: Page, language: str = "he", link_type: str = "regular") -> None:
     """Fill the two-step login form on the current page (email, then password).
 
     The password step is optional: when the session is already authenticated
     (e.g. the admin app via SSO), the password field never appears and we skip it.
     """
-    username, password = get_jeen_credentials(language)
+    username, password = get_jeen_credentials(language, link_type=link_type)
     if not username or not password:
         raise RuntimeError(
             f"JEEN credentials for language '{language}' must be set in .env"
@@ -197,12 +197,155 @@ async def _submit_credentials(page: Page, language: str = "he") -> None:
     await page.wait_for_load_state("domcontentloaded")
 
 
-async def _login(page: Page, language: str = "he") -> None:
-    """Log into jeenai.app using credentials for the given language."""
-    logger.info("Logging into jeenai.app (language=%s)...", language)
-    await page.goto(LOGIN_URL, wait_until="domcontentloaded", timeout=30000)
+async def _login_finops(page: Page, base_url: str) -> None:
+    """Log into FinOps via the Zitadel SSO flow.
+
+    Steps:
+      1. Navigate to the FinOps login page
+      2. Click the "Log In" button to initiate the SSO redirect
+      3. Wait for the identity provider login form (Zitadel)
+      4. Fill username/email and submit
+      5. Fill password and submit
+      6. Handle any "stay signed in" or consent prompts
+      7. Wait for redirect back to FinOps
+    """
+    username, password = get_jeen_credentials(link_type="finops")
+    if not username or not password:
+        raise RuntimeError("FinOps credentials (JEEN_USERNAME_FINOPS / JEEN_PASSWORD_FINOPS) must be set in .env")
+
+    login_url = f"{base_url.rstrip('/')}/login"
+    logger.info("FinOps login: navigating to %s", login_url)
+    await page.goto(login_url, wait_until="domcontentloaded", timeout=30000)
+    await page.wait_for_timeout(3000)
+
+    # Step 1: Click the "Log In" button on the FinOps landing page
+    login_btn = page.locator('button:has-text("Log In"), button:has-text("Log in")').first
+    try:
+        await login_btn.wait_for(state="visible", timeout=10000)
+        await login_btn.click()
+        logger.info("FinOps login: clicked 'Log In' button")
+    except Exception as exc:
+        raise RuntimeError(f"FinOps login: could not find/click 'Log In' button: {exc}") from exc
+
+    # Step 2: Wait for the identity provider page to load and show an input
+    await page.wait_for_timeout(3000)
+    logger.info("FinOps login: redirected to %s", page.url)
+
+    # Step 3: Fill username/email — try multiple selectors for Zitadel / Microsoft / generic
+    username_selectors = (
+        'input[name="loginName"]',       # Zitadel
+        'input[name="loginfmt"]',         # Microsoft
+        'input[type="email"]',            # generic email
+        'input[name="email"]',            # generic email
+        'input[name="username"]',         # generic username
+        'input[type="text"]',             # fallback text input
+    )
+    email_input = None
+    for sel in username_selectors:
+        loc = page.locator(sel).first
+        try:
+            await loc.wait_for(state="visible", timeout=5000)
+            email_input = loc
+            logger.info("FinOps login: found username field via %s", sel)
+            break
+        except Exception:
+            continue
+
+    if email_input is None:
+        await page.screenshot(path="/tmp/finops_login_debug.png")
+        raise RuntimeError(
+            f"FinOps login: no username/email input found on {page.url} "
+            "(screenshot saved to /tmp/finops_login_debug.png)"
+        )
+
+    await email_input.click()
+    await email_input.fill(username)
+    logger.info("FinOps login: filled username")
+
+    # Submit the username step (button or Enter)
+    next_btn = page.locator(
+        'button[type="submit"], input[type="submit"], '
+        'button:has-text("Next"), button:has-text("next"), '
+        'button:has-text("Continue"), button:has-text("continue")'
+    ).first
+    try:
+        await next_btn.click(timeout=5000)
+        logger.info("FinOps login: clicked submit/next button")
+    except Exception:
+        await page.keyboard.press("Enter")
+        logger.info("FinOps login: pressed Enter to submit username")
+    await page.wait_for_timeout(3000)
+
+    # Step 4: Fill password
+    password_input = page.locator(
+        'input[type="password"], input[name="passwd"], input[name="password"]'
+    ).first
+    try:
+        await password_input.wait_for(state="visible", timeout=15000)
+        await password_input.click()
+        await password_input.fill(password)
+        logger.info("FinOps login: filled password")
+    except Exception as exc:
+        await page.screenshot(path="/tmp/finops_password_debug.png")
+        raise RuntimeError(
+            f"FinOps login: could not fill password on {page.url}: {exc} "
+            "(screenshot saved to /tmp/finops_password_debug.png)"
+        ) from exc
+
+    # Submit the password step
+    signin_btn = page.locator(
+        'button[type="submit"], input[type="submit"], '
+        'button:has-text("Sign in"), button:has-text("Log in"), '
+        'button:has-text("Next"), button:has-text("next")'
+    ).first
+    try:
+        await signin_btn.click(timeout=5000)
+        logger.info("FinOps login: clicked sign-in button")
+    except Exception:
+        await page.keyboard.press("Enter")
+        logger.info("FinOps login: pressed Enter to submit password")
+    await page.wait_for_timeout(3000)
+
+    # Step 5: Handle Microsoft "Stay signed in?" prompt — click No
+    try:
+        no_btn = page.locator(
+            'input#idBtn_Back, '
+            'input[type="submit"][value="No"], input[type="submit"][value="לא"], '
+            'button:has-text("No"), button:has-text("לא")'
+        ).first
+        await no_btn.wait_for(state="visible", timeout=10000)
+        await no_btn.click()
+        logger.info("FinOps login: clicked 'No' on Microsoft stay-signed-in prompt")
+    except Exception:
+        logger.info("FinOps login: no stay-signed-in prompt appeared — skipping")
+
+    # Step 6: Wait for redirect back to FinOps
+    finops_host = urlparse(base_url).netloc
+    try:
+        await page.wait_for_url(lambda url: finops_host in url, timeout=30000)
+    except Exception as exc:
+        await page.screenshot(path="/tmp/finops_redirect_debug.png")
+        raise RuntimeError(
+            f"FinOps login: never redirected back to {finops_host} "
+            f"(current: {page.url}): {exc} "
+            "(screenshot saved to /tmp/finops_redirect_debug.png)"
+        ) from exc
     await page.wait_for_timeout(2000)
-    await _submit_credentials(page, language=language)
+    await page.wait_for_load_state("domcontentloaded")
+    logger.info("FinOps login complete — current URL: %s", page.url)
+
+
+async def _login(page: Page, base_url: str = DEFAULT_BASE_URL, language: str = "he", link_type: str = "regular") -> None:
+    """Log into the product using credentials for the given language/link_type."""
+    if link_type == "finops":
+        await _login_finops(page, base_url)
+        return
+
+    login_url = f"{base_url.rstrip('/')}/login"
+    logger.info("Logging into %s (language=%s, link_type=%s)...", login_url, language, link_type)
+    await page.goto(login_url, wait_until="domcontentloaded", timeout=30000)
+    await page.wait_for_timeout(2000)
+    await _submit_credentials(page, language=language, link_type=link_type)
     logger.info("Login complete — current URL: %s", page.url)
 
 
@@ -222,6 +365,11 @@ async def _enter_admin_app(page: Page, admin_url: str) -> Page:
     admin_host = urlparse(admin_url).netloc
     if not admin_host:
         raise RuntimeError(f"Invalid admin_url for admin entry: {admin_url!r}")
+
+    current_host = urlparse(page.url).netloc
+    if current_host == admin_host:
+        logger.info("Already on admin app (%s) — skipping apps menu navigation", admin_host)
+        return page
 
     context = page.context
     logger.info("Entering admin app via apps menu...")
@@ -324,13 +472,35 @@ async def _enter_admin_app(page: Page, admin_url: str) -> Page:
     return admin_page
 
 
+def _flatten_clickable_element(el, groups: list[list[str]]) -> None:
+    """
+    Append the label-variant group for one clickable element, then recurse into
+    any nested child buttons (`opens`) so a child label can also be located. The
+    parent-first click order is enforced by the LLM prompt; here we only need the
+    child labels to be resolvable once the parent has been opened.
+    """
+    if isinstance(el, dict) and el.get("variants"):
+        variants = [str(v).strip() for v in el["variants"] if str(v).strip()]
+    elif isinstance(el, dict):
+        variants = [str(el.get(k, "")).strip() for k in ("text", "aria")]
+        variants = [v for v in variants if v]
+    else:
+        variants = [str(el).strip()] if str(el).strip() else []
+    if variants:
+        groups.append(variants)
+    if isinstance(el, dict):
+        for child in el.get("opens") or []:
+            _flatten_clickable_element(child, groups)
+
+
 def _load_clickable_groups(path: str, link_type: str) -> list[list[str]]:
     """
     Return the recorded clickable buttons for a route as a list of label-variant
     groups (each group is the set of labels — e.g. Hebrew + English — that locate
-    the same button). Empty list if the route or file is missing.
+    the same button). Nested child buttons revealed by an opener are flattened in
+    as their own groups. Empty list if the route or file is missing.
     """
-    norm_lt = "admin" if link_type == "admin" else "regular"
+    norm_lt = link_type if link_type in ("admin", "finops") else "regular"
     try:
         with open(_ROUTES_MAP_PATH, encoding="utf-8") as f:
             routes = json.load(f)
@@ -342,20 +512,13 @@ def _load_clickable_groups(path: str, link_type: str) -> list[list[str]]:
     for r in routes:
         if not isinstance(r, dict):
             continue
-        r_lt = "admin" if r.get("link_type") == "admin" else "regular"
+        r_raw = r.get("link_type", "regular")
+        r_lt = r_raw if r_raw in ("admin", "finops") else "regular"
         if r.get("path") != path or r_lt != norm_lt:
             continue
         groups: list[list[str]] = []
         for el in r.get("clickable_elements") or []:
-            if isinstance(el, dict) and el.get("variants"):
-                variants = [str(v).strip() for v in el["variants"] if str(v).strip()]
-            elif isinstance(el, dict):
-                variants = [str(el.get(k, "")).strip() for k in ("text", "aria")]
-                variants = [v for v in variants if v]
-            else:
-                variants = [str(el).strip()] if str(el).strip() else []
-            if variants:
-                groups.append(variants)
+            _flatten_clickable_element(el, groups)
         return groups
     return []
 
@@ -376,20 +539,79 @@ def _expand_variants(text: str, groups: list[list[str]]) -> list[str]:
     return [text]
 
 
+async def _count_visible(locator) -> tuple[int, object]:
+    """
+    Return (visible_count, first_visible_element) for a locator. The count is
+    capped at 2 — callers only need to distinguish "none", "exactly one" and
+    "more than one" (ambiguous).
+    """
+    try:
+        count = await locator.count()
+    except Exception:
+        return 0, None
+
+    visible_first = None
+    n = 0
+    for i in range(count):
+        element = locator.nth(i)
+        try:
+            if await element.is_visible():
+                n += 1
+                if visible_first is None:
+                    visible_first = element
+                if n >= 2:
+                    break
+        except Exception:
+            continue
+    return n, visible_first
+
+
 async def _find_clickable(page: Page, text: str):
     """
-    Locate a visible clickable element for the given label, trying several
-    strategies in order. Returns the first visible locator found, or None.
+    Locate a visible clickable element for the given label.
 
-    The label text may correspond to a button's accessible name, its visible
-    text, or only its aria-label (icon-only buttons), so we try each in turn.
+    Resolution order:
+    1. Sidebar-swap shortcut for known menu-toggle labels.
+    2. Exact accessible-name match per role. This is the strongest signal: if a
+       role has exactly one visible exact match it is used; if it has more than
+       one, the label is AMBIGUOUS on this page and we return None rather than
+       guess (the caller then fails the interaction, which lets the pipeline
+       realign the narration to the screen actually shown).
+    3. Looser substring / aria-label / text matching for icon-only or partially
+       labelled buttons, returning the first visible match.
+
+    Returning None on ambiguity is intentional — silently clicking the wrong
+    element (e.g. one of several buttons sharing the label "Menu") is the worst
+    failure mode, because the voiceover would describe something never shown.
     """
     normalized = " ".join(text.split())
     lowered = normalized.lower()
     escaped = normalized.replace('"', '\\"')
+
+    # 1. Sidebar swap toggle (explicit, unambiguous selector)
+    if lowered in SIDEBAR_SWAP_LABELS:
+        _, element = await _count_visible(page.locator(SIDEBAR_SWAP_BUTTON_SELECTOR))
+        if element is not None:
+            return element
+
+    roles = ("button", "tab", "menuitem", "link", "option", "radio")
+
+    # 2. Exact accessible-name match (ambiguity-aware)
+    for role in roles:
+        n, element = await _count_visible(
+            page.get_by_role(role, name=normalized, exact=True)
+        )
+        if n == 1:
+            return element
+        if n > 1:
+            logger.info(
+                "Label %r matches %d+ visible %r elements — ambiguous, refusing to guess",
+                normalized, n, role,
+            )
+            return None
+
+    # 3. Looser fallback (icon-only buttons, partial labels)
     candidates = [
-        page.locator(SIDEBAR_SWAP_BUTTON_SELECTOR)
-        if lowered in SIDEBAR_SWAP_LABELS else None,
         page.get_by_role("button", name=normalized, exact=False),
         page.get_by_role("tab", name=normalized, exact=False),
         page.get_by_role("menuitem", name=normalized, exact=False),
@@ -402,8 +624,6 @@ async def _find_clickable(page: Page, text: str):
         page.locator(f'[data-value*="{escaped}" i]'),
     ]
     for locator in candidates:
-        if locator is None:
-            continue
         try:
             count = await locator.count()
         except Exception:
@@ -411,16 +631,8 @@ async def _find_clickable(page: Page, text: str):
         for i in range(count):
             element = locator.nth(i)
             try:
-                if not await element.is_visible():
-                    continue
-                # Never resolve to the apps/admin "User interface controls menu"
-                # button via a generic match — a substring label like "menu"
-                # would otherwise hit it instead of the real target. That button
-                # is only reachable through the explicit admin-entry flow.
-                aria = await element.get_attribute("aria-label")
-                if aria == APPS_MENU_ARIA_LABEL:
-                    continue
-                return element
+                if await element.is_visible():
+                    return element
             except Exception:
                 continue
     return None
@@ -504,7 +716,7 @@ async def _run_interactions(
     and filled with the provided demo value (never triggers real persistence).
     """
     variant_groups = variant_groups or []
-    for step in interactions:
+    for step_idx, step in enumerate(interactions):
         kind = (step.get("type") or "click").lower()
 
         if kind == "wait":
@@ -539,8 +751,45 @@ async def _run_interactions(
             element = await _resolve_clickable_with_retry(page, candidates)
             if element is None:
                 raise RuntimeError(f"no visible clickable element for {candidates!r}")
+
+            try:
+                aria_expanded = await element.get_attribute("aria-expanded")
+                if aria_expanded == "true":
+                    logger.info(
+                        "Element %r already expanded — skipping click to avoid closing it",
+                        text,
+                    )
+                    await page.wait_for_timeout(RENDER_SETTLE_MS)
+                    continue
+            except Exception:
+                pass
             await element.click(timeout=5000)
             await page.wait_for_timeout(RENDER_SETTLE_MS)
+
+            # Clear :hover state by moving the mouse to the next click target,
+            # or to the viewport center if there is no upcoming click.
+            moved = False
+            for next_step in interactions[step_idx + 1:]:
+                if (next_step.get("type") or "click").lower() == "click":
+                    next_text = (next_step.get("text") or "").strip()
+                    if next_text and not DESTRUCTIVE_TEXT.search(next_text):
+                        next_candidates = _expand_variants(next_text, variant_groups)
+                        next_element = await _find_clickable(page, next_candidates[0])
+                        if next_element is not None:
+                            try:
+                                box = await next_element.bounding_box()
+                                if box:
+                                    await page.mouse.move(
+                                        box["x"] + box["width"] / 2,
+                                        box["y"] + box["height"] / 2,
+                                    )
+                                    moved = True
+                            except Exception:
+                                pass
+                    break
+
+            if not moved:
+                await page.mouse.move(960, 540)
             continue
 
         logger.warning("Unknown interaction step type %r — skipping: %s", kind, step)
@@ -579,7 +828,7 @@ async def take_screenshots(
         )
         page = await context.new_page()
 
-        await _login(page, language=language)
+        await _login(page, base_url=base_url, language=language, link_type=link_type)
 
         if link_type == "admin":
             page = await _enter_admin_app(page, base_url)

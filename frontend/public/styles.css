@@ -304,8 +304,16 @@ a {
 }
 
 #exportExcelBtn {
-  background: linear-gradient(135deg, #e85c50, #f4ad51);
-  box-shadow: 0 12px 24px rgba(232, 92, 80, 0.2);
+  color: #b64855;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(232, 92, 80, 0.28);
+  box-shadow: none;
+}
+
+#exportExcelBtn:hover:not(:disabled) {
+  border-color: rgba(232, 92, 80, 0.42);
+  background: linear-gradient(135deg, rgba(255, 244, 194, 0.72), rgba(255, 225, 207, 0.72) 52%, rgba(255, 224, 236, 0.72));
+  box-shadow: 0 10px 18px rgba(232, 92, 80, 0.12);
 }
 
 .export-group {
@@ -920,16 +928,49 @@ tr:last-child td {
 }
 
 .route-check:checked + .switch-track {
-  background: linear-gradient(135deg, #7c3aed, #a855f7);
-  box-shadow: inset 0 0 0 1px rgba(124, 58, 237, 0.12), 0 8px 18px rgba(124, 58, 237, 0.18);
+  background: linear-gradient(135deg, rgba(255, 244, 194, 0.92), rgba(255, 225, 207, 0.92) 52%, rgba(255, 224, 236, 0.92));
+  border: 1px solid rgba(232, 92, 80, 0.32);
+  box-shadow: 0 8px 18px rgba(232, 92, 80, 0.14);
 }
 
 .route-check:checked + .switch-track::after {
   transform: translateX(20px);
+  background: #b64855;
 }
 
 .route-check:focus-visible + .switch-track {
-  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+  box-shadow: 0 0 0 4px rgba(232, 92, 80, 0.12);
+}
+
+.route-type-picks {
+  display: inline-flex;
+  gap: 10px;
+  margin-left: 4px;
+}
+
+.route-type-picks.hidden {
+  display: none;
+}
+
+.route-type-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted-2);
+}
+
+.route-type-check input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: #b64855;
+  cursor: pointer;
+}
+
+.route-type-check input[type="checkbox"]:checked + span {
+  color: var(--ink);
 }
 
 .info-icon {
@@ -1705,4 +1746,99 @@ tr:last-child td {
   .asset-btn {
     flex: 1 1 100%;
   }
+}
+
+/* ── SharePoint save modal ── */
+
+.sp-modal {
+  width: min(420px, 92vw);
+  max-height: 82vh;
+}
+
+.sp-modal-body {
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sp-field {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sp-field legend {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 10px;
+  letter-spacing: 0.02em;
+}
+
+.sp-checkbox-group {
+  display: flex;
+  gap: 12px;
+}
+
+.sp-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  user-select: none;
+}
+
+.sp-checkbox:hover {
+  border-color: var(--jeen-orange);
+  background: var(--jeen-orange-soft);
+}
+
+.sp-checkbox:has(input:checked) {
+  border-color: var(--jeen-orange);
+  background: linear-gradient(135deg, var(--jeen-yellow-soft), var(--jeen-orange-soft) 60%, var(--jeen-pink-soft));
+  box-shadow: 0 0 0 1px var(--jeen-orange);
+}
+
+.sp-checkbox input[type="checkbox"] {
+  accent-color: var(--jeen-orange);
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.sp-save-btn {
+  width: 100%;
+  justify-content: center;
+  min-height: 40px;
+  margin-top: 4px;
+  color: #b64855;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(232, 92, 80, 0.28);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.sp-save-btn:hover:not(:disabled) {
+  border-color: rgba(232, 92, 80, 0.42);
+  background: linear-gradient(135deg, rgba(255, 244, 194, 0.72), rgba(255, 225, 207, 0.72) 52%, rgba(255, 224, 236, 0.72));
+  box-shadow: 0 10px 18px rgba(232, 92, 80, 0.12);
+}
+
+.sp-save-btn:disabled {
+  opacity: 0.4;
+}
+
+.sp-save-btn.loading {
+  pointer-events: none;
+  opacity: 0.65;
 }

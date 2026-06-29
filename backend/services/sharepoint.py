@@ -498,6 +498,7 @@ async def copy_pdfs_to_folder(
             item = up.json()
             uploaded.append({
                 "name": item.get("name"),
+                "sourceUrl": web_url,
                 "webUrl": item.get("webUrl"),
                 "size": item.get("size"),
             })

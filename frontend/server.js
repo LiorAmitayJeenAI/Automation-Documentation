@@ -30,11 +30,16 @@ function makeSessionId(prefix = 'tutorial-run') {
 }
 
 function normalizeLinkType(value) {
-  return value === 'admin' ? 'admin' : 'regular';
+  if (value === 'admin') return 'admin';
+  if (value === 'finops') return 'finops';
+  return 'regular';
 }
 
 function getLinkTypeForFolder(folderName = '') {
-  return String(folderName).toLowerCase().includes('admin') ? 'admin' : 'regular';
+  const lower = String(folderName).toLowerCase();
+  if (lower.includes('admin')) return 'admin';
+  if (lower.includes('finops')) return 'finops';
+  return 'regular';
 }
 
 function normalizeRunItems({ items, urls, linkType }) {
@@ -1078,10 +1083,10 @@ function callBackendJson(apiPath, payload) {
   });
 }
 
-function exportFolderName(type = 'Presentations', date = new Date()) {
+function exportFolderName(lang, type = 'Presentations', date = new Date()) {
   const pad = (n) => String(n).padStart(2, '0');
   const stamp = `${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()}`;
-  return `${type} ${stamp}`;
+  return `${lang}_${type} ${stamp}`;
 }
 
 function buildExcelBuffer(tutorials, foldersData) {
@@ -1098,8 +1103,8 @@ function buildExcelBuffer(tutorials, foldersData) {
     Language: t.language ? t.language.toUpperCase() : '-',
     'Confluence URL': t.confluenceUrl || t.url || '',
     'Gamma URL': t.gammaUrl || '',
-    'PDF URL': t.sharepointUrl || '',
-    'Video URL': t.videoUrl || '',
+    'PDF URL': t.exportSharepointUrl || t.sharepointUrl || '',
+    'Video URL': t.exportVideoUrl || t.videoUrl || '',
   }));
 
   const ws = XLSX.utils.json_to_sheet(rows);
@@ -1108,87 +1113,118 @@ function buildExcelBuffer(tutorials, foldersData) {
   return XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
 }
 
-app.post('/api/export-sharepoint', async (req, res) => {
-  const list = loadTutorials();
+function applyExportUrls(list, lang, sourceField, exportField, uploadedFiles = []) {
+  let changed = false;
+  const bySourceUrl = new Map(
+    uploadedFiles
+      .filter(file => file?.sourceUrl && file?.webUrl)
+      .map(file => [file.sourceUrl, file.webUrl])
+  );
 
-  const pdfSeen = new Set();
-  const pdfUrls = [];
-  const videoSeen = new Set();
-  const videoUrls = [];
+  if (!bySourceUrl.size) return false;
 
   for (const t of list) {
-    if (t.sharepointUrl && !pdfSeen.has(t.sharepointUrl)) {
-      pdfSeen.add(t.sharepointUrl);
-      pdfUrls.push(t.sharepointUrl);
-    }
-    if (t.videoUrl && !videoSeen.has(t.videoUrl)) {
-      videoSeen.add(t.videoUrl);
-      videoUrls.push(t.videoUrl);
+    if ((t.language || '').toLowerCase() !== lang) continue;
+    const exportUrl = bySourceUrl.get(t[sourceField]);
+    if (exportUrl && t[exportField] !== exportUrl) {
+      t[exportField] = exportUrl;
+      t.lastUpdatedAt = new Date().toISOString();
+      changed = true;
     }
   }
 
-  if (!pdfUrls.length && !videoUrls.length) {
-    return res.status(400).json({ error: 'No presentations or videos to export.' });
+  return changed;
+}
+
+app.post('/api/export-sharepoint', async (req, res) => {
+  const { languages = [], types = [] } = req.body || {};
+
+  if (!languages.length || !types.length) {
+    return res.status(400).json({ error: 'Select at least one language and one type.' });
   }
 
+  const includePdf = types.includes('pdf');
+  const includeVideo = types.includes('video');
+
+  const list = loadTutorials();
   const now = new Date();
-  const pdfFolder = exportFolderName('Presentations', now);
-  const videoFolder = exportFolderName('Videos', now);
+  const result = { folders: [], errors: [] };
+  let tutorialsChanged = false;
 
-  const result = {
-    pdfFolderName: null, pdfFolderUrl: null, pdfCount: 0,
-    videoFolderName: null, videoFolderUrl: null, videoCount: 0,
-    excelUrl: null,
-    errors: [],
-  };
+  for (const lang of languages) {
+    const langTutorials = list.filter(t => (t.language || '').toLowerCase() === lang);
 
-  // 1. Sync PDFs
-  if (pdfUrls.length) {
-    try {
-      const pdfResult = await callBackendJson('/api/sync-export-folder', {
-        prefix: 'Presentations',
-        folder_name: pdfFolder,
-        current_urls: pdfUrls,
-      });
-      result.pdfFolderName = pdfFolder;
-      result.pdfFolderUrl = pdfResult.folderUrl || null;
-      result.pdfCount = pdfResult.uploaded || 0;
-    } catch (err) {
-      result.errors.push(`PDFs: ${err?.message || 'failed'}`);
+    if (includePdf) {
+      const seen = new Set();
+      const urls = [];
+      for (const t of langTutorials) {
+        if (t.sharepointUrl && !seen.has(t.sharepointUrl)) {
+          seen.add(t.sharepointUrl);
+          urls.push(t.sharepointUrl);
+        }
+      }
+      if (urls.length) {
+        const folderName = exportFolderName(lang, 'Presentations', now);
+        try {
+          const syncResult = await callBackendJson('/api/sync-export-folder', {
+            prefix: `${lang}_Presentations`,
+            folder_name: folderName,
+            current_urls: urls,
+          });
+          tutorialsChanged = applyExportUrls(
+            list, lang, 'sharepointUrl', 'exportSharepointUrl', syncResult.uploadedFiles
+          ) || tutorialsChanged;
+          result.folders.push({
+            lang, type: 'pdf', folderName,
+            folderUrl: syncResult.folderUrl || null,
+            count: syncResult.uploaded || 0,
+          });
+        } catch (err) {
+          result.errors.push(`${lang.toUpperCase()} PDFs: ${err?.message || 'failed'}`);
+        }
+      }
+    }
+
+    if (includeVideo) {
+      const seen = new Set();
+      const urls = [];
+      for (const t of langTutorials) {
+        if (t.videoUrl && !seen.has(t.videoUrl)) {
+          seen.add(t.videoUrl);
+          urls.push(t.videoUrl);
+        }
+      }
+      if (urls.length) {
+        const folderName = exportFolderName(lang, 'Videos', now);
+        try {
+          const syncResult = await callBackendJson('/api/sync-export-folder', {
+            prefix: `${lang}_Videos`,
+            folder_name: folderName,
+            current_urls: urls,
+          });
+          tutorialsChanged = applyExportUrls(
+            list, lang, 'videoUrl', 'exportVideoUrl', syncResult.uploadedFiles
+          ) || tutorialsChanged;
+          result.folders.push({
+            lang, type: 'video', folderName,
+            folderUrl: syncResult.folderUrl || null,
+            count: syncResult.uploaded || 0,
+          });
+        } catch (err) {
+          result.errors.push(`${lang.toUpperCase()} Videos: ${err?.message || 'failed'}`);
+        }
+      }
     }
   }
 
-  // 2. Sync Videos
-  if (videoUrls.length) {
-    try {
-      const vidResult = await callBackendJson('/api/sync-export-folder', {
-        prefix: 'Videos',
-        folder_name: videoFolder,
-        current_urls: videoUrls,
-      });
-      result.videoFolderName = videoFolder;
-      result.videoFolderUrl = vidResult.folderUrl || null;
-      result.videoCount = vidResult.uploaded || 0;
-    } catch (err) {
-      result.errors.push(`Videos: ${err?.message || 'failed'}`);
-    }
-  }
+  if (tutorialsChanged) saveTutorials(list);
 
-  // 3. Upload Excel
-  try {
-    const foldersData = loadFoldersRaw();
-    const excelBuf = buildExcelBuffer(list, foldersData);
-    const excelResult = await callBackendJson('/api/upload-excel-to-sharepoint', {
-      file_name: 'tutorials-library.xlsx',
-      file_base64: excelBuf.toString('base64'),
-    });
-    result.excelUrl = excelResult.webUrl || null;
-  } catch (err) {
-    result.errors.push(`Excel: ${err?.message || 'failed'}`);
-  }
-
-  if (result.errors.length && !result.pdfCount && !result.videoCount && !result.excelUrl) {
+  if (result.errors.length && !result.folders.length) {
     return res.status(500).json({ error: result.errors.join('; ') });
+  }
+
+  if (!result.folders.length && !result.errors.length) {
+    return res.status(400).json({ error: 'No matching content found for the selected languages and types.' });
   }
 
   res.json(result);

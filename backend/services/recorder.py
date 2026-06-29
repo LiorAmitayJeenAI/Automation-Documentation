@@ -226,7 +226,101 @@ _JS_HIGHLIGHT_HIDE = """() => {
   const hl = document.getElementById('__jeen_hl__');
   if (hl) hl.remove();
 }"""
+
+# Minimum on-screen size (px) for a target to be worth highlighting/clicking.
+# Anything smaller is almost certainly a zero-size / collapsed / stale node.
+_MIN_TARGET_PX = 6
+
+# Probe: is the element a genuine, on-screen, hit-testable, INTERACTIVE target?
+# Returns {related, interactive}. `related` is true when the element painted at
+# the box centre is the target itself or shares its DOM lineage (so the ring
+# would land on the real element, not on top of an overlay). `interactive` is
+# true when the element or an ancestor is an actual control — this rejects the
+# loose text/aria fallback matching a paragraph that merely contains the label.
+_JS_HIT_TEST = """(el, pt) => {
+  const hit = document.elementFromPoint(pt.x, pt.y);
+  if (!hit) return { related: false, interactive: false };
+  const related = el === hit || el.contains(hit) || hit.contains(el);
+  const interactive = !!el.closest(
+    'button, a, [role="button"], [role="tab"], [role="menuitem"], ' +
+    '[role="option"], [role="link"], [role="radio"], [role="checkbox"], ' +
+    'input, select, textarea, [onclick], [tabindex]'
+  );
+  return { related, interactive };
+}"""
 # ─────────────────────────────────────────────────────────────────────────────
+
+
+async def _genuine_target_bbox(page: Page, element, require_interactive: bool = True):
+    """
+    Return a viewport bounding box for *element* only if it is a genuine,
+    visible, on-screen, hit-testable target — otherwise None.
+
+    This is the guard against the "phantom" highlight: _find_clickable's looser
+    fallback can match a stale, hidden, zero-size, off-screen, or non-interactive
+    node (e.g. a paragraph that merely contains the button's label text). Drawing
+    the ring on such a node makes a button frame appear where there is no button.
+
+    Steps: require the element to be visible, scroll it into view so an element
+    below the fold gets a correct on-screen box, reject empty / sub-pixel boxes,
+    reject boxes whose centre is outside the recorded viewport, and finally
+    hit-test the centre point (it must resolve to the element / its lineage, and
+    — when require_interactive — sit inside a real interactive control).
+    """
+    try:
+        if not await element.is_visible():
+            return None
+    except Exception:
+        return None
+
+    try:
+        await element.scroll_into_view_if_needed(timeout=2000)
+    except Exception:
+        pass
+
+    try:
+        bbox = await element.bounding_box()
+    except Exception:
+        bbox = None
+    if not bbox:
+        return None
+
+    width = bbox.get("width", 0)
+    height = bbox.get("height", 0)
+    if width < _MIN_TARGET_PX or height < _MIN_TARGET_PX:
+        return None
+
+    cx = bbox["x"] + width / 2
+    cy = bbox["y"] + height / 2
+    if not (0 <= cx <= VIEWPORT["width"] and 0 <= cy <= VIEWPORT["height"]):
+        return None
+
+    try:
+        probe = await element.evaluate(_JS_HIT_TEST, {"x": cx, "y": cy})
+    except Exception:
+        probe = {"related": True, "interactive": True}  # permissive if probe fails
+
+    if not probe.get("related"):
+        return None
+    if require_interactive and not probe.get("interactive"):
+        return None
+
+    return bbox
+
+
+async def _glide_and_highlight(page: Page, bbox: dict) -> None:
+    """Glide the visible cursor to the box centre and draw the highlight ring.
+
+    Leaves the ring on screen — the caller hides it after the click/hold so the
+    press is visible. The injected click-ripple fires automatically on the
+    real mousedown dispatched by element.click().
+    """
+    cx = bbox["x"] + bbox["width"] / 2
+    cy = bbox["y"] + bbox["height"] / 2
+    await page.mouse.move(cx, cy, steps=18)
+    await page.wait_for_timeout(200)
+    await page.evaluate(_JS_HIGHLIGHT_SHOW, bbox)
+    await page.wait_for_timeout(350)
 
 
 async def _run_interactions_visible(
@@ -252,6 +346,24 @@ async def _run_interactions_visible(
             await page.wait_for_timeout(int(step.get("ms", 1000)))
             continue
 
+        if kind == "scroll":
+            target = (step.get("target") or "").strip()
+            await page.evaluate("""(target) => {
+                if (!target || target === 'bottom') {
+                    window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
+                } else {
+                    const headings = [...document.querySelectorAll('h1,h2,h3,h4,h5,h6,[class*="title"],[class*="header"]')];
+                    const match = headings.find(e => e.textContent.trim().includes(target));
+                    if (match) {
+                        match.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    } else {
+                        window.scrollBy({top: 500, behavior: 'smooth'});
+                    }
+                }
+            }""", target)
+            await page.wait_for_timeout(int(step.get("ms", 1200)))
+            continue
+
         if kind == "fill":
             label = (step.get("label") or "").strip()
             value = (step.get("value") or "").strip()
@@ -263,15 +375,17 @@ async def _run_interactions_visible(
             if element is None:
                 raise RuntimeError(f"no visible input for label {label!r}")
 
-            # Glide mouse to the input field so the cursor is visibly there
-            bbox = await element.bounding_box()
+            # Glide the cursor to the field and draw the highlight ring BEFORE
+            # the click, so the click into the input is always shown (cursor +
+            # ring + ripple), never an invisible press. Inputs need no
+            # interactivity probe — they are inherently fillable controls.
+            bbox = await _genuine_target_bbox(page, element, require_interactive=False)
             if bbox:
-                cx = bbox["x"] + bbox["width"] / 2
-                cy = bbox["y"] + bbox["height"] / 2
-                await page.mouse.move(cx, cy, steps=18)
-                await page.wait_for_timeout(200)
+                await _glide_and_highlight(page, bbox)
 
             await element.click(timeout=5000)
+            if bbox:
+                await page.evaluate(_JS_HIGHLIGHT_HIDE)
             await element.fill(value)
 
             actual = await element.input_value()
@@ -296,16 +410,71 @@ async def _run_interactions_visible(
             if element is None:
                 raise RuntimeError(f"no visible clickable element for {candidates!r}")
 
-            # Glide mouse → highlight → click → remove highlight
-            bbox = await element.bounding_box()
-            if bbox:
-                cx = bbox["x"] + bbox["width"] / 2
-                cy = bbox["y"] + bbox["height"] / 2
-                await page.mouse.move(cx, cy, steps=18)
-                await page.wait_for_timeout(200)
-                await page.evaluate(_JS_HIGHLIGHT_SHOW, bbox)
-                await page.wait_for_timeout(350)
+            # Validate this is a genuine, on-screen, hit-testable interactive
+            # target BEFORE drawing anything. This single check fixes both:
+            #  • the phantom frame — a stale/hidden/zero-size/off-screen or
+            #    non-interactive match (e.g. a paragraph containing the label)
+            #    no longer gets a highlight ring drawn around empty space; and
+            #  • the invisible press — when bounding_box() was falsy the old
+            #    code skipped the visuals but still clicked. Now an unverifiable
+            #    target fails the step (plain page captured, narration realigned)
+            #    instead of producing a silent, unseen click.
+            bbox = await _genuine_target_bbox(page, element)
 
+            # Toggle-aware: if the target is already expanded (e.g. a menu the
+            # page opened by default, or one opened by a previous interaction),
+            # clicking it would CLOSE it. Don't click — but still glide + ring
+            # (no ripple, no click) so the viewer sees the element the narration
+            # is about, then leave it open.
+            try:
+                already_expanded = await element.evaluate("""(el) => {
+                    if (el.getAttribute('aria-expanded') === 'true') return true;
+                    const cls = (el.className || '').toLowerCase();
+                    if (/\\b(open|expanded|active|is-open|is-expanded|is-active)\\b/.test(cls)) return true;
+                    const state = el.getAttribute('data-state');
+                    if (state === 'open' || state === 'expanded') return true;
+                    const ariaControls = el.getAttribute('aria-controls');
+                    if (ariaControls) {
+                        const panel = document.getElementById(ariaControls);
+                        if (panel) {
+                            const rect = panel.getBoundingClientRect();
+                            if (rect.height > 10) return true;
+                        }
+                    }
+                    const hasChevron = !!el.querySelector('svg[class*="chevron"], svg[class*="arrow"], svg[class*="caret"]');
+                    if (hasChevron) {
+                        const wrapper = el.closest('div');
+                        if (wrapper) {
+                            const sib = wrapper.nextElementSibling;
+                            if (sib) {
+                                const rect = sib.getBoundingClientRect();
+                                if (rect.height > 10) return true;
+                            }
+                        }
+                    }
+                    return false;
+                }""")
+            except Exception:
+                already_expanded = False
+
+            if already_expanded:
+                logger.info(
+                    "Element %r already expanded — showing without clicking to avoid closing it",
+                    text,
+                )
+                if bbox:
+                    await _glide_and_highlight(page, bbox)
+                    await page.evaluate(_JS_HIGHLIGHT_HIDE)
+                await page.wait_for_timeout(RENDER_SETTLE_MS)
+                continue
+
+            if bbox is None:
+                raise RuntimeError(
+                    f"resolved element for {candidates!r} is not a genuine visible target"
+                )
+
+            # Glide → highlight ring → real click (fires the ripple) → hide ring.
+            await _glide_and_highlight(page, bbox)
             await element.click(timeout=5000)
             await page.evaluate(_JS_HIGHLIGHT_HIDE)
             await page.wait_for_timeout(RENDER_SETTLE_MS)
@@ -321,9 +490,9 @@ def _url_key(url: str) -> str:
 
 
 def _has_screen_changing_interactions(interactions: list[dict]) -> bool:
-    """True only if at least one interaction is a click or fill (not just waits)."""
+    """True only if at least one interaction is a click, fill, or scroll (not just waits)."""
     return any(
-        (step.get("type") or "click").lower() in ("click", "fill")
+        (step.get("type") or "click").lower() in ("click", "fill", "scroll")
         for step in interactions
     )
 
@@ -383,7 +552,7 @@ async def record_product_video(
             ignore_https_errors=True,
         )
         login_page = await login_context.new_page()
-        await _login(login_page, language=language)
+        await _login(login_page, base_url=base_url, language=language, link_type=link_type)
         if link_type == "admin":
             login_page = await _enter_admin_app(login_page, base_url)
         storage_state = await login_context.storage_state()

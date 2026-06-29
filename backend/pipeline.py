@@ -22,7 +22,8 @@ from urllib.parse import quote
 from backend.config import (
     REGULAR_URL,
     ADMIN_URL,
-    SP_FOLDER_PATH,
+    FINOPS_URL,
+    SP_DRAFT_PDF_FOLDER,
     SP_SCREENSHOTS_FOLDER,
     PUBLIC_BASE_URL,
     IMGBB_API_KEY,
@@ -65,7 +66,12 @@ async def run_pipeline(
     Yields PipelineEvent objects for each major step.
     The final event contains gamma_url and sharepoint_url.
     """
-    base_url = ADMIN_URL if link_type == "admin" else REGULAR_URL
+    if link_type == "admin":
+        base_url = ADMIN_URL
+    elif link_type == "finops":
+        base_url = FINOPS_URL
+    else:
+        base_url = REGULAR_URL
 
     # Per-run SharePoint subfolder so only this run's screenshots are read back
     # and passed to Gamma (avoids accumulating images across runs).
@@ -250,7 +256,7 @@ async def run_pipeline(
                     file_name = f"{lang}-{slug or 'presentation'}.pdf"
 
             upload_result = await sharepoint.download_url_and_upload(
-                pdf_url, file_name, SP_FOLDER_PATH, session_id=session_id,
+                pdf_url, file_name, SP_DRAFT_PDF_FOLDER, session_id=session_id,
             )
             sharepoint_url = upload_result.get("webUrl")
             yield PipelineEvent(

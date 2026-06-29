@@ -37,7 +37,11 @@ _client = AsyncAzureOpenAI(
 
 
 def _normalize_link_type(value: str | None) -> str:
-    return "admin" if value == "admin" else "regular"
+    if value == "admin":
+        return "admin"
+    if value == "finops":
+        return "finops"
+    return "regular"
 
 
 def _route_link_type(route: dict) -> str:
@@ -103,13 +107,30 @@ def _format_clickable_elements(route: dict) -> str:
     Each on-page button is shown with all of its label variants (Hebrew /
     English) joined by " / ", and buttons are separated by commas. Used to
     constrain the LLM's interaction click steps to real, on-page buttons.
-    Returns an empty string when the route has no recorded clickable elements.
+
+    A button that reveals other buttons when clicked (an opener) lists those
+    child buttons inline as "(opens -> ...)", so the LLM knows it must click the
+    parent first to reach them. Returns an empty string when the route has no
+    recorded clickable elements.
     """
     buttons: list[str] = []
     for el in route.get("clickable_elements") or []:
         variants = _element_variants(el)
-        if variants:
-            buttons.append(" / ".join(f'"{v}"' for v in variants))
+        if not variants:
+            continue
+        label = " / ".join(f'"{v}"' for v in variants)
+        if isinstance(el, dict) and el.get("default_expanded"):
+            label += " [already open on page load]"
+        children = el.get("opens") if isinstance(el, dict) else None
+        if children:
+            child_labels = [
+                " / ".join(f'"{v}"' for v in _element_variants(c))
+                for c in children
+                if _element_variants(c)
+            ]
+            if child_labels:
+                label += f" (opens -> {'; '.join(child_labels)})"
+        buttons.append(label)
     return ", ".join(buttons)
 
 

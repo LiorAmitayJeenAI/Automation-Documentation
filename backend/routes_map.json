@@ -5,54 +5,65 @@
     "clickable_elements": [
       {
         "variants": [
-          "GPT 5.1 - Azure OpenAI",
-          "dropdown-trigger"
+          "GPT 5.1 - Azure OpenAI"
         ]
       },
       {
         "variants": [
           "Brain",
           "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "כלים\nלא נבחרו"
+            ]
+          },
+          {
+            "variants": [
+              "חיבורים\nאפליקציות צד שלישי"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "dropdown-trigger"
+          "JD"
         ]
       },
       {
         "variants": [
-          "Open search",
-          "פתח חיפוש"
+          "Open search"
         ]
       },
       {
         "variants": [
-          "Menu",
-          "תפריט"
+          "Upload Files"
         ]
       },
       {
         "variants": [
-          "Upload Files",
-          "העלאת קבצים"
+          "Voice input"
         ]
       },
       {
         "variants": [
-          "record-meeting-button"
+          "Submit"
         ]
       },
       {
         "variants": [
-          "Voice input",
-          "קלט קולי"
+          "התראות"
         ]
       },
       {
         "variants": [
-          "Submit",
-          "שלח"
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
         ]
       }
     ]
@@ -63,43 +74,82 @@
     "clickable_elements": [
       {
         "variants": [
-          "GPT 5.1 - Azure OpenAI",
-          "dropdown-trigger"
+          "GPT 5.1 - Azure OpenAI"
         ]
       },
       {
         "variants": [
           "Brain",
           "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "כלים\nלא נבחרו"
+            ]
+          },
+          {
+            "variants": [
+              "חיבורים\nאפליקציות צד שלישי"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "Menu",
-          "תפריט"
+          "JD"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "Upload Files",
-          "העלאת קבצים"
+          "Upload Files"
         ]
       },
       {
         "variants": [
-          "record-meeting-button"
+          "Voice input"
         ]
       },
       {
         "variants": [
-          "Voice input",
-          "קלט קולי"
+          "Submit"
         ]
       },
       {
         "variants": [
-          "Submit",
-          "שלח"
+          "התראות"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
         ]
       }
     ]
@@ -110,58 +160,109 @@
     "clickable_elements": [
       {
         "variants": [
-          "בית",
-          "Home"
+          "הסוכנים שלי"
         ]
       },
       {
         "variants": [
-          "הסוכנים שלי",
-          "My Agents"
+          "שותף איתי"
         ]
       },
       {
         "variants": [
-          "שותף איתי",
-          "Shared with Me"
+          "משותף על ידי הארגון"
         ]
       },
       {
         "variants": [
-          "משותף על ידי הארגון",
-          "Shared by Organization"
+          "צור סוכן"
         ]
       },
       {
         "variants": [
-          "צור סוכן",
-          "agents-page-primary-action-add",
-          "Create Agent"
+          "צור תיקייה"
         ]
       },
       {
         "variants": [
-          "צור תיקייה",
-          "agents-page-primary-action-create-folder",
-          "Create Folder"
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "Open search",
-          "פתח חיפוש"
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "Menu",
-          "תפריט"
+          "Open search"
         ]
       },
       {
         "variants": [
-          "Select all rows",
-          "בחר את כל השורות"
+          "Select all rows"
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
         ]
       }
     ]
@@ -173,75 +274,172 @@
     "clickable_elements": [
       {
         "variants": [
-          "פעיל",
-          "dropdown-trigger",
-          "Active"
-        ]
-      },
-      {
-        "variants": [
-          "העתקת מזהה",
-          "Copy ID"
-        ]
-      },
-      {
-        "variants": [
-          "שמור",
-          "Save"
+          "פעיל"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "מושבת"
+            ]
+          }
         ]
       },
       {
         "variants": [
           "Brain",
           "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "כלים\nלא נבחרו"
+            ]
+          },
+          {
+            "variants": [
+              "חיבורים\nאפליקציות צד שלישי"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "העלאת תמונה",
-          "Upload Image"
+          "בחר מודל"
         ]
       },
       {
         "variants": [
-          "הסרה",
-          "Remove"
+          "העתקת מזהה"
         ]
       },
       {
         "variants": [
-          "בחר תהליכים",
-          "Select Processes"
+          "שמור"
         ]
       },
       {
         "variants": [
-          "הוסף",
-          "Add"
+          "תוכל לעזור לי לבנות תרחישי בדיקה?"
         ]
       },
       {
         "variants": [
-          "0 קבצים",
-          "0 files"
+          "איך לנסח באג בצורה מדויקת?"
         ]
       },
       {
         "variants": [
-          "העלאת קובץ",
-          "Upload File"
+          "מהם סוגי הבדיקות שכדאי לבצע למוצר חדש?"
         ]
       },
       {
         "variants": [
-          "ערוך",
-          "Edit"
+          "האם תוכל לנתח עבורי בדיקות קיימות?"
         ]
       },
       {
         "variants": [
-          "הגדר טבלת המרה",
-          "Configure Conversion Table"
+          "העלאת תמונה"
+        ]
+      },
+      {
+        "variants": [
+          "הסרה"
+        ]
+      },
+      {
+        "variants": [
+          "בחר תהליכים"
+        ]
+      },
+      {
+        "variants": [
+          "ערוך פתיחי שיחה"
+        ]
+      },
+      {
+        "variants": [
+          "0 קבצים"
+        ]
+      },
+      {
+        "variants": [
+          "העלאת קובץ"
+        ]
+      },
+      {
+        "variants": [
+          "ערוך"
+        ]
+      },
+      {
+        "variants": [
+          "הגדר טבלת המרה"
+        ]
+      },
+      {
+        "variants": [
+          "הוסף Skills"
+        ]
+      },
+      {
+        "variants": [
+          "הוספת חיבורים"
+        ]
+      },
+      {
+        "variants": [
+          "בחר"
+        ]
+      },
+      {
+        "variants": [
+          "JD"
+        ]
+      },
+      {
+        "variants": [
+          "Reset-context-button"
+        ]
+      },
+      {
+        "variants": [
+          "Upload Files"
+        ]
+      },
+      {
+        "variants": [
+          "Submit"
+        ]
+      },
+      {
+        "variants": [
+          "Increment"
+        ]
+      },
+      {
+        "variants": [
+          "Decrement"
+        ]
+      },
+      {
+        "variants": [
+          "Copy"
+        ]
+      },
+      {
+        "variants": [
+          "Like"
+        ]
+      },
+      {
+        "variants": [
+          "Dislike"
+        ]
+      },
+      {
+        "variants": [
+          "Feedback"
         ]
       }
     ]
@@ -253,75 +451,174 @@
     "clickable_elements": [
       {
         "variants": [
-          "פעיל",
-          "dropdown-trigger",
-          "Active"
-        ]
-      },
-      {
-        "variants": [
-          "העתקת מזהה",
-          "Copy ID"
-        ]
-      },
-      {
-        "variants": [
-          "שמור",
-          "Save"
+          "פעיל"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "מושבת"
+            ]
+          }
         ]
       },
       {
         "variants": [
           "Brain",
           "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "כלים\nלא נבחרו"
+            ]
+          },
+          {
+            "variants": [
+              "חיבורים\nאפליקציות צד שלישי"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "העלאת תמונה",
-          "Upload Image"
+          "GPT 5.1 - Azure OpenAI\nמומלץ"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "מושבת"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "הסרה",
-          "Remove"
+          "העתקת מזהה"
         ]
       },
       {
         "variants": [
-          "בחר תהליכים",
-          "Select Processes"
+          "שמור"
         ]
       },
       {
         "variants": [
-          "הוסף",
-          "Add"
+          "העלאת תמונה"
         ]
       },
       {
         "variants": [
-          "0 קבצים",
-          "0 files"
+          "הסרה"
         ]
       },
       {
         "variants": [
-          "העלאת קובץ",
-          "Upload File"
+          "בחר תהליכים"
         ]
       },
       {
         "variants": [
-          "ערוך",
-          "Edit"
+          "הוסף"
         ]
       },
       {
         "variants": [
-          "הגדר טבלת המרה",
-          "Configure Conversion Table"
+          "1 קבצים"
+        ]
+      },
+      {
+        "variants": [
+          "העלאת קובץ"
+        ]
+      },
+      {
+        "variants": [
+          "ערוך"
+        ]
+      },
+      {
+        "variants": [
+          "הגדר טבלת המרה"
+        ]
+      },
+      {
+        "variants": [
+          "הוסף Skills"
+        ]
+      },
+      {
+        "variants": [
+          "הוספת חיבורים"
+        ]
+      },
+      {
+        "variants": [
+          "בחר"
+        ]
+      },
+      {
+        "variants": [
+          "JD"
+        ]
+      },
+      {
+        "variants": [
+          "Reset-context-button"
+        ]
+      },
+      {
+        "variants": [
+          "Upload Files"
+        ]
+      },
+      {
+        "variants": [
+          "Submit"
+        ]
+      },
+      {
+        "variants": [
+          "Increment"
+        ]
+      },
+      {
+        "variants": [
+          "Decrement"
+        ]
+      },
+      {
+        "variants": [
+          "Copy"
+        ]
+      },
+      {
+        "variants": [
+          "Like"
+        ]
+      },
+      {
+        "variants": [
+          "Dislike"
+        ]
+      },
+      {
+        "variants": [
+          "Feedback"
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
         ]
       }
     ]
@@ -329,22 +626,230 @@
   {
     "path": "/workflow/flow/05e7f241-7528-4417-a5c6-4a2774ea0d9e",
     "language": "he",
-    "description": "Edit a Workflow agent — visual flow builder for a workflow-type agent"
+    "description": "Edit a Workflow agent — visual flow builder for a workflow-type agent",
+    "clickable_elements": [
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
   },
   {
     "path": "/agent-configuration/338b8275-4edf-41af-a846-baa2d08e1019",
     "language": "en",
-    "description": "Edit a Spark agent — configuration and settings page for a Spark-type agent"
+    "description": "Edit a Spark agent — configuration and settings page for a Spark-type agent",
+    "clickable_elements": [
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
   },
   {
     "path": "/agent-configuration/c40c8d50-2a04-4a1b-8932-bc0afbef7675",
     "language": "en",
-    "description": "Edit a Cortex agent — configuration and settings page for a Cortex-type agent"
+    "description": "Edit a Cortex agent — configuration and settings page for a Cortex-type agent",
+    "clickable_elements": [
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
   },
   {
     "path": "/workflow/flow/5625b3d8-3355-464c-b539-f7f1b1feb58e",
     "language": "en",
-    "description": "Edit a Workflow agent — visual flow builder for a workflow-type agent"
+    "description": "Edit a Workflow agent — visual flow builder for a workflow-type agent",
+    "clickable_elements": [
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
   },
   {
     "path": "/agent-configuration/new",
@@ -352,26 +857,149 @@
     "clickable_elements": [
       {
         "variants": [
-          "דלג",
-          "Skip"
+          "פעיל"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "מושבת"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "תבניות נוספות",
-          "More Templates"
+          "Brain",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "כלים\nלא נבחרו"
+            ]
+          },
+          {
+            "variants": [
+              "חיבורים\nאפליקציות צד שלישי"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "Voice input",
-          "קלט קולי"
+          "GPT 5.1 - Azure OpenAI\nמומלץ"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "מושבת"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "Submit",
-          "שלח"
+          "יצירה"
+        ]
+      },
+      {
+        "variants": [
+          "העלאת תמונה"
+        ]
+      },
+      {
+        "variants": [
+          "הסרה"
+        ]
+      },
+      {
+        "variants": [
+          "בחר תהליכים"
+        ]
+      },
+      {
+        "variants": [
+          "הוסף"
+        ]
+      },
+      {
+        "variants": [
+          "1 קבצים"
+        ]
+      },
+      {
+        "variants": [
+          "העלאת קובץ"
+        ]
+      },
+      {
+        "variants": [
+          "ערוך"
+        ]
+      },
+      {
+        "variants": [
+          "הגדר טבלת המרה"
+        ]
+      },
+      {
+        "variants": [
+          "הוסף Skills"
+        ]
+      },
+      {
+        "variants": [
+          "הוספת חיבורים"
+        ]
+      },
+      {
+        "variants": [
+          "בחר"
+        ]
+      },
+      {
+        "variants": [
+          "JD"
+        ]
+      },
+      {
+        "variants": [
+          "Reset-context-button"
+        ]
+      },
+      {
+        "variants": [
+          "Upload Files"
+        ]
+      },
+      {
+        "variants": [
+          "Submit"
+        ]
+      },
+      {
+        "variants": [
+          "Increment"
+        ]
+      },
+      {
+        "variants": [
+          "Decrement"
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
         ]
       }
     ]
@@ -382,52 +1010,104 @@
     "clickable_elements": [
       {
         "variants": [
-          "בית",
-          "Home"
+          "הSkills שלי"
         ]
       },
       {
         "variants": [
-          "הSkills שלי",
-          "My Skills"
+          "שותפו איתי"
         ]
       },
       {
         "variants": [
-          "שותפו איתי",
-          "Shared with Me"
+          "Skills של הארגון"
         ]
       },
       {
         "variants": [
-          "Skills של הארגון",
-          "Organization Skills"
+          "צור Skill"
         ]
       },
       {
         "variants": [
-          "צור Skill",
-          "skills-page-primary-action-create",
-          "Create Skill"
+          "ייבא Skill"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Close modal"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "ייבא Skill",
-          "skills-page-primary-action-upload",
-          "Import Skill"
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "Open search",
-          "פתח חיפוש"
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "Menu",
-          "תפריט"
+          "Open search"
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
         ]
       }
     ]
@@ -438,33 +1118,72 @@
     "clickable_elements": [
       {
         "variants": [
-          "בית",
-          "Home"
+          "התזמונים שלי"
         ]
       },
       {
         "variants": [
-          "התזמונים שלי",
-          "My Schedules"
+          "צור תזמון"
         ]
       },
       {
         "variants": [
-          "צור תזמון",
-          "triggers-page-primary-action-create",
-          "Create Schedule"
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "Open search",
-          "פתח חיפוש"
+          "Open search"
         ]
       },
       {
         "variants": [
-          "Select all rows",
-          "בחר את כל השורות"
+          "Select all rows"
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
         ]
       }
     ]
@@ -475,58 +1194,117 @@
     "clickable_elements": [
       {
         "variants": [
-          "דף הבית",
-          "Home"
+          "הקבצים שלי"
         ]
       },
       {
         "variants": [
-          "הקבצים שלי",
-          "My Files"
+          "שותף איתי"
         ]
       },
       {
         "variants": [
-          "שותף איתי",
-          "Shared with Me"
+          "העלה או גרור"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Close modal"
+            ]
+          },
+          {
+            "variants": [
+              "העלאה"
+            ]
+          },
+          {
+            "variants": [
+              "הוספת מסמך"
+            ]
+          },
+          {
+            "variants": [
+              "הוספה ממערכת שיתוף קבצים"
+            ]
+          },
+          {
+            "variants": [
+              "אפשרויות מתקדמות"
+            ]
+          },
+          {
+            "variants": [
+              "Increment"
+            ]
+          },
+          {
+            "variants": [
+              "Decrement"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "העלה או גרור",
-          "sources-page-primary-action-upload",
-          "Upload or Drag"
+          "צור תיקייה"
         ]
       },
       {
         "variants": [
-          "צור תיקייה",
-          "Create Folder"
+          "סנכרן"
         ]
       },
       {
         "variants": [
-          "סנכרן",
-          "sources-page-primary-action-sync",
-          "Sync"
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "Open search",
-          "פתח חיפוש"
+          "JD",
+          "Menu"
         ]
       },
       {
         "variants": [
-          "Menu",
-          "תפריט"
+          "Open search"
         ]
       },
       {
         "variants": [
-          "Select all rows",
-          "בחר את כל השורות"
+          "Select all rows"
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
         ]
       }
     ]
@@ -537,7 +1315,106 @@
     "clickable_elements": [
       {
         "variants": [
-          "filter-tags"
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          }
         ]
       }
     ]
@@ -548,32 +1425,126 @@
     "clickable_elements": [
       {
         "variants": [
-          "סקירה כללית",
-          "Overview"
+          "סקירה כללית"
         ]
       },
       {
         "variants": [
-          "שיחות",
-          "Chats"
+          "שיחות"
         ]
       },
       {
         "variants": [
-          "סוכנים",
-          "Agents"
+          "סוכנים"
         ]
       },
       {
         "variants": [
-          "מודלים",
-          "Models"
+          "מודלים"
         ]
       },
       {
         "variants": [
-          "כלים",
-          "Tools"
+          "כלים"
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          }
         ]
       }
     ]
@@ -588,54 +1559,65 @@
     "clickable_elements": [
       {
         "variants": [
-          "GPT 5.1 - Azure OpenAI",
-          "dropdown-trigger"
+          "GPT 5.1 - Azure OpenAI"
         ]
       },
       {
         "variants": [
           "Brain",
           "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "כלים\nלא נבחרו"
+            ]
+          },
+          {
+            "variants": [
+              "חיבורים\nאפליקציות צד שלישי"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "dropdown-trigger"
+          "JD"
         ]
       },
       {
         "variants": [
-          "Open search",
-          "פתח חיפוש"
+          "Open search"
         ]
       },
       {
         "variants": [
-          "Menu",
-          "תפריט"
+          "Upload Files"
         ]
       },
       {
         "variants": [
-          "Upload Files",
-          "העלאת קבצים"
+          "Voice input"
         ]
       },
       {
         "variants": [
-          "record-meeting-button"
+          "Submit"
         ]
       },
       {
         "variants": [
-          "Voice input",
-          "קלט קולי"
+          "התראות"
         ]
       },
       {
         "variants": [
-          "Submit",
-          "שלח"
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
         ]
       }
     ]
@@ -768,77 +1750,166 @@
     "clickable_elements": [
       {
         "variants": [
-          "Jeen Admin",
-          "logo-wrapper",
-          "מנהל Jeen"
+          "Builder (רמה 4)"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Company Admin (רמה 2)"
+            ]
+          },
+          {
+            "variants": [
+              "Unit Admin (רמה 3)"
+            ]
+          },
+          {
+            "variants": [
+              "test_1 (רמה 5)"
+            ]
+          },
+          {
+            "variants": [
+              "Member (רמה 5)"
+            ]
+          },
+          {
+            "variants": [
+              "IAI Builder (רמה 6)"
+            ]
+          },
+          {
+            "variants": [
+              "test_2 (רמה 7)"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "Company Admin\nרמה 2",
-          "מנהל חברה\nרמה 2"
+          "0\nשינויי הרשאות"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "Company Admin\nרמה 2"
         ]
       },
       {
         "variants": [
-          "Unit Admin\nרמה 3",
-          "מנהל יחידה\nרמה 3"
+          "Unit Admin\nרמה 3"
         ]
       },
       {
         "variants": [
-          "רמה 4\n2 תפקידים",
-          "Level 4\n2 roles"
+          "Builder\nרמה 4"
         ]
       },
       {
         "variants": [
-          "Member\nרמה 9",
-          "חבר\nרמה 9"
+          "רמה 5\n2 תפקידים"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "IAI Builder\nרמה 6"
         ]
       },
       {
         "variants": [
-          "תפקיד חדש",
-          "new-role-button",
-          "New role"
+          "test_2\nרמה 7"
         ]
       },
       {
         "variants": [
-          "Builder (רמה 4)",
-          "dropdown-trigger",
-          "בונה (רמה 4)"
+          "תפקיד חדש"
         ]
       },
       {
         "variants": [
-          "Platform (Global)",
-          "פלטפורמה (גלובלית)"
+          "Platform (Global)"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "Workspace"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "Knowledge"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "Agents"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "Admin APP"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "בטל"
         ]
       },
       {
         "variants": [
-          "Workspace",
-          "סביבת עבודה"
+          "שמור שינויים"
         ]
       },
       {
         "variants": [
-          "Knowledge",
-          "ידע"
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "Agents",
-          "סוכנים"
+          "Edit role"
         ]
       },
       {
         "variants": [
-          "Admin APP",
-          "אפליקציית ניהול"
+          "Delete role"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
         ]
       }
     ]
@@ -850,75 +1921,72 @@
     "clickable_elements": [
       {
         "variants": [
-          "Jeen Admin",
-          "logo-wrapper",
-          "מנהל Jeen"
+          "קובץ לוגו\nאו גרור ושחרר כאן"
         ]
       },
       {
         "variants": [
-          "קובץ לוגו\nאו גרור ושחרר כאן",
-          "design-config-logo-drop-zone",
-          "Logo file\nor drag and drop here"
+          "בהיר"
         ]
       },
       {
         "variants": [
-          "בהיר",
-          "design-preview-mode-button",
-          "Light"
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "בטל",
-          "btn-secondary",
-          "Cancel"
+          "בטל"
         ]
       },
       {
         "variants": [
-          "שמור שינויים",
-          "btn-primary",
-          "Save changes"
+          "שמור שינויים"
         ]
       },
       {
         "variants": [
-          "מחק ערכת נושא",
-          "Delete theme"
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "שנה שם",
-          "Rename"
+          "מחק ערכת נושא"
         ]
       },
       {
         "variants": [
-          "הסר לוגו",
-          "Remove logo"
+          "שנה שם"
         ]
       },
       {
         "variants": [
-          "design-preview-app-switcher-button"
-        ]
-      },
-      {
-        "variants": [
-          "design-preview-attach-button"
-        ]
-      },
-      {
-        "variants": [
-          "design-preview-plus-button"
-        ]
-      },
-      {
-        "variants": [
-          "design-preview-send-button"
+          "הסר לוגו"
         ]
       }
     ]
@@ -930,36 +1998,57 @@
     "clickable_elements": [
       {
         "variants": [
-          "Jeen Admin",
-          "logo-wrapper",
-          "מנהל Jeen"
+          "בטל"
         ]
       },
       {
         "variants": [
-          "בטל",
-          "main-prompt-discard-button",
-          "Cancel"
+          "שמור"
         ]
       },
       {
         "variants": [
-          "שמור",
-          "main-prompt-save-button",
-          "Save"
+          "שמור שינויים"
         ]
       },
       {
         "variants": [
-          "שמור שינויים",
-          "btn-primary",
-          "Save changes"
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "סגור",
-          "Close"
+          "סגור"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
         ]
       }
     ]
@@ -971,64 +2060,103 @@
     "clickable_elements": [
       {
         "variants": [
-          "Jeen Admin",
-          "logo-wrapper",
-          "מנהל Jeen"
+          "כל הסטטוסים"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "מופעל"
+            ]
+          },
+          {
+            "variants": [
+              "מושבת"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "העלאה",
-          "upload-skill",
-          "Upload"
+          "פעולות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "ערוך"
+            ]
+          },
+          {
+            "variants": [
+              "השתמש כהנחיית מערכת"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "צור כישור",
-          "create-skill",
-          "Create skill"
+          "העלאה"
         ]
       },
       {
         "variants": [
-          "כל הסטטוסים",
-          "dropdown-trigger",
-          "All statuses"
+          "צור כישור"
         ]
       },
       {
         "variants": [
           "שם הכישור",
-          "Sort by שם הכישור",
-          "Skill name"
+          "Sort by שם הכישור"
         ]
       },
       {
         "variants": [
           "נוצר",
-          "Sort by נוצר",
-          "Created"
+          "Sort by נוצר"
         ]
       },
       {
         "variants": [
-          "בטל",
-          "btn-secondary",
-          "Cancel"
+          "בטל"
         ]
       },
       {
         "variants": [
-          "שמור שינויים",
-          "btn-primary",
-          "Save changes"
+          "שמור שינויים"
         ]
       },
       {
         "variants": [
-          "פעולות",
-          "Actions"
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
         ]
       }
     ]
@@ -1040,86 +2168,112 @@
     "clickable_elements": [
       {
         "variants": [
-          "Jeen Admin",
-          "logo-wrapper",
-          "מנהל Jeen"
+          "ייצוא (CSV)"
         ]
       },
       {
         "variants": [
-          "ייצוא (CSV)",
-          "audit-logs-export-button",
-          "Export (CSV)"
+          "טווח תאריכים"
         ]
       },
       {
         "variants": [
-          "טווח תאריכים",
-          "audit-logs-date-range-button",
-          "Date range"
-        ]
+          "קטגוריה"
+        ],
+        "default_expanded": true
       },
       {
         "variants": [
-          "קטגוריה",
-          "category-filter-button",
-          "Category"
-        ]
+          "סוג פעולה"
+        ],
+        "default_expanded": true
       },
       {
         "variants": [
-          "סוג פעולה",
-          "action-filter-button",
-          "Action type"
-        ]
-      },
-      {
-        "variants": [
-          "היקף",
-          "scope-filter-button",
-          "Scope"
+          "היקף"
         ]
       },
       {
         "variants": [
           "חותמת זמן",
-          "Sort by חותמת זמן",
-          "Timestamp"
-        ]
+          "Sort by חותמת זמן"
+        ],
+        "default_expanded": true
       },
       {
         "variants": [
           "פעולה",
-          "Sort by פעולה",
-          "Action"
-        ]
+          "Sort by פעולה"
+        ],
+        "default_expanded": true
       },
       {
         "variants": [
           "ישות",
-          "Sort by ישות",
-          "Entity"
-        ]
+          "Sort by ישות"
+        ],
+        "default_expanded": true
       },
       {
         "variants": [
           "בוצע על ידי",
-          "Sort by בוצע על ידי",
-          "Performed by"
+          "Sort by בוצע על ידי"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "הקודם"
         ]
       },
       {
         "variants": [
-          "הקודם",
-          "pagination-prev",
-          "Previous"
+          "הבא"
         ]
       },
       {
         "variants": [
-          "הבא",
-          "pagination-next",
-          "Next"
+          "בטל"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים"
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
         ]
       }
     ]
@@ -1131,77 +2285,138 @@
     "clickable_elements": [
       {
         "variants": [
-          "Jeen Admin",
-          "logo-wrapper",
-          "מנהל Jeen"
+          "כל המשתמשים"
         ]
       },
       {
         "variants": [
-          "דוחות",
-          "Reports"
+          "כל המודלים"
         ]
       },
       {
         "variants": [
-          "פעילות משתמשים",
-          "User activity"
+          "דוחות"
         ]
       },
       {
         "variants": [
-          "ביצועים ושגיאות",
-          "Performance and errors"
+          "פעילות משתמשים"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "ביצועים ושגיאות"
         ]
       },
       {
         "variants": [
-          "סוכנים",
-          "Agents"
+          "סוכנים"
         ]
       },
       {
         "variants": [
-          "מעקב",
-          "Monitoring"
+          "מעקב"
         ]
       },
       {
         "variants": [
-          "5/23/2026 – 6/21/2026",
-          "date-range-picker-trigger"
+          "5/31/2026 – 6/29/2026"
         ]
       },
       {
         "variants": [
-          "כל המשתמשים",
-          "dropdown-trigger",
-          "All users"
+          "שמור פילטרים מותאמים"
         ]
       },
       {
         "variants": [
-          "כל המודלים",
-          "dropdown-trigger",
-          "All models"
+          "שעות"
         ]
       },
       {
         "variants": [
-          "שמור פילטרים מותאמים",
-          "Save custom filters"
+          "ימים"
         ]
       },
       {
         "variants": [
-          "שעות",
-          "Hours"
+          "שבועות"
         ]
       },
       {
         "variants": [
-          "ימים",
-          "Days"
+          "חודשים"
+        ]
+      },
+      {
+        "variants": [
+          "רבעונים"
+        ]
+      },
+      {
+        "variants": [
+          "ייצוא CSV"
+        ]
+      },
+      {
+        "variants": [
+          "Previous"
+        ]
+      },
+      {
+        "variants": [
+          "Next"
+        ]
+      },
+      {
+        "variants": [
+          "בטל"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים"
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "Close panel"
         ]
       }
     ]
@@ -1213,83 +2428,255 @@
     "clickable_elements": [
       {
         "variants": [
-          "Jeen Admin",
-          "logo-wrapper",
-          "מנהל Jeen"
+          "בעלים"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "bengarusi2"
+            ]
+          },
+          {
+            "variants": [
+              "Demo"
+            ]
+          },
+          {
+            "variants": [
+              "Dvir"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen D"
+            ]
+          },
+          {
+            "variants": [
+              "Maccabi Demo"
+            ]
+          },
+          {
+            "variants": [
+              "Manhar Manhar"
+            ]
+          },
+          {
+            "variants": [
+              "Margalit"
+            ]
+          },
+          {
+            "variants": [
+              "Ministry Of Welfare"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "סוכנים",
-          "Agents"
+          "קבוצה"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Customers POC"
+            ]
+          },
+          {
+            "variants": [
+              "Existing Users"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "כישורים",
-          "Skills"
+          "כל הסטטוסים"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "פעיל"
+            ]
+          },
+          {
+            "variants": [
+              "לא פעיל"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "טריגרים",
-          "Triggers"
+          "פעולות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "פרטים"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "בעלים",
-          "dropdown-trigger",
-          "Owner"
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "קבוצה",
-          "dropdown-trigger",
-          "Group"
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "כל הסטטוסים",
-          "dropdown-trigger",
-          "All statuses"
+          "סוכנים"
+        ]
+      },
+      {
+        "variants": [
+          "כישורים"
+        ]
+      },
+      {
+        "variants": [
+          "טריגרים"
         ]
       },
       {
         "variants": [
           "שם",
-          "Sort by שם",
-          "Name"
+          "Sort by שם"
         ]
       },
       {
         "variants": [
           "סוג",
-          "Sort by סוג",
-          "Type"
+          "Sort by סוג"
         ]
       },
       {
         "variants": [
           "חשיפה",
-          "Sort by חשיפה",
-          "Visibility"
+          "Sort by חשיפה"
         ]
       },
       {
         "variants": [
           "סטטוס בעלים",
-          "Sort by סטטוס בעלים",
-          "Owner status"
+          "Sort by סטטוס בעלים"
         ]
       },
       {
         "variants": [
           "שליטה",
-          "Sort by שליטה",
-          "Control"
+          "Sort by שליטה"
+        ]
+      },
+      {
+        "variants": [
+          "בטל"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים"
+        ]
+      },
+      {
+        "variants": [
+          "הפעלה"
+        ]
+      },
+      {
+        "variants": [
+          "השבתה"
+        ]
+      },
+      {
+        "variants": [
+          "Share"
+        ]
+      },
+      {
+        "variants": [
+          "Promote to organization"
+        ]
+      },
+      {
+        "variants": [
+          "נקה"
+        ]
+      },
+      {
+        "variants": [
+          "Select all"
+        ]
+      },
+      {
+        "variants": [
+          "Select  מש\"ת מטרות רדואן"
+        ]
+      },
+      {
+        "variants": [
+          "Select Air Evac Analyst"
+        ]
+      },
+      {
+        "variants": [
+          "Select Ask Manhar Agent"
+        ]
+      },
+      {
+        "variants": [
+          "Select Bot with character"
+        ]
+      },
+      {
+        "variants": [
+          "Select Bot with emojis"
+        ]
+      },
+      {
+        "variants": [
+          "Select Cortex Agent Screenshot"
+        ]
+      },
+      {
+        "variants": [
+          "Select Demo Copy"
+        ]
+      },
+      {
+        "variants": [
+          "Select DEMO CORTEX"
         ]
       }
     ]
@@ -1301,78 +2688,184 @@
     "clickable_elements": [
       {
         "variants": [
-          "Jeen Admin",
-          "logo-wrapper",
-          "מנהל Jeen"
+          "Builder"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Organization Admin"
+            ]
+          },
+          {
+            "variants": [
+              "Company Admin"
+            ]
+          },
+          {
+            "variants": [
+              "Unit Admin"
+            ]
+          },
+          {
+            "variants": [
+              "test_1"
+            ]
+          },
+          {
+            "variants": [
+              "Member"
+            ]
+          },
+          {
+            "variants": [
+              "IAI Builder"
+            ]
+          },
+          {
+            "variants": [
+              "test_2"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "כללי",
-          "General"
+          "Hebrew"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "2\nשינויים"
+            ],
+            "default_expanded": true
+          }
         ]
       },
       {
         "variants": [
-          "סוכנים",
-          "Agents"
+          "Select..."
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Organization Admin"
+            ]
+          },
+          {
+            "variants": [
+              "Company Admin"
+            ]
+          },
+          {
+            "variants": [
+              "Unit Admin"
+            ]
+          },
+          {
+            "variants": [
+              "test_1"
+            ]
+          },
+          {
+            "variants": [
+              "Member"
+            ]
+          },
+          {
+            "variants": [
+              "IAI Builder"
+            ]
+          },
+          {
+            "variants": [
+              "test_2"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "תבניות",
-          "Templates"
+          "0\nשינויים"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "כללי"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "סוכנים"
         ]
       },
       {
         "variants": [
-          "מודלים",
-          "Models"
+          "תבניות"
         ]
       },
       {
         "variants": [
-          "הטמעה וניתוח",
-          "Embedding and analysis"
+          "מודלים"
         ]
       },
       {
         "variants": [
-          "Builder",
-          "dropdown-trigger",
-          "בונה"
+          "הטמעה וניתוח"
         ]
       },
       {
         "variants": [
-          "English",
-          "language-item-en",
-          "אנגלית"
+          "English"
         ]
       },
       {
         "variants": [
-          "Hebrew",
-          "language-item-he",
-          "עברית"
+          "דחה"
         ]
       },
       {
         "variants": [
-          "דחה",
-          "Reject"
+          "אשר"
         ]
       },
       {
         "variants": [
-          "אשר",
-          "Confirm"
+          "הוספת תבנית"
         ]
       },
       {
         "variants": [
-          "הוספת תבנית",
-          "Add template"
+          "בטל"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים"
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
         ]
       }
     ]
@@ -1384,55 +2877,101 @@
     "clickable_elements": [
       {
         "variants": [
-          "Jeen Admin",
-          "logo-wrapper",
-          "מנהל Jeen"
+          "Off"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Monitor only"
+            ]
+          },
+          {
+            "variants": [
+              "Redact sensitive data"
+            ]
+          },
+          {
+            "variants": [
+              "Strict compliance"
+            ]
+          },
+          {
+            "variants": [
+              "Custom"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "Off",
-          "dropdown-trigger",
-          "כבוי"
+          "13 selected"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Credit cards\nPayment card numbers"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "13 selected",
-          "dropdown-trigger",
-          "13 נבחרו"
+          "הרץ בדיקה"
         ]
       },
       {
         "variants": [
-          "הרץ בדיקה",
-          "Run test"
+          "בטל"
         ]
       },
       {
         "variants": [
-          "בטל",
-          "btn-secondary",
-          "Cancel"
+          "שמור שינויים"
         ]
       },
       {
         "variants": [
-          "שמור שינויים",
-          "btn-primary",
-          "Save changes"
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "Add tag",
-          "הוסף תגית"
+          "Add tag"
         ]
       },
       {
         "variants": [
-          "Clear selection",
-          "נקה בחירה"
+          "Clear selection"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
         ]
       }
     ]
@@ -1444,62 +2983,496 @@
     "clickable_elements": [
       {
         "variants": [
-          "Jeen Admin",
-          "logo-wrapper",
-          "מנהל Jeen"
-        ]
-      },
-      {
-        "variants": [
-          "קישורים",
-          "manage-links-button",
-          "Links"
-        ]
-      },
-      {
-        "variants": [
           "הוסף",
-          "Menu",
-          "Add"
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הוסף יחידה"
+            ]
+          },
+          {
+            "variants": [
+              "הוסף משתמש"
+            ]
+          },
+          {
+            "variants": [
+              "רישום משתמש"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "תפקיד:\nכל התפקידים",
-          "dropdown-trigger",
-          "Role:\nAll roles"
+          "תפקיד:\nכל התפקידים"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Builder"
+            ]
+          },
+          {
+            "variants": [
+              "Company Admin"
+            ]
+          },
+          {
+            "variants": [
+              "IAI Builder"
+            ]
+          },
+          {
+            "variants": [
+              "Organization Admin"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "דריסה:\nהכל",
-          "dropdown-trigger",
-          "Override:\nAll"
+          "דריסה:\nהכל"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Builder"
+            ]
+          },
+          {
+            "variants": [
+              "Company Admin"
+            ]
+          },
+          {
+            "variants": [
+              "IAI Builder"
+            ]
+          },
+          {
+            "variants": [
+              "Organization Admin"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "בטל",
-          "btn-secondary",
-          "Cancel"
+          "פעולות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "ערוך"
+            ]
+          },
+          {
+            "variants": [
+              "העברה"
+            ]
+          }
         ]
       },
       {
         "variants": [
-          "שמור שינויים",
-          "btn-primary",
-          "Save changes"
+          "קישורים"
         ]
       },
       {
         "variants": [
-          "collapse-expand-all-button"
+          "בטל"
         ]
       },
       {
         "variants": [
-          "פעולות",
-          "Actions"
+          "שמור שינויים"
+        ]
+      },
+      {
+        "variants": [
+          "JD"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234/project/7713c0c0-d831-4097-8ca2-1fb2ac712495/wallets",
+    "description": "Wallets page — view and manage entity wallets for the Default Project, with summary counters and an empty-state message when no wallets exist. Includes Export Entities plus status and entity-type filters that update the list without changing the URL.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Export Entities",
+          "ייצא ישויות"
+        ]
+      },
+      {
+        "variants": [
+          "Refresh",
+          "רענן"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234/project/7713c0c0-d831-4097-8ca2-1fb2ac712495/usage",
+    "description": "Usage analytics page — spend and activity dashboards with metric cards, charts, and no-data states for the selected period. Includes tabs for Budget Items Cost & Usage, Vendors & Models, Cursor, Copilot Studio, Report Builder, and Usage Resolver, plus date/vendor/model/budget/entity filters and Daily/Weekly/Monthly toggles.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Budget Items Cost & Usage",
+          "עלות ושימוש לפי סעיפי תקציב"
+        ]
+      },
+      {
+        "variants": [
+          "Vendors & Models",
+          "ספקים ומודלים"
+        ]
+      },
+      {
+        "variants": [
+          "Cursor"
+        ]
+      },
+      {
+        "variants": [
+          "OpenAI"
+        ]
+      },
+      {
+        "variants": [
+          "Copilot Studio"
+        ]
+      },
+      {
+        "variants": [
+          "Report Builder",
+          "מחולל דוחות"
+        ]
+      },
+      {
+        "variants": [
+          "Usage Resolver",
+          "מפענח שימוש"
+        ]
+      },
+      {
+        "variants": [
+          "30/05/2026 – 29/06/2026"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "All Vendors",
+          "כל הספקים"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "All Models",
+          "כל המודלים"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "All Budget Items",
+          "כל סעיפי התקציב"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "All Entities",
+          "כל הישויות"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "All Entity Types",
+          "כל סוגי הישויות"
+        ]
+      },
+      {
+        "variants": [
+          "Daily",
+          "יומי"
+        ]
+      },
+      {
+        "variants": [
+          "Weekly",
+          "שבועי"
+        ]
+      },
+      {
+        "variants": [
+          "Monthly",
+          "חודשי"
+        ]
+      },
+      {
+        "variants": [
+          "Budget item",
+          "סעיף תקציב"
+        ]
+      },
+      {
+        "variants": [
+          "Active entities",
+          "ישויות פעילות"
+        ]
+      },
+      {
+        "variants": [
+          "Actual consumption",
+          "צריכה בפועל"
+        ]
+      },
+      {
+        "variants": [
+          "Monthly rate",
+          "תעריף חודשי"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234/project/7713c0c0-d831-4097-8ca2-1fb2ac712495",
+    "description": "Project Home — FinOps command center for the Default Project with spend, budget, model, wallet summary cards and compact cost charts. Includes Open Usage and Build Report actions from the dashboard."
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234",
+    "description": "Organization Home — FinOps command center for Jeen Prod showing Default Project spend, budget, model, wallet summaries, and cost snapshot charts. Includes Open Usage and Build Report actions from the dashboard."
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234/project/7713c0c0-d831-4097-8ca2-1fb2ac712495/settings",
+    "description": "Project Settings page — manage Default Project configuration, showing project name, project ID, creation dates, and usage ingestion settings. Includes an Accept anonymous usage toggle and a Danger Zone with a Delete Project action.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Delete Project",
+          "מחק פרויקט"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234/settings",
+    "description": "Organization Settings page — manage Jeen Prod members and roles, with a members table showing names, emails, roles, and status. Includes Members and Role permissions tabs plus an Invite Member button that opens member-invite controls without changing the URL.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Members",
+          "חברים"
+        ]
+      },
+      {
+        "variants": [
+          "Role permissions",
+          "הרשאות תפקיד"
+        ]
+      },
+      {
+        "variants": [
+          "Invite Member",
+          "הזמן חבר"
+        ]
+      },
+      {
+        "variants": [
+          "Name",
+          "שם"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "Email",
+          "אימייל"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "Viewer",
+          "צופה"
+        ]
+      },
+      {
+        "variants": [
+          "Admin",
+          "מנהל מערכת"
+        ]
+      },
+      {
+        "variants": [
+          "Previous",
+          "הקודם"
+        ]
+      },
+      {
+        "variants": [
+          "Next",
+          "הבא"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234/project/7713c0c0-d831-4097-8ca2-1fb2ac712495/model-pricing",
+    "description": "Model Pricing page — configure pricing tiers for AI models in the Default Project, with model/vendor summary counters and an empty vendor list state. Includes Sync Prices, Add, Refresh, vendor filter, Expand All, and Add Vendor controls.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Sync Prices",
+          "סנכרן מחירים"
+        ]
+      },
+      {
+        "variants": [
+          "Add",
+          "הוסף"
+        ]
+      },
+      {
+        "variants": [
+          "Add Vendor",
+          "הוסף ספק"
+        ]
+      },
+      {
+        "variants": [
+          "Add Model",
+          "הוסף מודל"
+        ]
+      },
+      {
+        "variants": [
+          "Refresh",
+          "רענן"
+        ]
+      },
+      {
+        "variants": [
+          "Expand All",
+          "הרחב הכל"
+        ],
+        "default_expanded": true
+      }
+    ]
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234/connectors",
+    "description": "Connectors page — organization integrations list with cards for Anthropic, Copilot Studio, Cursor, and OpenAI showing connection status. Each connector has a Configure button for setup or editing without changing the route.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Configure Anthropic",
+          "הגדר את Anthropic"
+        ]
+      },
+      {
+        "variants": [
+          "Configure",
+          "הגדר"
+        ]
+      },
+      {
+        "variants": [
+          "Configure Copilot Studio",
+          "הגדר את Copilot Studio"
+        ]
+      },
+      {
+        "variants": [
+          "Configure Cursor",
+          "הגדר את Cursor"
+        ]
+      },
+      {
+        "variants": [
+          "Configure OpenAI",
+          "הגדר את OpenAI"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234/project/7713c0c0-d831-4097-8ca2-1fb2ac712495/budgets",
+    "description": "Budgets page — plan and track budget allocations for the Default Project with annual summary metrics, variance, and budget item count. Includes year tabs, Create Budget, Planned/Actuals toggles, Reset, Copy from 2025, and Create First Budget actions.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Create Budget",
+          "צור תקציב"
+        ]
+      },
+      {
+        "variants": [
+          "Planned",
+          "מתוכנן"
+        ]
+      },
+      {
+        "variants": [
+          "Actuals",
+          "בפועל"
+        ]
+      },
+      {
+        "variants": [
+          "Reset",
+          "אפס"
+        ]
+      },
+      {
+        "variants": [
+          "Copy from 2025",
+          "העתק מ-2025"
+        ]
+      },
+      {
+        "variants": [
+          "Create First Budget",
+          "צור תקציב ראשון"
+        ]
+      },
+      {
+        "variants": [
+          "Refresh",
+          "רענן"
         ]
       }
     ]

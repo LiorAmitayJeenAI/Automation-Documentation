@@ -638,7 +638,7 @@ async def record_clips_video(
         # ── Phase 1: login off-camera ────────────────────────────────────────
         login_context = await browser.new_context(viewport=VIEWPORT, ignore_https_errors=True)
         login_page = await login_context.new_page()
-        await _login(login_page, language=language)
+        await _login(login_page, base_url=base_url, language=language, link_type=link_type)
         if link_type == "admin":
             login_page = await _enter_admin_app(login_page, base_url)
         storage_state = await login_context.storage_state()

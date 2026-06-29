@@ -38,17 +38,9 @@
                 <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 Export to Excel
               </button>
-              <div class="kebab-wrap">
-                <button id="exportMenuBtn" class="btn btn-icon" type="button" aria-haspopup="true" aria-expanded="false" aria-label="More export options">
-                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
-                </button>
-                <div id="exportMenu" class="dropdown-menu" role="menu" hidden>
-                  <button id="saveSharepointBtn" type="button" class="dropdown-item" role="menuitem">
-                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    Save to SharePoint
-                  </button>
-                </div>
-              </div>
+              <button id="openSharepointModalBtn" class="btn btn-icon" type="button" aria-label="Save to SharePoint" title="Save to SharePoint">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 21v-8H7v8M7 3v5h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
             </div>
           </div>
         </header>
@@ -76,6 +68,50 @@
         </section>
       </div>
     </main>
+  </div>
+
+  <div id="sharepointModal" class="modal-backdrop" onclick="closeSharepointModal(event)">
+    <div class="modal sp-modal" role="dialog" aria-modal="true" aria-labelledby="spModalTitle">
+      <div class="modal-head">
+        <div>
+          <h2 id="spModalTitle">Save to SharePoint</h2>
+          <p>Select language and content type to export.</p>
+        </div>
+        <button class="icon-btn" onclick="closeSharepointModal()" aria-label="Close">x</button>
+      </div>
+      <div class="sp-modal-body">
+        <fieldset class="sp-field">
+          <legend>Language</legend>
+          <div class="sp-checkbox-group">
+            <label class="sp-checkbox">
+              <input type="checkbox" name="spLang" value="he" />
+              <span>Hebrew</span>
+            </label>
+            <label class="sp-checkbox">
+              <input type="checkbox" name="spLang" value="en" />
+              <span>English</span>
+            </label>
+          </div>
+        </fieldset>
+        <fieldset class="sp-field">
+          <legend>Type</legend>
+          <div class="sp-checkbox-group">
+            <label class="sp-checkbox">
+              <input type="checkbox" name="spType" value="pdf" />
+              <span>Presentations</span>
+            </label>
+            <label class="sp-checkbox">
+              <input type="checkbox" name="spType" value="video" />
+              <span>Videos</span>
+            </label>
+          </div>
+        </fieldset>
+        <button id="spSaveBtn" class="btn btn-primary sp-save-btn" type="button" disabled>
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Save to SharePoint
+        </button>
+      </div>
+    </div>
   </div>
 
   <div id="historyModal" class="modal-backdrop" onclick="closeHistory(event)">

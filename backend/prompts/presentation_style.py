@@ -37,6 +37,7 @@ Language and formatting:
   - Numbered lists — the number must appear on the right side
   - Nested and indented lists
   - Tables — column headers and cell content must be right-aligned, reading direction right to left
+  - Hebrew tables MUST preserve right-to-left column order: the first/logical primary column must appear on the far right, and subsequent columns must proceed leftward. Do not place the rightmost Hebrew column on the far left.
 
 """
 
@@ -61,7 +62,7 @@ Slide readability:
 Visual style:
 * Match the visual type to the actual content of each slide.
 * All AI-generated images MUST be natural, realistic photographs of people (for example, people working or collaborating in a modern office).
-* NEVER AI-generate diagrams, flowcharts, process flows, charts, graphs, infographics, schematics, drawings, conceptual illustrations, or any abstract/artistic artwork.
+* *CRITICAL*: NEVER AI-generate diagrams, flowcharts, process flows, charts, graphs, infographics, schematics, drawings, conceptual illustrations, or any abstract/artistic artwork.
 * This restriction applies ONLY to AI-generated imagery — it does NOT apply to provided screenshots.
 * When explaining technical topics, structure the slide content as clear workflow steps or process flows using text and layout rather than asking for an AI-generated illustration of them.
 * Maintain a consistent modern professional visual identity across the presentation.

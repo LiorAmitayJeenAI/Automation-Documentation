@@ -17,7 +17,7 @@ import logging
 import re
 from typing import AsyncGenerator
 
-from backend.config import REGULAR_URL, ADMIN_URL, SP_VIDEO_FOLDER_PATH
+from backend.config import REGULAR_URL, ADMIN_URL, FINOPS_URL, SP_DRAFT_VIDEO_FOLDER
 from backend.services import confluence, llm, sharepoint
 from backend.services import recorder, video, tts
 
@@ -60,7 +60,12 @@ async def run_video_pipeline(
     Yield VideoEvent objects for each stage of the video generation process.
     The final event carries video_url (SharePoint URL for the MP4).
     """
-    base_url = ADMIN_URL if link_type == "admin" else REGULAR_URL
+    if link_type == "admin":
+        base_url = ADMIN_URL
+    elif link_type == "finops":
+        base_url = FINOPS_URL
+    else:
+        base_url = REGULAR_URL
     file_stem = _make_file_stem(folder_name, part_name, session_id, language)
 
     # ── 1. Fetch Confluence content ──
@@ -231,7 +236,7 @@ async def run_video_pipeline(
         page_id = confluence.extract_page_id(confluence_url)
         slug = re.sub(r"[^a-zA-Z0-9]+", "-", title).strip("-")[:60]
         upload_list = await sharepoint.upload_local_files(
-            [mp4_path], SP_VIDEO_FOLDER_PATH, session_id=session_id,
+            [mp4_path], SP_DRAFT_VIDEO_FOLDER, session_id=session_id,
         )
         if upload_list:
             video_url = upload_list[0].get("webUrl")
