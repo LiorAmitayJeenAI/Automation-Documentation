@@ -221,14 +221,14 @@ async def render_video(
         total_duration_s, title_s, recording_s, explanation_frames / FPS, end_s,
         total_seconds, total_seconds - recording_s,
     )
-    if total_duration_s > 60:
+    if total_duration_s > 90:
         breakdown = []
         for idx, seg in enumerate(segments):
             seg_s = seg["durationFrames"] / FPS
             action = recorded_steps[idx].get("action", "?") if idx < len(recorded_steps) else "?"
             breakdown.append(f"  step {idx + 1}: {seg_s:.1f}s — {action}")
         logger.warning(
-            "Video exceeds 60 s target (%.1f s). Per-segment breakdown:\n%s",
+            "Video exceeds 90 s target (%.1f s). Per-segment breakdown:\n%s",
             total_duration_s, "\n".join(breakdown),
         )
 

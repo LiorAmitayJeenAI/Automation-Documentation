@@ -39,7 +39,7 @@ Rules for each rewritten narration:
 - Describe ONLY the plain base page at "url". Do NOT mention the tab/panel/modal/dropdown
   named in "failed_interaction" — it never appeared on screen.
 - Do NOT say "click here", "open the tab", or reference any navigation that did not occur.
-- Keep it natural, instructional, and roughly the same length as the original (1-2 sentences).
+- Keep it natural, instructional, and roughly the same length as the original (1-3 sentences).
 - Write in the SAME language as "language" ("he" = Hebrew, "en" = English). Hebrew output
   must be entirely in Hebrew; English output entirely in English.
 - Stay grounded in what a customer would plausibly see on that page's default view.

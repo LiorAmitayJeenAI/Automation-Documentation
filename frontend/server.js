@@ -867,7 +867,12 @@ async function executeVideoRun(runId, runItems, language) {
   if (!run) return;
 
   for (const item of runItems) {
+    run.itemStates.set(item.url, { status: 'queued' });
+  }
+
+  for (const item of runItems) {
     if (run.controller.signal.aborted) {
+      run.itemStates.set(item.url, { status: 'stopped', error: 'Stopped by user' });
       handleStoppedTutorial(item.url, { language, sessionId: null, error: 'Stopped by user' });
       run.emitter.emit('event', { url: item.url, status: 'stopped', folderName: item.folderName, label: item.label, error: 'Stopped by user' });
       continue;
@@ -876,6 +881,7 @@ async function executeVideoRun(runId, runItems, language) {
     const { url, linkType: itemLinkType } = item;
     const sessionId = makeSessionId('video-run');
 
+    run.itemStates.set(url, { status: 'running', sessionId });
     run.emitter.emit('event', { url, status: 'running', sessionId, folderName: item.folderName, label: item.label });
     console.log(`[video-run] ${runId} — starting item  url=${url}  session=${sessionId}`);
 
@@ -883,6 +889,7 @@ async function executeVideoRun(runId, runItems, language) {
       const result = await runVideoPipelineStream(
         url, language, itemLinkType, run.controller.signal, sessionId,
         (stageEvent) => {
+          run.itemStates.set(url, { status: 'running', sessionId, stage: stageEvent.stage, detail: stageEvent.detail });
           run.emitter.emit('event', {
             url,
             status: 'stage',
@@ -899,6 +906,7 @@ async function executeVideoRun(runId, runItems, language) {
 
       const videoUrl = result?.video_url || null;
 
+      run.itemStates.set(url, { status: 'done', sessionId, video_url: videoUrl });
       upsertTutorial(url, {
         status: 'done',
         language,
@@ -912,10 +920,12 @@ async function executeVideoRun(runId, runItems, language) {
       run.emitter.emit('event', { url, status: 'done', sessionId, folderName: item.folderName, label: item.label, video_url: videoUrl });
     } catch (err) {
       if (run.controller.signal.aborted || err.name === 'AbortError') {
+        run.itemStates.set(url, { status: 'stopped', sessionId, error: 'Stopped by user' });
         console.log(`[video-run] ${runId} — stopped by user  url=${url}`);
         handleStoppedTutorial(url, { language, sessionId, error: 'Stopped by user' });
         run.emitter.emit('event', { url, status: 'stopped', folderName: item.folderName, label: item.label, error: 'Stopped by user' });
       } else {
+        run.itemStates.set(url, { status: 'error', sessionId, error: err.message });
         console.error(`[video-run] ${runId} — error  url=${url}:`, err.message);
         run.emitter.emit('event', { url, status: 'error', folderName: item.folderName, label: item.label, error: err.message });
       }
@@ -940,6 +950,7 @@ app.post('/api/run-video', (req, res) => {
     controller: new AbortController(),
     items: runItems,
     language,
+    itemStates: new Map(),
     startedAt: new Date().toISOString(),
   };
   activeVideoRuns.set(runId, run);
@@ -965,6 +976,41 @@ app.post('/api/video-runs/:runId/stop', (req, res) => {
   if (!run) return res.status(404).json({ error: 'Video run not found or already completed' });
   run.controller.abort();
   res.json({ stopped: true, runId: req.params.runId });
+});
+
+app.get('/api/video-runs/active', (req, res) => {
+  const runs = [];
+  for (const [runId, run] of activeVideoRuns) {
+    const items = run.items.map(item => {
+      const state = run.itemStates?.get(item.url);
+      return { url: item.url, linkType: item.linkType, folderName: item.folderName, label: item.label, ...(state || { status: 'pending' }) };
+    });
+    runs.push({ runId, language: run.language, startedAt: run.startedAt, items });
+  }
+  res.json({ runs });
+});
+
+app.get('/api/video-runs/:runId/events', (req, res) => {
+  const run = activeVideoRuns.get(req.params.runId);
+  if (!run) return res.status(404).json({ error: 'Video run not found or already completed' });
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.flushHeaders();
+
+  const snapshot = run.items.map(item => {
+    const state = run.itemStates?.get(item.url);
+    return { url: item.url, linkType: item.linkType, folderName: item.folderName, label: item.label, ...(state || { status: 'pending' }) };
+  });
+  res.write(`data: ${JSON.stringify({ status: 'snapshot', runId: run.runId, items: snapshot })}\n\n`);
+
+  subscribeSSE(res, run.emitter);
+
+  run.emitter.on('event', payload => {
+    if (payload.status === 'complete') {
+      if (!res.destroyed) { try { res.end(); } catch {} }
+    }
+  });
 });
 
 /* ── Reconnect to an active run's event stream ── */
@@ -1228,6 +1274,23 @@ app.post('/api/export-sharepoint', async (req, res) => {
   }
 
   res.json(result);
+});
+
+app.patch('/api/tutorials/:id/asset', (req, res) => {
+  const { field } = req.body;
+  const allowedFields = ['gammaUrl', 'sharepointUrl', 'videoUrl', 'exportSharepointUrl', 'exportVideoUrl'];
+  if (!field || !allowedFields.includes(field)) {
+    return res.status(400).json({ error: `Invalid field. Must be one of: ${allowedFields.join(', ')}` });
+  }
+
+  const list = loadTutorials();
+  const tutorial = list.find(t => t.id === req.params.id);
+  if (!tutorial) return res.status(404).json({ error: 'Tutorial not found' });
+
+  tutorial[field] = null;
+  tutorial.lastUpdatedAt = new Date().toISOString();
+  saveTutorials(list);
+  res.json({ ok: true, id: tutorial.id, field });
 });
 
 app.delete('/api/tutorials/:id', (req, res) => {

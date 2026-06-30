@@ -300,18 +300,26 @@ function externalIcon() {
   return '<svg class="asset-external" width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M20 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 }
 
-function assetButton(url, type, label) {
+function assetButton(url, type, label, tutorialId, field) {
   const className = `asset-btn ${type}`;
   if (!url) {
     return `<span class="${className} off">${assetIcon(type)}<span>${esc(label)}</span></span>`;
   }
 
+  const deleteBtn = tutorialId && field
+    ? `<button class="asset-delete-btn" onclick="event.preventDefault(); event.stopPropagation(); deleteAsset('${esc(jsString(tutorialId))}', '${esc(field)}')" title="Remove ${esc(label)}">
+        <svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+      </button>`
+    : '';
+
   return `
-    <a class="${className}" href="${esc(url)}" target="_blank" rel="noopener">
-      ${assetIcon(type)}
-      <span>${esc(label)}</span>
-      ${externalIcon()}
-    </a>`;
+    <span class="asset-btn-wrap">
+      <a class="${className}" href="${esc(url)}" target="_blank" rel="noopener">
+        ${assetIcon(type)}
+        <span>${esc(label)}</span>
+        ${externalIcon()}
+      </a>${deleteBtn}
+    </span>`;
 }
 
 
@@ -342,9 +350,9 @@ function renderLanguageSection(page, tutorial, language) {
       </div>
       <div class="asset-actions">
         ${assetButton(page.url, 'confluence', 'Confluence')}
-        ${assetButton(tutorial?.gammaUrl, 'gamma', 'Gamma')}
-        ${assetButton(tutorial?.exportSharepointUrl || tutorial?.sharepointUrl, 'pdf', 'PDF')}
-        ${assetButton(tutorial?.exportVideoUrl || tutorial?.videoUrl, 'video', 'Video')}
+        ${assetButton(tutorial?.gammaUrl, 'gamma', 'Gamma', tutorial?.id, 'gammaUrl')}
+        ${assetButton(tutorial?.exportSharepointUrl || tutorial?.sharepointUrl, 'pdf', 'PDF', tutorial?.id, tutorial?.exportSharepointUrl ? 'exportSharepointUrl' : 'sharepointUrl')}
+        ${assetButton(tutorial?.exportVideoUrl || tutorial?.videoUrl, 'video', 'Video', tutorial?.id, tutorial?.exportVideoUrl ? 'exportVideoUrl' : 'videoUrl')}
       </div>
     </section>`;
 }
@@ -472,6 +480,20 @@ function toggleLibFolder(folderId) {
 function togglePartCard(partId) {
   expandedPartId = expandedPartId === partId ? '' : partId;
   renderLibrary();
+}
+
+async function deleteAsset(tutorialId, field) {
+  const fieldLabels = { gammaUrl: 'Gamma', sharepointUrl: 'PDF', exportSharepointUrl: 'PDF', videoUrl: 'Video', exportVideoUrl: 'Video' };
+  const label = fieldLabels[field] || field;
+
+  if (!confirm(`Remove the ${label} link from this tutorial?`)) return;
+
+  await fetch(`/api/tutorials/${encodeURIComponent(tutorialId)}/asset`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ field }),
+  });
+  await loadTutorials();
 }
 
 async function deleteTutorial(id) {

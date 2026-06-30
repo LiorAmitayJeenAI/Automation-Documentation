@@ -536,7 +536,10 @@ async def record_clips_video(
                 url = f"{base_url.rstrip('/')}/{url.lstrip('/')}"
 
             url_key = _url_key(url)
-            if url_key in seen_urls and not _has_screen_changing_interactions(interactions):
+            current_key = _url_key(content.url) if content.url else ""
+            needs_navigation = (current_key != url_key)
+
+            if url_key in seen_urls and not _has_screen_changing_interactions(interactions) and needs_navigation:
                 logger.info("Step %d skipped — duplicate screen: %s", i + 1, url)
                 continue
 
@@ -544,38 +547,50 @@ async def record_clips_video(
 
             t_nav_start = now()
             try:
-                response = await content.goto(url, wait_until="domcontentloaded", timeout=30000)
-                status = response.status if response else None
-                log_event({
-                    "type": "navigate",
-                    "step_index": i,
-                    "url": url,
-                    "action": action,
-                    "status": status,
-                    "t_start": t_nav_start,
-                    "t_end": now(),
-                })
-                if status and status >= 400:
-                    logger.warning("Step %d failed — HTTP %d: %s", i + 1, status, url)
-                    failed_steps.append(step)
-                    continue
+                if needs_navigation:
+                    response = await content.goto(url, wait_until="domcontentloaded", timeout=30000)
+                    status = response.status if response else None
+                    log_event({
+                        "type": "navigate",
+                        "step_index": i,
+                        "url": url,
+                        "action": action,
+                        "status": status,
+                        "t_start": t_nav_start,
+                        "t_end": now(),
+                    })
+                    if status and status >= 400:
+                        logger.warning("Step %d failed — HTTP %d: %s", i + 1, status, url)
+                        failed_steps.append(step)
+                        continue
 
-                try:
-                    await content.wait_for_load_state("networkidle", timeout=PAGE_LOAD_WAIT_MS)
-                except Exception:
-                    pass
+                    try:
+                        await content.wait_for_load_state("networkidle", timeout=PAGE_LOAD_WAIT_MS)
+                    except Exception:
+                        pass
 
-                final_url = content.url
-                if final_url.rstrip("/") != url.rstrip("/"):
-                    logger.warning("Step %d failed — redirected to %s", i + 1, final_url)
-                    failed_steps.append(step)
-                    continue
+                    final_url = content.url
+                    if final_url.rstrip("/") != url.rstrip("/"):
+                        logger.warning("Step %d failed — redirected to %s", i + 1, final_url)
+                        failed_steps.append(step)
+                        continue
 
-                error_reason = await _looks_like_error_page(content)
-                if error_reason:
-                    logger.warning("Step %d failed — %s", i + 1, error_reason)
-                    failed_steps.append(step)
-                    continue
+                    error_reason = await _looks_like_error_page(content)
+                    if error_reason:
+                        logger.warning("Step %d failed — %s", i + 1, error_reason)
+                        failed_steps.append(step)
+                        continue
+                else:
+                    logger.info("Step %d — same URL, continuing from current state", i + 1)
+                    log_event({
+                        "type": "navigate",
+                        "step_index": i,
+                        "url": url,
+                        "action": action,
+                        "status": "same_url",
+                        "t_start": t_nav_start,
+                        "t_end": now(),
+                    })
 
                 route_path = urlparse(url).path.rstrip("/") or "/"
                 variant_groups = _load_clickable_groups(route_path, link_type)

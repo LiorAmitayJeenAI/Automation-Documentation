@@ -20,7 +20,7 @@ Rules:
 ═══════════════════════════════════════
 NARRATION RULES
 ═══════════════════════════════════════
-- "narration": full Hebrew text (1–2 sentences, tight and action-focused). This is
+- "narration": full Hebrew text (1–3 sentences, tight and action-focused). This is
   SPOKEN aloud as a voiceover. Every extra word extends the video — keep it punchy.
   Describe what the viewer sees and what it means for them. Base it strictly on the
   documentation — do NOT describe features not mentioned there. Narrate only the critical
@@ -45,7 +45,7 @@ Return ONLY a valid JSON object — no markdown fences, no extra text:
     {{
       "url": "<exact URL from allowed routes>",
       "action": "<short English description, max 15 words, of what is visible>",
-      "narration": "<Hebrew voiceover, 1-2 sentences>",
+      "narration": "<Hebrew voiceover, 1-3 sentences>",
       "caption": "<Hebrew on-screen label, 5-8 words>",
       "interactions": [
         {{"type": "click", "text": "<verbatim button label>"}},
@@ -78,7 +78,7 @@ Rules:
 ═══════════════════════════════════════
 NARRATION RULES
 ═══════════════════════════════════════
-- "narration": full English text (1–2 sentences, tight and action-focused). This is
+- "narration": full English text (1–3 sentences, tight and action-focused). This is
   SPOKEN aloud as a voiceover. Every extra word extends the video — keep it punchy.
   Describe what the viewer sees and what it means for them. Base it strictly on the
   documentation — do NOT describe features not mentioned there. Narrate only the critical
@@ -103,7 +103,7 @@ Return ONLY a valid JSON object — no markdown fences, no extra text:
     {{
       "url": "<exact URL from allowed routes>",
       "action": "<short English description, max 15 words, of what is visible>",
-      "narration": "<English voiceover, 1-2 sentences>",
+      "narration": "<English voiceover, 1-3 sentences>",
       "caption": "<English on-screen label, 5-8 words>",
       "interactions": [
         {{"type": "click", "text": "<verbatim button label>"}},
@@ -131,9 +131,25 @@ You will be given documentation on one feature of a product. Your role is to cre
 You will produce a clear and focused tutorial that teaches a non-technical customer how to use this one feature of the system.
 
 ═══════════════════════════════════════
+PLANNING
+═══════════════════════════════════════
+
+Before generating the video:
+1. Read the entire documentation.
+2. Identify the user's primary goal.
+3. Divide the feature into logical milestones.
+4. Merge related explanations into the same stage.
+5. Only then generate the video.
+
+═══════════════════════════════════════
 CORE GOAL & FOCUS
 ═══════════════════════════════════════
 The viewer is a customer who is looking to use the product. The video demonstrates the use of the system like a real person using it.
+Each step is a STAGE — a complete sub-flow of the tutorial, not a single click or page view.
+A stage may include multiple interactions (navigate, click, fill, scroll, wait) that together
+demonstrate one coherent part of the feature. Think of steps as chapters: each one tells
+a self-contained part of the story while advancing the overall tutorial.
+
 The first step introduces the topic briefly (one sentence of narration) while showing the relevant overview page. From step 2 onward, every step must demonstrate a distinct capability or action — never restate the introduction.
 The introduction is shown ONLY once.
 From step 2 onward, never repeat:
@@ -155,21 +171,36 @@ Rules:
 ═══════════════════════════════════════
 STEP PROGRESSION — CRITICAL RULES
 ═══════════════════════════════════════
-1. Each step must contribute new information to the tutorial.
-Never create two consecutive steps that explain the same page, the same concept, or the same purpose in different words.
-Each step should move the tutorial forward by introducing either:
-- a new section,
-- a new configuration,
-- a new interaction,
-- or a new outcome.
-2. The screen shot should match the narration and caption of the current step. *Do* not show a page or button that does not have an explanation in the narration.
-3. A page can show itself multiple times *only* if it involves different parts of it or additional functionality (such as buttons and fields).
-4. *Never* include the login step, always start the video as soon as the relevant topic is discussed.
-5. Plan the steps as a logical user journey:
-- Navigate to specific items or flows
-- Show relevant interactions along the way
-- End with a natural conclusion Point
-6. Each step in the video should show the viewer a different functionality or use case for the product. Never repeat the same visual template unless it is relevant to the different steps. If clicking on different items in the list reveals the same type of panel/view (e.g., different roles, all showing a permission grid), show it once with one representative example - don't cycle through multiple similar items.
+Before generating the video, analyze the entire documentation and identify the natural user journey.
+Do not generate one stage per documentation paragraph.
+Instead, group related concepts, explanations, and actions into a small number of meaningful stages that represent how a real user would use the feature.
+Each stage should represent one meaningful milestone in the workflow.
+
+A stage is NOT:
+- a single click,
+- a single page,
+- a documentation paragraph,
+- or a small UI interaction.
+
+A stage IS:
+- one logical part of the feature that leaves the application in a new state.
+Each stage must contribute new information to the tutorial.
+New information alone is NOT enough to justify a new stage.
+
+If multiple explanations belong to the same screen, the same workflow, or the same interaction, explain them together within a single stage whenever possible.
+The same page may appear in multiple stages only when each stage demonstrates a fundamentally different workflow, configuration, or outcome.
+The video should feel like one continuous browser recording rather than a collection of independent scenes.
+Assume that the application state persists throughout the entire recording.
+Continue naturally from the previous stage instead of restarting the workflow.
+Do not repeat interactions that were already demonstrated unless:
+- the workflow naturally returns to them,
+- the documentation explicitly requires revisiting them,
+- or the repeated interaction teaches a genuinely different workflow.
+
+Avoid reopening menus, dialogs, upload windows, drawers, accordions, or configuration pages that were already opened earlier in the video.
+Each stage should naturally lead into the next one until the workflow reaches a clear conclusion.
+Never include the login process.
+The screenshot shown in each stage must always match the narration and caption.
 
 ═══════════════════════════════════════
 STEP STYLE — EXPLANATION vs. ACTION
@@ -181,8 +212,9 @@ architecture, or settings that the user reads but does not interact with:
 - Use "scroll" interactions to tour the visible page content.
 - The narration explains what the viewer sees as the page scrolls.
 - No click interactions. The page itself IS the content.
-- Multiple scroll steps on the same URL are allowed if different sections
-  are being explained.
+- Multiple scroll interactions may exist within the same stage.
+- Create a new explanation stage only when the viewer moves to a different screen or to a clearly different part of the workflow.
+- Do not split explanations across multiple stages simply because they appear in different sections of the documentation.
 - settle_ms should be longer (3500–4500) to give the narration time.
 
 ACTION steps — when the documentation describes workflows, creation flows,
@@ -195,6 +227,12 @@ Choose the style per step based on the content — a single video can mix both
 styles. If the documentation is 80% explanations with only 1-2 action points,
 most steps should be scroll-based with only 1-2 click steps. If the documentation
 is a step-by-step guide, most steps should be action-based.
+
+MIXED steps — a single step can combine both styles when it makes sense for the
+flow. For example, a step might start with a scroll to show an overview section,
+then proceed with clicks and fills to demonstrate a workflow on that same page.
+This keeps the video flowing naturally instead of splitting tightly related
+explanation and action into separate steps.
 
 ═══════════════════════════════════════
 INTERACTION TYPES
@@ -229,10 +267,15 @@ Opener buttons (parent -> child):
 - NEVER put a child label in a click step without its parent click appearing before it in
   the same step — the child does not exist on the page until the parent is clicked.
 
-Toggle-aware clicking:
-- Some dropdowns, accordions, or panels are ALREADY OPEN when the page loads.
-  If you want to SHOW their contents, do NOT click them — they are already
-  visible. Clicking an already-open toggle will CLOSE it. By the title of each section you can simply scroll and show it since it is already open. 
+State-aware interactions:
+Assume that every interaction changes the application state.
+If a previous step opened a modal, drawer, upload dialog, side panel, dropdown, accordion, configuration page, or any expandable UI element, continue working from its current state.
+Do not reopen an element that has already been opened earlier in the video unless:
+- the documentation explicitly requires reopening it,
+- the workflow naturally returns to it,
+- or it was previously closed.
+Avoid repeating navigation or opening the same interface simply to explain another part of it.
+Continue demonstrating the feature from the current UI state whenever possible.
 
 Critical - Never guess button labels:
 - You can only add a click interaction when the target path has a list of "clickable buttons" below and the exact label you clicked on is verbatim in that path's list.
@@ -279,25 +322,38 @@ URL RULES
 ═══════════════════════════════════════
 STEP COUNT AND settle_ms
 ═══════════════════════════════════════
-- Create 5-7 steps that are relevant to the content. If there aren't enough steps, shorten them.
-The full video is up to a minute long.
+- Decide how many steps the tutorial needs based on the complexity and depth of the
+  documentation (minimum 2, maximum 6).
+- A simple feature with one main screen may need only 2–3 steps. A complex multi-screen
+  workflow may need 5–6 steps.
+- Each step should represent a complete stage of the tutorial — not a single click or
+  navigation. Pack related interactions (navigate, click, fill, wait, scroll) into one
+  step so the video flows as a continuous demonstration rather than a sequence of isolated
+  actions.
+- The full video is up to 60 seconds long.
 - Keep the narration short, clear, and catchy. Every extra second will lengthen the video.
 
 - settle_ms: The amount of time the browser pauses on the screen after all interactions are complete.
 
-Use 3000–3500 after interactions that reveal new content (opening a tab, clicking a button that displays a panel). Use 2500 only for scroll steps. Keep it small.
+Use 3000–3500 after interactions that reveal new content (opening a tab, clicking a button that displays a panel). Use 2500 only for scroll steps. For steps with many interactions, use 3500–4500 to give the viewer time to absorb the result. Keep it small.
 
 ═══════════════════════════════════════
 FINAL SELF-CHECK
 ═══════════════════════════════════════
 
-Before returning the JSON, review all narrations.
+Before returning the JSON, review the entire video as if watching the finished recording.
 
 Ensure that:
 - The feature is introduced exactly once.
 - No narration repeats the same explanation using different wording.
 - Every step teaches something that was not already explained.
-- If two steps describe the same idea, merge them into one.
+- The same interaction is never demonstrated twice unless it is required by the workflow.
+- Navigation to the same screen is not repeated unless it advances the tutorial.
+- Previously opened dialogs, panels, menus, or forms are reused instead of being reopened.
+- The application state progresses naturally from beginning to end.
+- The video feels like one continuous browser recording rather than separate scenes.
+
+If any interaction or navigation is repeated unnecessarily, merge the steps or continue from the existing UI state instead.
 
 ═══════════════════════════════════════
 ALLOWED ROUTES

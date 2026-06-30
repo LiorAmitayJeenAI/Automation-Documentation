@@ -901,7 +901,7 @@
     "gammaUrl": "https://gamma.app/docs/4v7nlds4k8hmxf3",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/383025178-Part-2-Spark-Agent.pdf",
     "createdAt": "2026-06-15T09:18:37.733Z",
-    "lastUpdatedAt": "2026-06-16T08:03:46.069Z",
+    "lastUpdatedAt": "2026-06-30T12:08:17.828Z",
     "lastGeneratedAt": "2026-06-15T09:24:20.935Z",
     "error": null,
     "history": [
@@ -925,7 +925,7 @@
       }
     ],
     "videoStatus": "done",
-    "videoUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/video-1781596738122-oyhxdj.mp4"
+    "videoUrl": null
   },
   {
     "id": "mqf03qg27buie",
@@ -1716,12 +1716,12 @@
     "label": "Part 3-Users and Groups & Token Management",
     "status": "done",
     "language": "he",
-    "sessionId": "video-run-1782734235839-bd1wg6",
+    "sessionId": "video-run-1782820763711-7neir5",
     "gammaUrl": "https://gamma.app/docs/y1wi1ef3e98giyb",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Admin-%26-Control-Part-3-Users-and-Groups-%26-Token-Management.pdf",
     "createdAt": "2026-06-15T07:02:38.158Z",
-    "lastUpdatedAt": "2026-06-29T12:06:38.636Z",
-    "lastGeneratedAt": "2026-06-29T12:03:07.067Z",
+    "lastUpdatedAt": "2026-06-30T12:04:30.214Z",
+    "lastGeneratedAt": "2026-06-30T12:04:30.211Z",
     "error": null,
     "history": [
       {
@@ -2406,7 +2406,7 @@
     "gammaUrl": "https://gamma.app/docs/ch3kriz9hj2jw8p",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Agent-Part-2-Spark-Agent.pdf",
     "createdAt": "2026-06-14T14:28:50.173Z",
-    "lastUpdatedAt": "2026-06-28T10:03:00.745Z",
+    "lastUpdatedAt": "2026-06-30T12:08:10.671Z",
     "lastGeneratedAt": "2026-06-28T10:03:00.738Z",
     "error": null,
     "history": [
@@ -2450,7 +2450,7 @@
       }
     ],
     "videoStatus": "done",
-    "videoUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/jeen%20tutorial/Tutorial%20Automation/Draft/Video%20Draft/he-Agent-Part-2-Spark-Agent.mp4"
+    "videoUrl": null
   },
   {
     "id": "mqdvkohoc30i3",
@@ -2652,12 +2652,12 @@
     "label": "Part 2 - RAG Mechanism",
     "status": "done",
     "language": "he",
-    "sessionId": "video-run-1782745473555-fgqoko",
+    "sessionId": "video-run-1782814509446-bcd0ir",
     "gammaUrl": "https://gamma.app/docs/8az18we4qqomwoo",
     "sharepointUrl": "https://jeenai365.sharepoint.com/sites/JEEN.AI/Shared%20Documents/Testing/LiorAmitay/JeenTutorial/he-Knowledge-%26-Sources-Part-2-RAG-Mechanism.pdf",
     "createdAt": "2026-06-14T13:29:51.984Z",
-    "lastUpdatedAt": "2026-06-29T15:10:27.689Z",
-    "lastGeneratedAt": "2026-06-29T15:10:27.683Z",
+    "lastUpdatedAt": "2026-06-30T10:18:52.767Z",
+    "lastGeneratedAt": "2026-06-30T10:18:52.766Z",
     "error": null,
     "history": [
       {

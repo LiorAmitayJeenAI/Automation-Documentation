@@ -588,11 +588,13 @@ async def record_product_video(
             if not url.startswith("http"):
                 url = f"{base_url.rstrip('/')}/{url.lstrip('/')}"
 
-            # Skip duplicate screens: same URL already shown with no click/fill
-            # interactions. Wait-only interaction lists don't change the screen,
-            # so they don't exempt a step from dedup.
             url_key = _url_key(url)
-            if url_key in seen_urls and not _has_screen_changing_interactions(interactions):
+            current_key = _url_key(page.url) if page.url else ""
+            needs_navigation = (current_key != url_key)
+
+            # Skip only pure duplicates: same URL already shown, no interactions,
+            # and we'd have to navigate there (nothing new to show).
+            if url_key in seen_urls and not _has_screen_changing_interactions(interactions) and needs_navigation:
                 logger.info("Step %d skipped — duplicate screen: %s", i + 1, url)
                 continue
 
@@ -601,33 +603,36 @@ async def record_product_video(
             )
 
             try:
-                response = await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-                status = response.status if response else None
-                if status and status >= 400:
-                    logger.warning("Step %d failed — HTTP %d: %s", i + 1, status, url)
-                    failed_steps.append(step)
-                    continue
+                if needs_navigation:
+                    response = await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+                    status = response.status if response else None
+                    if status and status >= 400:
+                        logger.warning("Step %d failed — HTTP %d: %s", i + 1, status, url)
+                        failed_steps.append(step)
+                        continue
 
-                try:
-                    await page.wait_for_load_state("networkidle", timeout=PAGE_LOAD_WAIT_MS)
-                except Exception:
-                    pass
+                    try:
+                        await page.wait_for_load_state("networkidle", timeout=PAGE_LOAD_WAIT_MS)
+                    except Exception:
+                        pass
 
-                # Detect redirects (SPA route guards — page not reachable in current state)
-                final_url = page.url
-                if final_url.rstrip("/") != url.rstrip("/"):
-                    logger.warning(
-                        "Step %d failed — redirected to %s", i + 1, final_url
-                    )
-                    failed_steps.append(step)
-                    continue
+                    # Detect redirects (SPA route guards — page not reachable in current state)
+                    final_url = page.url
+                    if final_url.rstrip("/") != url.rstrip("/"):
+                        logger.warning(
+                            "Step %d failed — redirected to %s", i + 1, final_url
+                        )
+                        failed_steps.append(step)
+                        continue
 
-                # Detect 404 / blank / error pages
-                error_reason = await _looks_like_error_page(page)
-                if error_reason:
-                    logger.warning("Step %d failed — %s", i + 1, error_reason)
-                    failed_steps.append(step)
-                    continue
+                    # Detect 404 / blank / error pages
+                    error_reason = await _looks_like_error_page(page)
+                    if error_reason:
+                        logger.warning("Step %d failed — %s", i + 1, error_reason)
+                        failed_steps.append(step)
+                        continue
+                else:
+                    logger.info("Step %d — same URL, continuing from current state", i + 1)
 
                 # ── Wait for the SPA to finish painting ──
                 # Resolve variant groups once (used by both ready-wait and interactions)

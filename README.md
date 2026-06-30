@@ -45,7 +45,7 @@ Both live in `backend/`, run asynchronously, and stream live progress events to 
 ### B) Video pipeline — `backend/video_pipeline.py` → `POST /api/generate-video`
 
 1. **`confluence.py`** — fetch the Confluence page as markdown
-2. **`llm.py`** — generate a 5–12 step video script with narration
+2. **`llm.py`** — generate a 2–6 step video script with narration
 3. **`tts.py`** — synthesize the voiceover (ElevenLabs, with Azure Speech fallback)
 4. **`recorder.py`** — drive a real Playwright browser session following the script
 5. **`video.py` + `video/`** — render the MP4 with subtitles via Remotion

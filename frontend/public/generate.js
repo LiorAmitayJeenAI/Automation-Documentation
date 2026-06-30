@@ -11,6 +11,9 @@ let rowIds = {};
 let isVideoRunning = false;
 let currentVideoRunId = null;
 let videoRowIds = {};
+let selectAllMode = null; // null | 'presentation' | 'video'
+
+const VIDEO_EXCLUDED_FOLDERS = ['overview', 'apis & platform interfaces'];
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('addUrlBtn').addEventListener('click', addUrl);
@@ -18,7 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('runVideoBtn').addEventListener('click', runVideoSelected);
   document.getElementById('stopBtn').addEventListener('click', stopGeneration);
   document.getElementById('stopVideoBtn').addEventListener('click', stopVideoGeneration);
-  document.getElementById('selectAllBtn').addEventListener('click', toggleSelectAll);
+  document.getElementById('selectAllPresentationBtn').addEventListener('click', () => toggleSelectAll('presentation'));
+  document.getElementById('selectAllVideoBtn').addEventListener('click', () => toggleSelectAll('video'));
   document.getElementById('newUrlBtn').addEventListener('click', openAddModal);
   document.getElementById('urlInput').addEventListener('keydown', e => { if (e.key === 'Enter') addUrl(); });
   document.getElementById('labelInput').addEventListener('keydown', e => { if (e.key === 'Enter') addUrl(); });
@@ -35,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bindSegment('langSegment', value => { language = value; });
   loadFolders();
   checkActiveRuns();
+  checkActiveVideoRuns();
 });
 
 function bindSegment(id, onChange) {
@@ -52,9 +57,22 @@ function pageKey(folderId, pageIndex) {
   return `${folderId}:${pageIndex}`;
 }
 
+function isFolderVideoExcluded(folder) {
+  return VIDEO_EXCLUDED_FOLDERS.includes(folder.name.toLowerCase());
+}
+
 function getAllPageKeys() {
   const keys = [];
   for (const folder of foldersData.folders) {
+    folder.pages.forEach((_, i) => keys.push(pageKey(folder.id, i)));
+  }
+  return keys;
+}
+
+function getVideoEligiblePageKeys() {
+  const keys = [];
+  for (const folder of foldersData.folders) {
+    if (isFolderVideoExcluded(folder)) continue;
     folder.pages.forEach((_, i) => keys.push(pageKey(folder.id, i)));
   }
   return keys;
@@ -107,11 +125,16 @@ function renderFolderSelect() {
 function renderFolders() {
   const container = document.getElementById('folderList');
   const summary = document.getElementById('sourceSummary');
-  const selectAllBtn = document.getElementById('selectAllBtn');
+  const selectAllPresentationBtn = document.getElementById('selectAllPresentationBtn');
+  const selectAllVideoBtn = document.getElementById('selectAllVideoBtn');
   const total = getTotalPages();
 
   summary.textContent = `${total} sources · ${selected.size} selected`;
-  selectAllBtn.textContent = selected.size === total && total ? 'Clear selection' : 'Select all';
+  const allPresentationSelected = selected.size === total && total;
+  const videoKeys = getVideoEligiblePageKeys();
+  const allVideoSelected = videoKeys.length && videoKeys.every(k => selected.has(k));
+  selectAllPresentationBtn.textContent = allPresentationSelected && selectAllMode === 'presentation' ? 'Clear Selection' : 'Select All Presentations';
+  selectAllVideoBtn.textContent = allVideoSelected && selectAllMode === 'video' ? 'Clear Selection' : 'Select All Videos';
 
   if (!foldersData.folders.length) {
     container.innerHTML = `
@@ -207,6 +230,7 @@ function toggleFolder(folderId) {
 
 function togglePage(key) {
   selected.has(key) ? selected.delete(key) : selected.add(key);
+  selectAllMode = null;
   renderFolders();
 }
 
@@ -221,23 +245,28 @@ function toggleFolderSelection(folderId) {
   } else {
     keys.forEach(k => selected.add(k));
   }
+  selectAllMode = null;
   renderFolders();
 }
 
-function toggleSelectAll() {
-  const allKeys = getAllPageKeys();
-  if (selected.size === allKeys.length && allKeys.length) {
-    selected.clear();
+function toggleSelectAll(mode) {
+  const keys = mode === 'video' ? getVideoEligiblePageKeys() : getAllPageKeys();
+  const allSelected = keys.length && keys.every(k => selected.has(k));
+
+  if (allSelected && selectAllMode === mode) {
+    keys.forEach(k => selected.delete(k));
+    selectAllMode = null;
   } else {
-    allKeys.forEach(k => selected.add(k));
+    keys.forEach(k => selected.add(k));
+    selectAllMode = mode;
   }
   renderFolders();
 }
 
 function syncRunButton() {
-  document.getElementById('runBtn').disabled = selected.size === 0 || isRunning;
+  document.getElementById('runBtn').disabled = selected.size === 0 || isRunning || selectAllMode === 'video';
   document.getElementById('stopBtn').classList.toggle('hidden', !isRunning);
-  document.getElementById('runVideoBtn').disabled = selected.size === 0 || isVideoRunning;
+  document.getElementById('runVideoBtn').disabled = selected.size === 0 || isVideoRunning || selectAllMode === 'presentation';
   document.getElementById('stopVideoBtn').classList.toggle('hidden', !isVideoRunning);
 }
 
@@ -334,7 +363,6 @@ async function checkActiveRuns() {
     notice.classList.remove('visible');
     frame.classList.add('visible');
     results.classList.add('visible');
-    results.innerHTML = '';
 
     run.items.forEach((item, index) => {
       const id = `result-${index}`;
@@ -543,6 +571,10 @@ async function runSelected() {
   const toRun = getSelectedItems();
   if (!toRun.length || isRunning) return;
 
+  selected.clear();
+  selectAllMode = null;
+  renderFolders();
+
   const frame = document.getElementById('resultsFrame');
   const results = document.getElementById('results');
   const notice = document.getElementById('successNotice');
@@ -702,8 +734,15 @@ function disableSessionStop(row) {
 ══════════════════════════════════════════════════ */
 
 async function runVideoSelected() {
-  const toRun = getSelectedItems();
+  const toRun = getSelectedItems().filter(item => {
+    const folder = foldersData.folders.find(f => f.id === item.folderId);
+    return !folder || !isFolderVideoExcluded(folder);
+  });
   if (!toRun.length || isVideoRunning) return;
+
+  selected.clear();
+  selectAllMode = null;
+  renderFolders();
 
   const frame = document.getElementById('resultsFrame');
   const results = document.getElementById('results');
@@ -846,6 +885,86 @@ function finishVideoRun() {
   isVideoRunning = false;
   currentVideoRunId = null;
   syncRunButton();
+}
+
+/* ── Check for active video runs on page load ── */
+async function checkActiveVideoRuns() {
+  try {
+    const res = await fetch('/api/video-runs/active');
+    const data = await res.json();
+    if (!data.runs || !data.runs.length) return;
+
+    const run = data.runs[0];
+    currentVideoRunId = run.runId;
+    isVideoRunning = true;
+    videoRowIds = {};
+
+    const frame = document.getElementById('resultsFrame');
+    const results = document.getElementById('results');
+    const notice = document.getElementById('successNotice');
+    notice.classList.remove('visible');
+    frame.classList.add('visible');
+    results.classList.add('visible');
+
+    run.items.forEach((item, index) => {
+      const id = `video-result-${index}`;
+      videoRowIds[item.url] = id;
+
+      let className = 'running';
+      let msg = 'Pending...';
+      if (item.status === 'done') { className = 'done'; msg = item.video_url ? 'Done — Video ready' : 'Done'; }
+      else if (item.status === 'error') { className = 'error'; msg = item.error || 'Failed'; }
+      else if (item.status === 'stopped') { className = 'error'; msg = 'Stopped'; }
+      else if (item.status === 'running') {
+        const stageLabel = item.stage ? (VIDEO_STAGE_LABELS[item.stage] || item.detail || 'Processing…') : 'Processing…';
+        msg = stageLabel;
+      }
+
+      const displayLabel = formatRunLabel(item.folderName, item.label) || esc(item.url);
+      const actionsHtml = item.status === 'done' && item.video_url
+        ? `<span class="result-actions"><a class="result-action primary" href="${esc(item.video_url)}" target="_blank" rel="noopener">Open Video</a></span>`
+        : '';
+      results.insertAdjacentHTML('beforeend', `
+        <div id="${id}" class="result-row ${className} video-row">
+          <span class="result-dot"></span>
+          <span class="result-label video-tag">Video</span>
+          <span class="result-url" title="${esc(item.url)}">${displayLabel}</span>
+          <span class="result-msg">${msg}</span>
+          ${actionsHtml}
+        </div>`);
+    });
+
+    updateProgress();
+    syncRunButton();
+    connectToVideoRunEvents(run.runId);
+  } catch {}
+}
+
+/* ── Connect to an active video run's SSE event stream ── */
+function connectToVideoRunEvents(runId) {
+  fetch(`/api/video-runs/${encodeURIComponent(runId)}/events`)
+    .then(response => {
+      const reader = response.body.getReader();
+      let buffer = '';
+
+      function pump() {
+        reader.read().then(({ done, value }) => {
+          if (done) {
+            finishVideoRun();
+            return;
+          }
+          buffer = parseServerSentEvents(buffer, value, handleVideoRunMessage);
+          pump();
+        }).catch(() => {
+          finishVideoRun();
+        });
+      }
+
+      pump();
+    })
+    .catch(() => {
+      finishVideoRun();
+    });
 }
 
 async function stopVideoGeneration() {

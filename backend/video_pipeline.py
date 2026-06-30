@@ -4,7 +4,7 @@ Standalone video generation pipeline.
 Completely independent from the presentation pipeline (pipeline.py).
 Produces an MP4 tutorial video from a Confluence page by:
   1. Fetching Confluence content
-  2. Generating a video script (5-12 steps, narration in the chosen language)
+  2. Generating a video script (2-6 steps, narration in the chosen language)
   3. Recording a real Playwright browser session following the script
   4. Rendering the recording with subtitle overlays via Remotion
   5. Uploading the MP4 to SharePoint
@@ -79,7 +79,7 @@ async def run_video_pipeline(
 
     lang_label = "Hebrew" if language == "he" else "English"
 
-    # ── 2. Generate video script (5-7 steps, target <60 s) ──
+    # ── 2. Generate video script (2-6 steps, target <90 s) ──
     yield VideoEvent("script", "running", "Generating video script with AI...")
     try:
         video_script = await llm.generate_video_script(
