@@ -90,7 +90,7 @@ async def render_video(
         settle_s = step_settles[idx] if idx < len(step_settles) else 2.0
         lead_s = step_leads[idx] if idx < len(step_leads) else 0.0
         # Start the segment lead_s earlier so the interaction animation (cursor
-        # glide, highlight ring, click ripple, the press itself) is shown.
+        # glide, click ripple, the press itself) is shown.
         source_start_frame = max(0, math.floor((timing - lead_s) * FPS))
         # Duration hugs the narration so voice and picture stay in sync: the
         # narration starts WITH the segment and plays over the interaction. We

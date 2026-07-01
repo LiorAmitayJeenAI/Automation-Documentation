@@ -1,7 +1,10 @@
 [
   {
     "path": "/",
-    "description": "Main chat workspace — chat input area with the assistant, also has 'history' and 'last activity' buttons that open a sidebar (URL stays the same)",
+    "description": "Main chat workspace — chat input area with the assistant. Logo button (פתח תפריט) opens activity/history panel. Left icon rail navigates to Knowledge/Agents/Skills/Schedules. App switcher (User interface controls menu) opens cross-app navigation. Avatar opens user profile menu.",
+    "input_fields": [
+      {"label": "chat-input-field", "description": "Main chat textarea where the user types messages to the assistant"}
+    ],
     "clickable_elements": [
       {
         "variants": [
@@ -24,11 +27,6 @@
               "חיבורים\nאפליקציות צד שלישי"
             ]
           }
-        ]
-      },
-      {
-        "variants": [
-          "JD"
         ]
       },
       {
@@ -58,47 +56,89 @@
       },
       {
         "variants": [
-          "avatar"
-        ]
-      },
-      {
-        "variants": [
-          "User interface controls menu"
-        ]
-      }
-    ]
-  },
-  {
-    "path": "/chat",
-    "description": "Active conversation thread with the AI assistant — message bubbles and input box",
-    "clickable_elements": [
-      {
-        "variants": [
-          "GPT 5.1 - Azure OpenAI"
-        ]
-      },
-      {
-        "variants": [
-          "Brain",
-          "Menu"
+          "פתח תפריט"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
-              "כלים\nלא נבחרו"
+              "היסטוריה"
             ]
           },
           {
             "variants": [
-              "חיבורים\nאפליקציות צד שלישי"
+              "פעילות אחרונה"
             ]
           }
         ]
       },
       {
         "variants": [
-          "JD"
+          "מקורות מידע"
         ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Skills"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "תזמונים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "role": "div",
         "opens": [
           {
             "variants": [
@@ -112,7 +152,7 @@
           },
           {
             "variants": [
-              "טוקנים\n1% Usage"
+              "טוקנים 1% Usage"
             ]
           },
           {
@@ -121,35 +161,160 @@
             ]
           }
         ]
+      }
+    ]
+  },
+  {
+    "path": "/chat",
+    "description": "Active conversation thread with the AI assistant — message bubbles and input box",
+    "input_fields": [
+      {"label": "chat-input-field", "description": "Main chat textarea where the user types messages to the assistant"}
+    ],
+    "clickable_elements": [
+      {
+        "variants": [
+          "GPT 5.1 - Azure OpenAI"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Brain",
+          "Menu"
+        ],
+        "repeated": true,
+        "role": "button"
       },
       {
         "variants": [
           "Upload Files"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Voice input"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Submit"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "התראות"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "פתח תפריט"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "היסטוריה"
+            ]
+          },
+          {
+            "variants": [
+              "פעילות אחרונה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "מקורות מידע"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Skills"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "תזמונים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          }
         ]
       },
       {
         "variants": [
           "avatar"
-        ]
-      },
-      {
-        "variants": [
-          "User interface controls menu"
+        ],
+        "role": "div",
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים 1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
         ]
       }
     ]
@@ -161,97 +326,50 @@
       {
         "variants": [
           "הסוכנים שלי"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שותף איתי"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "משותף על ידי הארגון"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "צור סוכן"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "צור תיקייה"
-        ]
-      },
-      {
-        "variants": [
-          "avatar"
         ],
-        "opens": [
-          {
-            "variants": [
-              "הגדרות"
-            ]
-          },
-          {
-            "variants": [
-              "שפות"
-            ]
-          },
-          {
-            "variants": [
-              "טוקנים\n1% Usage"
-            ]
-          },
-          {
-            "variants": [
-              "התנתק"
-            ]
-          }
-        ]
-      },
-      {
-        "variants": [
-          "JD",
-          "Menu"
-        ],
-        "opens": [
-          {
-            "variants": [
-              "הגדרות"
-            ]
-          },
-          {
-            "variants": [
-              "שפות"
-            ]
-          },
-          {
-            "variants": [
-              "טוקנים\n1% Usage"
-            ]
-          },
-          {
-            "variants": [
-              "התנתק"
-            ]
-          }
-        ]
+        "role": "button"
       },
       {
         "variants": [
           "Open search"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Select all rows"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "התראות"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -262,7 +380,110 @@
       },
       {
         "variants": [
+          "פתח תפריט"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "היסטוריה"
+            ]
+          },
+          {
+            "variants": [
+              "פעילות אחרונה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "מקורות מידע"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Skills"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "תזמונים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
           "User interface controls menu"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "role": "div",
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים 1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
         ]
       }
     ]
@@ -394,11 +615,6 @@
       },
       {
         "variants": [
-          "JD"
-        ]
-      },
-      {
-        "variants": [
           "Reset-context-button"
         ]
       },
@@ -440,6 +656,114 @@
       {
         "variants": [
           "Feedback"
+        ]
+      },
+      {
+        "variants": [
+          "פתח תפריט"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "היסטוריה"
+            ]
+          },
+          {
+            "variants": [
+              "פעילות אחרונה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "מקורות מידע"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Skills"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "תזמונים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "role": "div",
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים 1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
         ]
       }
     ]
@@ -558,11 +882,6 @@
       },
       {
         "variants": [
-          "JD"
-        ]
-      },
-      {
-        "variants": [
           "Reset-context-button"
         ]
       },
@@ -613,12 +932,110 @@
       },
       {
         "variants": [
-          "avatar"
+          "פתח תפריט"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "היסטוריה"
+            ]
+          },
+          {
+            "variants": [
+              "פעילות אחרונה"
+            ]
+          }
         ]
       },
       {
         "variants": [
+          "מקורות מידע"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Skills"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "תזמונים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
           "User interface controls menu"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "role": "div",
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים 1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
         ]
       }
     ]
@@ -630,9 +1047,102 @@
     "clickable_elements": [
       {
         "variants": [
-          "JD",
-          "Menu"
+          "התראות"
         ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "פתח תפריט"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "היסטוריה"
+            ]
+          },
+          {
+            "variants": [
+              "פעילות אחרונה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "מקורות מידע"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Skills"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "תזמונים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "role": "div",
         "opens": [
           {
             "variants": [
@@ -646,7 +1156,7 @@
           },
           {
             "variants": [
-              "טוקנים\n1% Usage"
+              "טוקנים 1% Usage"
             ]
           },
           {
@@ -654,28 +1164,6 @@
               "התנתק"
             ]
           }
-        ]
-      },
-      {
-        "variants": [
-          "התראות"
-        ],
-        "opens": [
-          {
-            "variants": [
-              "תצוגה מלאה"
-            ]
-          }
-        ]
-      },
-      {
-        "variants": [
-          "avatar"
-        ]
-      },
-      {
-        "variants": [
-          "User interface controls menu"
         ]
       }
     ]
@@ -687,9 +1175,95 @@
     "clickable_elements": [
       {
         "variants": [
-          "JD",
-          "Menu"
+          "התראות"
         ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "פתח תפריט"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "היסטוריה"
+            ]
+          },
+          {
+            "variants": [
+              "פעילות אחרונה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "מקורות מידע"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Skills"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "תזמונים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "role": "div",
         "opens": [
           {
             "variants": [
@@ -703,7 +1277,7 @@
           },
           {
             "variants": [
-              "טוקנים\n1% Usage"
+              "טוקנים 1% Usage"
             ]
           },
           {
@@ -711,28 +1285,6 @@
               "התנתק"
             ]
           }
-        ]
-      },
-      {
-        "variants": [
-          "התראות"
-        ],
-        "opens": [
-          {
-            "variants": [
-              "תצוגה מלאה"
-            ]
-          }
-        ]
-      },
-      {
-        "variants": [
-          "avatar"
-        ]
-      },
-      {
-        "variants": [
-          "User interface controls menu"
         ]
       }
     ]
@@ -744,9 +1296,101 @@
     "clickable_elements": [
       {
         "variants": [
-          "JD",
-          "Menu"
+          "התראות"
         ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "פתח תפריט"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "היסטוריה"
+            ]
+          },
+          {
+            "variants": [
+              "פעילות אחרונה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "מקורות מידע"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Skills"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "תזמונים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "role": "div",
         "opens": [
           {
             "variants": [
@@ -760,7 +1404,7 @@
           },
           {
             "variants": [
-              "טוקנים\n1% Usage"
+              "טוקנים 1% Usage"
             ]
           },
           {
@@ -768,28 +1412,6 @@
               "התנתק"
             ]
           }
-        ]
-      },
-      {
-        "variants": [
-          "התראות"
-        ],
-        "opens": [
-          {
-            "variants": [
-              "תצוגה מלאה"
-            ]
-          }
-        ]
-      },
-      {
-        "variants": [
-          "avatar"
-        ]
-      },
-      {
-        "variants": [
-          "User interface controls menu"
         ]
       }
     ]
@@ -801,9 +1423,101 @@
     "clickable_elements": [
       {
         "variants": [
-          "JD",
-          "Menu"
+          "התראות"
         ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "פתח תפריט"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "היסטוריה"
+            ]
+          },
+          {
+            "variants": [
+              "פעילות אחרונה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "מקורות מידע"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Skills"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "תזמונים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "role": "div",
         "opens": [
           {
             "variants": [
@@ -817,7 +1531,7 @@
           },
           {
             "variants": [
-              "טוקנים\n1% Usage"
+              "טוקנים 1% Usage"
             ]
           },
           {
@@ -825,28 +1539,6 @@
               "התנתק"
             ]
           }
-        ]
-      },
-      {
-        "variants": [
-          "התראות"
-        ],
-        "opens": [
-          {
-            "variants": [
-              "תצוגה מלאה"
-            ]
-          }
-        ]
-      },
-      {
-        "variants": [
-          "avatar"
-        ]
-      },
-      {
-        "variants": [
-          "User interface controls menu"
         ]
       }
     ]
@@ -959,11 +1651,6 @@
       },
       {
         "variants": [
-          "JD"
-        ]
-      },
-      {
-        "variants": [
           "Reset-context-button"
         ]
       },
@@ -994,12 +1681,110 @@
       },
       {
         "variants": [
-          "avatar"
+          "פתח תפריט"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "היסטוריה"
+            ]
+          },
+          {
+            "variants": [
+              "פעילות אחרונה"
+            ]
+          }
         ]
       },
       {
         "variants": [
+          "מקורות מידע"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Skills"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "תזמונים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
           "User interface controls menu"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "role": "div",
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים 1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
         ]
       }
     ]
@@ -1042,61 +1827,6 @@
       },
       {
         "variants": [
-          "avatar"
-        ],
-        "opens": [
-          {
-            "variants": [
-              "הגדרות"
-            ]
-          },
-          {
-            "variants": [
-              "שפות"
-            ]
-          },
-          {
-            "variants": [
-              "טוקנים\n1% Usage"
-            ]
-          },
-          {
-            "variants": [
-              "התנתק"
-            ]
-          }
-        ]
-      },
-      {
-        "variants": [
-          "JD",
-          "Menu"
-        ],
-        "opens": [
-          {
-            "variants": [
-              "הגדרות"
-            ]
-          },
-          {
-            "variants": [
-              "שפות"
-            ]
-          },
-          {
-            "variants": [
-              "טוקנים\n1% Usage"
-            ]
-          },
-          {
-            "variants": [
-              "התנתק"
-            ]
-          }
-        ]
-      },
-      {
-        "variants": [
           "Open search"
         ]
       },
@@ -1107,7 +1837,110 @@
       },
       {
         "variants": [
+          "פתח תפריט"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "היסטוריה"
+            ]
+          },
+          {
+            "variants": [
+              "פעילות אחרונה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "מקורות מידע"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Skills"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "תזמונים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
           "User interface controls menu"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "role": "div",
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים 1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
         ]
       }
     ]
@@ -1124,34 +1957,6 @@
       {
         "variants": [
           "צור תזמון"
-        ]
-      },
-      {
-        "variants": [
-          "JD",
-          "Menu"
-        ],
-        "opens": [
-          {
-            "variants": [
-              "הגדרות"
-            ]
-          },
-          {
-            "variants": [
-              "שפות"
-            ]
-          },
-          {
-            "variants": [
-              "טוקנים\n1% Usage"
-            ]
-          },
-          {
-            "variants": [
-              "התנתק"
-            ]
-          }
         ]
       },
       {
@@ -1178,12 +1983,110 @@
       },
       {
         "variants": [
-          "avatar"
+          "פתח תפריט"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "היסטוריה"
+            ]
+          },
+          {
+            "variants": [
+              "פעילות אחרונה"
+            ]
+          }
         ]
       },
       {
         "variants": [
+          "מקורות מידע"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Skills"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "תזמונים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
           "User interface controls menu"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "role": "div",
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים 1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
         ]
       }
     ]
@@ -1256,39 +2159,6 @@
       },
       {
         "variants": [
-          "avatar"
-        ],
-        "opens": [
-          {
-            "variants": [
-              "הגדרות"
-            ]
-          },
-          {
-            "variants": [
-              "שפות"
-            ]
-          },
-          {
-            "variants": [
-              "טוקנים\n1% Usage"
-            ]
-          },
-          {
-            "variants": [
-              "התנתק"
-            ]
-          }
-        ]
-      },
-      {
-        "variants": [
-          "JD",
-          "Menu"
-        ]
-      },
-      {
-        "variants": [
           "Open search"
         ]
       },
@@ -1304,20 +2174,89 @@
       },
       {
         "variants": [
-          "User interface controls menu"
+          "פתח תפריט"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "היסטוריה"
+            ]
+          },
+          {
+            "variants": [
+              "פעילות אחרונה"
+            ]
+          }
         ]
-      }
-    ]
-  },
-  {
-    "path": "/history",
-    "description": "Conversation history list — past conversations with timestamps",
-    "clickable_elements": [
+      },
       {
         "variants": [
-          "JD",
-          "Menu"
+          "מקורות מידע"
         ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Skills"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "תזמונים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "role": "div",
         "opens": [
           {
             "variants": [
@@ -1331,7 +2270,7 @@
           },
           {
             "variants": [
-              "טוקנים\n1% Usage"
+              "טוקנים 1% Usage"
             ]
           },
           {
@@ -1340,7 +2279,13 @@
             ]
           }
         ]
-      },
+      }
+    ]
+  },
+  {
+    "path": "/history",
+    "description": "Conversation history list — past conversations with timestamps",
+    "clickable_elements": [
       {
         "variants": [
           "התראות"
@@ -1355,8 +2300,89 @@
       },
       {
         "variants": [
+          "פתח תפריט"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "היסטוריה"
+            ]
+          },
+          {
+            "variants": [
+              "פעילות אחרונה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "מקורות מידע"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Skills"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "תזמונים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
           "avatar"
         ],
+        "role": "div",
         "opens": [
           {
             "variants": [
@@ -1370,49 +2396,12 @@
           },
           {
             "variants": [
-              "טוקנים\n1% Usage"
+              "טוקנים 1% Usage"
             ]
           },
           {
             "variants": [
               "התנתק"
-            ]
-          }
-        ]
-      },
-      {
-        "variants": [
-          "User interface controls menu"
-        ],
-        "opens": [
-          {
-            "variants": [
-              "מקורות מידע"
-            ]
-          },
-          {
-            "variants": [
-              "ניהול"
-            ]
-          },
-          {
-            "variants": [
-              "סוכנים"
-            ]
-          },
-          {
-            "variants": [
-              "סביבת עבודה"
-            ]
-          },
-          {
-            "variants": [
-              "Jeen Talk"
-            ]
-          },
-          {
-            "variants": [
-              "FinOps"
             ]
           }
         ]
@@ -1426,60 +2415,38 @@
       {
         "variants": [
           "סקירה כללית"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שיחות"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "סוכנים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "מודלים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "כלים"
-        ]
-      },
-      {
-        "variants": [
-          "JD",
-          "Menu"
         ],
-        "opens": [
-          {
-            "variants": [
-              "הגדרות"
-            ]
-          },
-          {
-            "variants": [
-              "שפות"
-            ]
-          },
-          {
-            "variants": [
-              "טוקנים\n1% Usage"
-            ]
-          },
-          {
-            "variants": [
-              "התנתק"
-            ]
-          }
-        ]
+        "role": "button"
       },
       {
         "variants": [
           "התראות"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -1490,8 +2457,89 @@
       },
       {
         "variants": [
+          "פתח תפריט"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "היסטוריה"
+            ]
+          },
+          {
+            "variants": [
+              "פעילות אחרונה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "מקורות מידע"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Skills"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "תזמונים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
           "avatar"
         ],
+        "role": "div",
         "opens": [
           {
             "variants": [
@@ -1505,44 +2553,12 @@
           },
           {
             "variants": [
-              "טוקנים\n1% Usage"
+              "טוקנים 1% Usage"
             ]
           },
           {
             "variants": [
               "התנתק"
-            ]
-          }
-        ]
-      },
-      {
-        "variants": [
-          "User interface controls menu"
-        ],
-        "opens": [
-          {
-            "variants": [
-              "מקורות מידע"
-            ]
-          },
-          {
-            "variants": [
-              "ניהול"
-            ]
-          },
-          {
-            "variants": [
-              "סביבת עבודה"
-            ]
-          },
-          {
-            "variants": [
-              "Jeen Talk"
-            ]
-          },
-          {
-            "variants": [
-              "FinOps"
             ]
           }
         ]
@@ -1582,11 +2598,6 @@
       },
       {
         "variants": [
-          "JD"
-        ]
-      },
-      {
-        "variants": [
           "Open search"
         ]
       },
@@ -1612,12 +2623,110 @@
       },
       {
         "variants": [
-          "avatar"
+          "פתח תפריט"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "היסטוריה"
+            ]
+          },
+          {
+            "variants": [
+              "פעילות אחרונה"
+            ]
+          }
         ]
       },
       {
         "variants": [
+          "מקורות מידע"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "Skills"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "תזמונים"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
           "User interface controls menu"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "role": "div",
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים 1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
         ]
       }
     ]
@@ -1752,6 +2861,7 @@
         "variants": [
           "Builder (רמה 4)"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -1787,91 +2897,107 @@
       },
       {
         "variants": [
-          "0\nשינויי הרשאות"
+          "0 שינויי הרשאות"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
-          "Company Admin\nרמה 2"
-        ]
-      },
-      {
-        "variants": [
-          "Unit Admin\nרמה 3"
-        ]
-      },
-      {
-        "variants": [
-          "Builder\nרמה 4"
-        ]
-      },
-      {
-        "variants": [
-          "רמה 5\n2 תפקידים"
+          "Company Admin רמה 2"
         ],
-        "default_expanded": true
+        "role": "button"
       },
       {
         "variants": [
-          "IAI Builder\nרמה 6"
-        ]
+          "Unit Admin רמה 3"
+        ],
+        "role": "button"
       },
       {
         "variants": [
-          "test_2\nרמה 7"
-        ]
+          "Builder רמה 4"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "רמה 5 2 תפקידים"
+        ],
+        "default_expanded": true,
+        "role": "button"
+      },
+      {
+        "variants": [
+          "IAI Builder רמה 6"
+        ],
+        "role": "button"
+      },
+      {
+        "variants": [
+          "test_2 רמה 7"
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "תפקיד חדש"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Platform (Global)"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "Workspace"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "Knowledge"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "Agents"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "Admin APP"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "בטל"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שמור שינויים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "JD",
           "Menu"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -1888,17 +3014,22 @@
       {
         "variants": [
           "Edit role"
-        ]
+        ],
+        "repeated": true,
+        "role": "button"
       },
       {
         "variants": [
           "Delete role"
-        ]
+        ],
+        "repeated": true,
+        "role": "button"
       },
       {
         "variants": [
           "avatar"
         ],
+        "role": "div",
         "opens": [
           {
             "variants": [
@@ -1921,18 +3052,22 @@
     "clickable_elements": [
       {
         "variants": [
-          "קובץ לוגו\nאו גרור ושחרר כאן"
-        ]
+          "קובץ לוגו או גרור ושחרר כאן"
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "בהיר"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "avatar"
         ],
+        "repeated": true,
+        "role": "div",
         "opens": [
           {
             "variants": [
@@ -1949,18 +3084,21 @@
       {
         "variants": [
           "בטל"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שמור שינויים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "JD",
           "Menu"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -1977,17 +3115,20 @@
       {
         "variants": [
           "מחק ערכת נושא"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שנה שם"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "הסר לוגו"
-        ]
+        ],
+        "role": "button"
       }
     ]
   },
@@ -1999,23 +3140,28 @@
       {
         "variants": [
           "בטל"
-        ]
+        ],
+        "repeated": true,
+        "role": "button"
       },
       {
         "variants": [
           "שמור"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שמור שינויים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "JD",
           "Menu"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -2032,12 +3178,14 @@
       {
         "variants": [
           "סגור"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "avatar"
         ],
+        "role": "div",
         "opens": [
           {
             "variants": [
@@ -2062,6 +3210,7 @@
         "variants": [
           "כל הסטטוסים"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -2079,6 +3228,7 @@
         "variants": [
           "פעולות"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -2095,40 +3245,64 @@
       {
         "variants": [
           "העלאה"
+        ],
+        "role": "button",
+        "opens": [
+          {
+            "variants": [
+              "סגור"
+            ]
+          },
+          {
+            "variants": [
+              "ביטול"
+            ]
+          },
+          {
+            "variants": [
+              "העלה"
+            ]
+          }
         ]
       },
       {
         "variants": [
           "צור כישור"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שם הכישור",
           "Sort by שם הכישור"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "נוצר",
           "Sort by נוצר"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "בטל"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שמור שינויים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "JD",
           "Menu"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -2146,6 +3320,7 @@
         "variants": [
           "avatar"
         ],
+        "role": "div",
         "opens": [
           {
             "variants": [
@@ -2169,83 +3344,99 @@
       {
         "variants": [
           "ייצוא (CSV)"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "טווח תאריכים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "קטגוריה"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "repeated": true,
+        "role": "button"
       },
       {
         "variants": [
           "סוג פעולה"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "היקף"
-        ]
+        ],
+        "repeated": true,
+        "role": "button"
       },
       {
         "variants": [
           "חותמת זמן",
           "Sort by חותמת זמן"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "פעולה",
           "Sort by פעולה"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "ישות",
           "Sort by ישות"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "בוצע על ידי",
           "Sort by בוצע על ידי"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "הקודם"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "הבא"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "בטל"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שמור שינויים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "JD",
           "Menu"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -2263,6 +3454,7 @@
         "variants": [
           "avatar"
         ],
+        "role": "div",
         "opens": [
           {
             "variants": [
@@ -2286,104 +3478,129 @@
       {
         "variants": [
           "כל המשתמשים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "כל המודלים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "דוחות"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "פעילות משתמשים"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "tab"
       },
       {
         "variants": [
           "ביצועים ושגיאות"
-        ]
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "סוכנים"
-        ]
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "מעקב"
-        ]
+        ],
+        "role": "tab"
       },
       {
         "variants": [
-          "5/31/2026 – 6/29/2026"
-        ]
+          "6/1/2026 – 6/30/2026"
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שמור פילטרים מותאמים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שעות"
-        ]
+        ],
+        "repeated": true,
+        "role": "button"
       },
       {
         "variants": [
           "ימים"
-        ]
+        ],
+        "repeated": true,
+        "role": "button"
       },
       {
         "variants": [
           "שבועות"
-        ]
+        ],
+        "repeated": true,
+        "role": "button"
       },
       {
         "variants": [
           "חודשים"
-        ]
+        ],
+        "repeated": true,
+        "role": "button"
       },
       {
         "variants": [
           "רבעונים"
-        ]
+        ],
+        "repeated": true,
+        "role": "button"
       },
       {
         "variants": [
           "ייצוא CSV"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Previous"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Next"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "בטל"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שמור שינויים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "JD",
           "Menu"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -2401,6 +3618,7 @@
         "variants": [
           "avatar"
         ],
+        "role": "div",
         "opens": [
           {
             "variants": [
@@ -2417,7 +3635,9 @@
       {
         "variants": [
           "Close panel"
-        ]
+        ],
+        "modal_only": true,
+        "role": "button"
       }
     ]
   },
@@ -2430,6 +3650,8 @@
         "variants": [
           "בעלים"
         ],
+        "repeated": true,
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -2477,6 +3699,7 @@
         "variants": [
           "קבוצה"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -2494,6 +3717,7 @@
         "variants": [
           "כל הסטטוסים"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -2511,6 +3735,8 @@
         "variants": [
           "פעולות"
         ],
+        "repeated": true,
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -2523,6 +3749,8 @@
         "variants": [
           "avatar"
         ],
+        "repeated": true,
+        "role": "div",
         "opens": [
           {
             "variants": [
@@ -2541,6 +3769,7 @@
           "JD",
           "Menu"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -2557,127 +3786,151 @@
       {
         "variants": [
           "סוכנים"
-        ]
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "כישורים"
-        ]
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "טריגרים"
-        ]
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "שם",
           "Sort by שם"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "סוג",
           "Sort by סוג"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "חשיפה",
           "Sort by חשיפה"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "סטטוס בעלים",
           "Sort by סטטוס בעלים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שליטה",
           "Sort by שליטה"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "בטל"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שמור שינויים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "הפעלה"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "השבתה"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Share"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Promote to organization"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "נקה"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Select all"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
-          "Select  מש\"ת מטרות רדואן"
-        ]
+          "Select מש\"ת מטרות רדואן"
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Select Air Evac Analyst"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Select Ask Manhar Agent"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Select Bot with character"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Select Bot with emojis"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Select Cortex Agent Screenshot"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Select Demo Copy"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Select DEMO CORTEX"
-        ]
+        ],
+        "role": "button"
       }
     ]
   },
@@ -2690,6 +3943,7 @@
         "variants": [
           "Builder"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -2732,12 +3986,15 @@
         "variants": [
           "Hebrew"
         ],
+        "repeated": true,
+        "role": "button",
         "opens": [
           {
             "variants": [
-              "2\nשינויים"
+              "2 שינויים"
             ],
-            "default_expanded": true
+            "default_expanded": true,
+            "role": "button"
           }
         ]
       },
@@ -2745,6 +4002,8 @@
         "variants": [
           "Select..."
         ],
+        "repeated": true,
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -2785,71 +4044,84 @@
       },
       {
         "variants": [
-          "0\nשינויים"
+          "0 שינויים"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "כללי"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "tab"
       },
       {
         "variants": [
           "סוכנים"
-        ]
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "תבניות"
-        ]
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "מודלים"
-        ]
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "הטמעה וניתוח"
-        ]
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "English"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "דחה"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "אשר"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "הוספת תבנית"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "בטל"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שמור שינויים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "JD",
           "Menu"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -2866,7 +4138,8 @@
       {
         "variants": [
           "avatar"
-        ]
+        ],
+        "role": "div"
       }
     ]
   },
@@ -2879,6 +4152,7 @@
         "variants": [
           "Off"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -2906,10 +4180,11 @@
         "variants": [
           "13 selected"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
-              "Credit cards\nPayment card numbers"
+              "Credit cards Payment card numbers"
             ]
           }
         ]
@@ -2917,23 +4192,27 @@
       {
         "variants": [
           "הרץ בדיקה"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "בטל"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שמור שינויים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "JD",
           "Menu"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -2950,17 +4229,21 @@
       {
         "variants": [
           "Add tag"
-        ]
+        ],
+        "repeated": true,
+        "role": "button"
       },
       {
         "variants": [
           "Clear selection"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "avatar"
         ],
+        "role": "div",
         "opens": [
           {
             "variants": [
@@ -2986,6 +4269,8 @@
           "הוסף",
           "Menu"
         ],
+        "repeated": true,
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -3006,8 +4291,9 @@
       },
       {
         "variants": [
-          "תפקיד:\nכל התפקידים"
+          "תפקיד: כל התפקידים"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -3033,8 +4319,9 @@
       },
       {
         "variants": [
-          "דריסה:\nהכל"
+          "דריסה: הכל"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -3062,6 +4349,8 @@
         "variants": [
           "פעולות"
         ],
+        "repeated": true,
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -3078,22 +4367,26 @@
       {
         "variants": [
           "קישורים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "בטל"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "שמור שינויים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "JD"
         ],
+        "role": "button",
         "opens": [
           {
             "variants": [
@@ -3110,7 +4403,8 @@
       {
         "variants": [
           "avatar"
-        ]
+        ],
+        "role": "div"
       }
     ]
   },
@@ -3123,13 +4417,15 @@
         "variants": [
           "Export Entities",
           "ייצא ישויות"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Refresh",
           "רענן"
-        ]
+        ],
+        "role": "button"
       }
     ]
   },
@@ -3142,122 +4438,148 @@
         "variants": [
           "Budget Items Cost & Usage",
           "עלות ושימוש לפי סעיפי תקציב"
-        ]
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "Vendors & Models",
           "ספקים ומודלים"
-        ]
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "Cursor"
-        ]
+        ],
+        "role": "tab"
+      },
+      {
+        "variants": [
+          "Anthropic"
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "OpenAI"
-        ]
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "Copilot Studio"
-        ]
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "Report Builder",
           "מחולל דוחות"
-        ]
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "Usage Resolver",
-          "מפענח שימוש"
-        ]
+          "שיוך שימושים"
+        ],
+        "role": "tab"
       },
       {
         "variants": [
-          "30/05/2026 – 29/06/2026"
+          "31/05/2026 – 30/06/2026"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "All Vendors",
           "כל הספקים"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "All Models",
           "כל המודלים"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "All Budget Items",
           "כל סעיפי התקציב"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "All Entities",
           "כל הישויות"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "All Entity Types",
           "כל סוגי הישויות"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Daily",
           "יומי"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Weekly",
           "שבועי"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Monthly",
           "חודשי"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Budget item",
           "סעיף תקציב"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Active entities",
           "ישויות פעילות"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Actual consumption",
           "צריכה בפועל"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Monthly rate",
           "תעריף חודשי"
-        ]
+        ],
+        "role": "button"
       }
     ]
   },
@@ -3280,7 +4602,8 @@
         "variants": [
           "Delete Project",
           "מחק פרויקט"
-        ]
+        ],
+        "role": "button"
       }
     ]
   },
@@ -3292,58 +4615,69 @@
       {
         "variants": [
           "Members",
-          "חברים"
-        ]
+          "חברי צוות"
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "Role permissions",
           "הרשאות תפקיד"
-        ]
+        ],
+        "role": "tab"
       },
       {
         "variants": [
           "Invite Member",
-          "הזמן חבר"
-        ]
+          "הזמן חבר צוות"
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Name",
           "שם"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "Email",
           "אימייל"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       },
       {
         "variants": [
           "Viewer",
           "צופה"
-        ]
+        ],
+        "repeated": true,
+        "role": "button"
       },
       {
         "variants": [
           "Admin",
           "מנהל מערכת"
-        ]
+        ],
+        "repeated": true,
+        "role": "button"
       },
       {
         "variants": [
           "Previous",
           "הקודם"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Next",
           "הבא"
-        ]
+        ],
+        "role": "button"
       }
     ]
   },
@@ -3356,38 +4690,45 @@
         "variants": [
           "Sync Prices",
           "סנכרן מחירים"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Add",
           "הוסף"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Add Vendor",
           "הוסף ספק"
-        ]
+        ],
+        "repeated": true,
+        "role": "button"
       },
       {
         "variants": [
           "Add Model",
           "הוסף מודל"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Refresh",
           "רענן"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Expand All",
           "הרחב הכל"
         ],
-        "default_expanded": true
+        "default_expanded": true,
+        "role": "button"
       }
     ]
   },
@@ -3400,31 +4741,37 @@
         "variants": [
           "Configure Anthropic",
           "הגדר את Anthropic"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Configure",
           "הגדר"
-        ]
+        ],
+        "repeated": true,
+        "role": "button"
       },
       {
         "variants": [
           "Configure Copilot Studio",
           "הגדר את Copilot Studio"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Configure Cursor",
           "הגדר את Cursor"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Configure OpenAI",
           "הגדר את OpenAI"
-        ]
+        ],
+        "role": "button"
       }
     ]
   },
@@ -3437,43 +4784,50 @@
         "variants": [
           "Create Budget",
           "צור תקציב"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Planned",
           "מתוכנן"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Actuals",
           "בפועל"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Reset",
           "אפס"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Copy from 2025",
           "העתק מ-2025"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Create First Budget",
           "צור תקציב ראשון"
-        ]
+        ],
+        "role": "button"
       },
       {
         "variants": [
           "Refresh",
           "רענן"
-        ]
+        ],
+        "role": "button"
       }
     ]
   }

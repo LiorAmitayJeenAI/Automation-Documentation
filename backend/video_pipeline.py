@@ -120,6 +120,18 @@ async def run_video_pipeline(
 
     # ── 4. Record the real browser session ──
     yield VideoEvent("record", "running", f"Recording browser session ({len(video_script)} steps)...")
+
+    step_events: list[dict] = []
+
+    def _on_step_status(step_num: int, total: int, status: str, action: str, url: str):
+        step_events.append({
+            "step": step_num,
+            "total": total,
+            "status": status,
+            "action": action,
+            "url": url,
+        })
+
     try:
         recording_result = await recorder.record_product_video(
             video_script=video_script,
@@ -128,13 +140,15 @@ async def run_video_pipeline(
             session_id=session_id,
             audio_results=audio_results,
             language=language,
+            on_step_status=_on_step_status,
         )
         n_recorded = len(recording_result.get("recorded_steps", []))
         duration = recording_result.get("total_seconds", 0)
         yield VideoEvent(
             "record", "done",
             f"Recorded {n_recorded} steps ({duration:.1f} s)",
-            {"recorded_steps": n_recorded, "duration_seconds": duration},
+            {"recorded_steps": n_recorded, "duration_seconds": duration,
+             "step_statuses": step_events},
         )
     except Exception as exc:
         yield VideoEvent("record", "error", str(exc))

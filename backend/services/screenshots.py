@@ -566,27 +566,80 @@ async def _count_visible(locator) -> tuple[int, object]:
     return n, visible_first
 
 
+async def _first_visible_in_content(locator) -> object | None:
+    """Return the first visible element for *locator*, preferring one inside the
+    main content area over page chrome. Returns None if none are visible.
+
+    This replaces the old "more than one match -> refuse" behaviour. When a
+    label legitimately repeats (e.g. a per-row "Actions"/"פעולות" button in a
+    table), the first visible instance in reading order is a correct and safe
+    demonstration target, so we click it instead of failing the whole step.
+    """
+    try:
+        count = await locator.count()
+    except Exception:
+        return None
+
+    first_visible = None
+    # Cap the scan so a locator that matches a huge list does not stall.
+    for i in range(min(count, 30)):
+        element = locator.nth(i)
+        try:
+            if not await element.is_visible():
+                continue
+        except Exception:
+            continue
+        if first_visible is None:
+            first_visible = element
+        try:
+            in_content = await element.evaluate(
+                "(el) => !!el.closest('main, [class*=\"content\"]')"
+            )
+        except Exception:
+            in_content = False
+        if in_content:
+            return element
+    return first_visible
+
+
+def _name_candidates(text: str) -> list[str]:
+    """Build accessible-name candidates from a stored label.
+
+    A stored label may be multi-line (e.g. a dropdown trigger whose label and
+    value live in separate child nodes, captured as ``"תפקיד:\\nכל התפקידים"``).
+    The combined string is often NOT the element's accessible name and never
+    appears as a single text node, so we also try each line on its own. Order:
+    full whitespace-collapsed string first (most specific), then each non-empty
+    line (handles the common "Primary\\nSecondary" label shape).
+    """
+    normalized = " ".join(text.split())
+    candidates = [normalized] if normalized else []
+    for line in re.split(r"[\r\n]+", text):
+        line_norm = " ".join(line.split())
+        if line_norm and line_norm not in candidates:
+            candidates.append(line_norm)
+    return candidates
+
+
 async def _find_clickable(page: Page, text: str):
     """
     Locate a visible clickable element for the given label.
 
     Resolution order:
     1. Sidebar-swap shortcut for known menu-toggle labels.
-    2. Exact accessible-name match per role. This is the strongest signal: if a
-       role has exactly one visible exact match it is used; if it has more than
-       one, the label is AMBIGUOUS on this page and we return None rather than
-       guess (the caller then fails the interaction, which lets the pipeline
-       realign the narration to the screen actually shown).
+    2. Exact accessible-name match per role, for each name candidate (the full
+       whitespace-collapsed label and each individual line). When several
+       identical controls match (e.g. a per-row action button), the first
+       visible one in reading order is used rather than refusing — demonstrating
+       the first row is correct and safe.
     3. Looser substring / aria-label / text matching for icon-only or partially
        labelled buttons, returning the first visible match.
 
-    Returning None on ambiguity is intentional — silently clicking the wrong
-    element (e.g. one of several buttons sharing the label "Menu") is the worst
-    failure mode, because the voiceover would describe something never shown.
+    Whitespace and line breaks are normalised on the stored label so multi-line
+    captures (``"תפקיד:\\nכל התפקידים"``) still resolve to the live control.
     """
     normalized = " ".join(text.split())
     lowered = normalized.lower()
-    escaped = normalized.replace('"', '\\"')
 
     # 1. Sidebar swap toggle (explicit, unambiguous selector)
     if lowered in SIDEBAR_SWAP_LABELS:
@@ -594,47 +647,37 @@ async def _find_clickable(page: Page, text: str):
         if element is not None:
             return element
 
+    names = _name_candidates(text)
     roles = ("button", "tab", "menuitem", "link", "option", "radio")
 
-    # 2. Exact accessible-name match (ambiguity-aware)
-    for role in roles:
-        n, element = await _count_visible(
-            page.get_by_role(role, name=normalized, exact=True)
-        )
-        if n == 1:
-            return element
-        if n > 1:
-            logger.info(
-                "Label %r matches %d+ visible %r elements — ambiguous, refusing to guess",
-                normalized, n, role,
+    # 2. Exact accessible-name match per candidate (repeat-tolerant)
+    for name in names:
+        for role in roles:
+            element = await _first_visible_in_content(
+                page.get_by_role(role, name=name, exact=True)
             )
-            return None
+            if element is not None:
+                return element
 
     # 3. Looser fallback (icon-only buttons, partial labels)
-    candidates = [
-        page.get_by_role("button", name=normalized, exact=False),
-        page.get_by_role("tab", name=normalized, exact=False),
-        page.get_by_role("menuitem", name=normalized, exact=False),
-        page.get_by_role("link", name=normalized, exact=False),
-        page.get_by_role("option", name=normalized, exact=False),
-        page.get_by_role("radio", name=normalized, exact=False),
-        page.locator(f'[role="tab"]:has-text("{escaped}")'),
-        page.get_by_text(normalized, exact=False),
-        page.locator(f'[aria-label*="{escaped}"]'),
-        page.locator(f'[data-value*="{escaped}" i]'),
-    ]
-    for locator in candidates:
-        try:
-            count = await locator.count()
-        except Exception:
-            continue
-        for i in range(count):
-            element = locator.nth(i)
-            try:
-                if await element.is_visible():
-                    return element
-            except Exception:
-                continue
+    for name in names:
+        escaped = name.replace('"', '\\"')
+        loose_candidates = [
+            page.get_by_role("button", name=name, exact=False),
+            page.get_by_role("tab", name=name, exact=False),
+            page.get_by_role("menuitem", name=name, exact=False),
+            page.get_by_role("link", name=name, exact=False),
+            page.get_by_role("option", name=name, exact=False),
+            page.get_by_role("radio", name=name, exact=False),
+            page.locator(f'[role="tab"]:has-text("{escaped}")'),
+            page.get_by_text(name, exact=False),
+            page.locator(f'[aria-label*="{escaped}"]'),
+            page.locator(f'[data-value*="{escaped}" i]'),
+        ]
+        for locator in loose_candidates:
+            element = await _first_visible_in_content(locator)
+            if element is not None:
+                return element
     return None
 
 
@@ -703,6 +746,7 @@ async def _run_interactions(
 
     Supported steps:
       - {"type": "click", "text": "<button/element label>"}
+      - {"type": "hover", "text": "<button/element label>"}
       - {"type": "fill", "label": "<input placeholder or aria-label>", "value": "<demo text>"}
       - {"type": "wait", "ms": <milliseconds>}
 
@@ -711,6 +755,9 @@ async def _run_interactions(
     visible-text and aria-label matching, so the click works regardless of which
     UI language the page is currently rendered in. Destructive labels are
     refused. Raises on failure so the caller can fall back for this item.
+
+    For a hover, the same label resolution is used, but the mouse only moves over
+    the element. It never clicks or triggers persistence.
 
     For a fill, the input is located by placeholder / aria-label / <label> text
     and filled with the provided demo value (never triggers real persistence).
@@ -736,6 +783,29 @@ async def _run_interactions(
             await element.click(timeout=5000)
             await element.fill(value)
             await page.wait_for_timeout(500)
+            continue
+
+        if kind == "hover":
+            text = (step.get("text") or "").strip()
+            if not text:
+                logger.warning("Skipping hover step with no text: %s", step)
+                continue
+
+            candidates = _expand_variants(text, variant_groups)
+            logger.info("Interaction: hovering element, candidates=%s", candidates)
+            element = await _resolve_clickable_with_retry(page, candidates)
+            if element is None:
+                raise RuntimeError(f"no visible hover target for {candidates!r}")
+
+            await element.scroll_into_view_if_needed(timeout=2000)
+            box = await element.bounding_box()
+            if not box:
+                raise RuntimeError(f"no visible hover target bounds for {candidates!r}")
+            await page.mouse.move(
+                box["x"] + box["width"] / 2,
+                box["y"] + box["height"] / 2,
+            )
+            await page.wait_for_timeout(RENDER_SETTLE_MS)
             continue
 
         if kind == "click":

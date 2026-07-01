@@ -13,7 +13,13 @@ const activeSessions = new Map();
 const activeRuns = new Map();
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.js') || filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+  },
+}));
 
 /* ── Helpers ── */
 function extractPageIdFromUrl(url) {
@@ -101,6 +107,16 @@ function loadFoldersRaw() {
         pageId: extractPageIdFromUrl(url),
         addedAt: new Date().toISOString(),
       });
+    }
+
+    const tutorials = loadTutorials();
+    for (const folder of folderMap.values()) {
+      for (const page of folder.pages) {
+        const match = tutorials.find(t => t.url === page.url || t.confluenceUrl === page.url);
+        if (match && match.videoDisabled) {
+          page.videoDisabled = true;
+        }
+      }
     }
 
     return { folders: [...folderMap.values()] };
@@ -434,6 +450,15 @@ function runVideoPipelineStream(url, language, linkType, signal, sessionId, onSt
               const event = JSON.parse(line.slice(6));
               const ts = new Date().toISOString().slice(11, 23);
               console.log(`[video] [${ts}] ${event.stage || '?'} ${event.status} — ${event.detail || ''}`);
+
+              if (event.stage === 'record' && event.status === 'done' && Array.isArray(event.step_statuses)) {
+                const statusIcons = { planned: '✅', adapted: '🔄', toured: '👀', failed: '❌', skipped: '⏭️' };
+                for (const s of event.step_statuses) {
+                  const icon = statusIcons[s.status] || '❓';
+                  console.log(`[video]   ${icon} Step ${s.step}/${s.total} [${s.status.toUpperCase()}] ${s.action}`);
+                }
+              }
+
               onStageEvent?.(event);
               if (event.stage === 'complete') finalEvent = event;
             } catch { /* ignore malformed lines */ }
@@ -875,6 +900,14 @@ async function executeVideoRun(runId, runItems, language) {
       run.itemStates.set(item.url, { status: 'stopped', error: 'Stopped by user' });
       handleStoppedTutorial(item.url, { language, sessionId: null, error: 'Stopped by user' });
       run.emitter.emit('event', { url: item.url, status: 'stopped', folderName: item.folderName, label: item.label, error: 'Stopped by user' });
+      continue;
+    }
+
+    const tutorials = loadTutorials();
+    const tutorialEntry = tutorials.find(t => t.url === item.url || t.confluenceUrl === item.url);
+    if (tutorialEntry && tutorialEntry.videoDisabled) {
+      run.itemStates.set(item.url, { status: 'skipped', error: 'Video creation disabled for this tutorial' });
+      run.emitter.emit('event', { url: item.url, status: 'skipped', folderName: item.folderName, label: item.label, error: 'Video creation disabled for this tutorial' });
       continue;
     }
 

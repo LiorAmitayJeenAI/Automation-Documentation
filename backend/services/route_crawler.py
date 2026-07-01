@@ -148,7 +148,12 @@ async def _gather_page_info(page: Page) -> dict:
               // real, page-specific action buttons.
               const chrome = 'nav, header, aside, [role="navigation"], '
                 + '[role="banner"], [class*="sidebar"], [class*="side-menu"], '
-                + '[class*="header"], [aria-label="User interface controls menu"]';
+                + '[class*="header"]';
+              // Workspace icon-rail labels — these live inside the sidebar
+              // chrome but should be kept as clickable navigation items.
+              const WORKSPACE_RAIL = new Set([
+                'מקורות מידע', 'סוכנים', 'skills', 'תזמונים'
+              ]);
               // Loose nav/avatar/logo items that often live OUTSIDE a recognized
               // chrome container yet are still chrome (Home, the account avatar,
               // the product logo, notifications, search). Dropped by label.
@@ -181,18 +186,22 @@ async def _gather_page_info(page: Page) -> dict:
               };
               // Header/nav menu openers we DO want to keep (their child menus
               // are captured by _capture_child_buttons): the account avatar,
-              // notifications, and the app switcher. We keep these even though
-              // they live in chrome, because their CHILDREN are real features
-              // a tutorial may need to click. Returns a stable label, or '' when
-              // the element is not a recognized chrome opener.
+              // notifications, activity-panel logo, and the app switcher.
+              // We keep these even though they live in chrome, because their
+              // CHILDREN are real features a tutorial may need to click.
+              // Workspace icon-rail buttons are also kept as direct nav items.
+              // Returns a stable label, or '' when the element is not recognized.
               const APPS_ARIA = 'User interface controls menu';
+              const ACTIVITY_ARIA = 'פתח תפריט';
               const CHROME_TRIGGER = new Set(['notifications', 'התראות', 'avatar']);
               const chromeTrigger = e => {
                 const aria = (e.getAttribute('aria-label') || '').trim();
                 const text = (e.innerText || '').trim();
                 if (aria === APPS_ARIA) return aria;
+                if (aria === ACTIVITY_ARIA || e.hasAttribute('data-sidebar-swap')) return ACTIVITY_ARIA;
                 if (aria === 'avatar' || e.closest('div[aria-label="avatar"]')) return 'avatar';
                 if (CHROME_TRIGGER.has((text || aria).toLowerCase())) return aria || text;
+                if (WORKSPACE_RAIL.has(aria.toLowerCase()) || WORKSPACE_RAIL.has(text.toLowerCase())) return aria || text;
                 // Any other in-chrome opener (e.g. a header dropdown) is kept too.
                 if (isOpener(e) && e.closest(chrome)) return aria || text;
                 return '';
@@ -207,10 +216,14 @@ async def _gather_page_info(page: Page) -> dict:
                 if ((e.innerText || '').trim()) s += 1;
                 return s;
               };
+              const collapse = s => (s || '').trim().replace(/\\s+/g, ' ').slice(0, 60);
               const toObj = e => {
                 const trigger = chromeTrigger(e);
-                const rawText = (e.innerText || '').trim().slice(0, 60);
-                const aria = (e.getAttribute('aria-label') || '').trim().slice(0, 60);
+                // Single-line accessible name: collapse line breaks/whitespace so
+                // the stored label matches what the click-time matcher resolves
+                // (a multi-line innerText label otherwise never matched).
+                const rawText = collapse(e.innerText);
+                const aria = collapse(e.getAttribute('aria-label'));
                 // Detect expanded state: aria-expanded OR visual signals
                 // (sibling/child panel visible, chevron rotated).
                 const ariaExp = e.getAttribute('aria-expanded') === 'true';
@@ -260,15 +273,21 @@ async def _gather_page_info(page: Page) -> dict:
                   opener: isOpener(e) || !!trigger || isExpandable(e) || isUploadTrigger(e),
                   expanded: isExpanded,
                   chrome: !!trigger,
+                  // Per-button context used downstream: the control's role, and
+                  // whether it lives inside a dialog/drawer (modal_only) so it is
+                  // not offered as a top-level page action.
+                  role: e.getAttribute('role') || e.tagName.toLowerCase(),
+                  modal_only: !!e.closest('[role="dialog"], [aria-modal="true"]'),
                   score: score(e),
                 };
               };
               const seen = new Set();
               const out = [];
-              els
+              const prelim = els
                 .map(e => ({ e, b: toObj(e) }))
                 // Keep normal page buttons (outside chrome) plus recognized
-                // chrome openers (profile/avatar, notifications, app switcher).
+                // chrome controls (avatar, notifications, app switcher,
+                // activity-panel logo, workspace icon rail).
                 .filter(({ e, b }) => b.chrome || !e.closest(chrome))
                 .map(({ b }) => b)
                 .filter(b => b.text || b.aria)
@@ -276,18 +295,28 @@ async def _gather_page_info(page: Page) -> dict:
                   if (b.chrome) return true;
                   const l = (b.text || b.aria).toLowerCase();
                   return !CHROME_LABELS.has(l) && !isAvatar(b.text);
-                })
+                });
+              // Count identical labels BEFORE dedup so we can mark controls that
+              // legitimately repeat (e.g. a per-row "Actions"/"פעולות" button).
+              const counts = {};
+              prelim.forEach(b => {
+                const k = (b.text || b.aria).toLowerCase();
+                counts[k] = (counts[k] || 0) + 1;
+              });
+              prelim
                 .sort((a, b) => b.score - a.score)
                 .forEach(b => {
                   const key = (b.text || b.aria).toLowerCase();
                   if (seen.has(key)) return;
                   seen.add(key);
+                  b.repeated = counts[key] > 1;
                   out.push(b);
                 });
               return out.slice(0, 40);
             }""",
         )
-    except Exception:
+    except Exception as exc:
+        logger.warning("Button capture failed (%s) — no buttons for this page", exc)
         buttons = []
 
     try:
@@ -295,10 +324,31 @@ async def _gather_page_info(page: Page) -> dict:
     except Exception:
         body_preview = ""
 
+    try:
+        input_fields = await page.eval_on_selector_all(
+            "input[type='text'], input[type='search'], input:not([type]), textarea",
+            """els => {
+              const out = [];
+              const seen = new Set();
+              for (const e of els) {
+                if (e.offsetWidth === 0 && e.offsetHeight === 0) continue;
+                if (e.type === 'hidden' || e.type === 'file') continue;
+                const label = (e.getAttribute('aria-label') || e.placeholder || e.name || '').trim();
+                if (!label || seen.has(label.toLowerCase())) continue;
+                seen.add(label.toLowerCase());
+                out.push({label});
+              }
+              return out.slice(0, 10);
+            }""",
+        )
+    except Exception:
+        input_fields = []
+
     return {
         "title": title,
         "heading": heading,
         "buttons": buttons,
+        "input_fields": input_fields,
         "body_preview": body_preview,
     }
 
@@ -1052,7 +1102,9 @@ def _normalize_clickable_elements(buttons: list) -> list[dict]:
         variants: list[str] = []
         local_seen: set[str] = set()
         for c in candidates:
-            label = str(c).strip()
+            # Collapse any newlines/whitespace so stored labels are single-line
+            # and resolvable by the click-time matcher.
+            label = " ".join(str(c).split())
             if _is_noise_label(label):
                 continue
             key = label.lower()
@@ -1070,6 +1122,15 @@ def _normalize_clickable_elements(buttons: list) -> list[dict]:
         group: dict = {"variants": variants}
         if isinstance(raw, dict) and raw.get("expanded"):
             group["default_expanded"] = True
+        # Carry per-button context so downstream consumers can treat repeated
+        # row controls and modal-only buttons correctly.
+        if isinstance(raw, dict):
+            if raw.get("modal_only"):
+                group["modal_only"] = True
+            if raw.get("repeated"):
+                group["repeated"] = True
+            if raw.get("role"):
+                group["role"] = raw["role"]
         # Preserve nested child buttons (revealed by clicking this opener),
         # normalized recursively. Children are deduped within their own menu
         # scope, not against top-level buttons, since they live in a different
@@ -1239,6 +1300,8 @@ def merge_routes(discovered: list[dict], descriptions: dict[str, str], link_type
         if clickable is None:
             clickable = _normalize_clickable_elements(info.get("buttons", []))
 
+        input_fields = info.get("input_fields") or []
+
         if route_key in existing_by_key:
             # Existing route: refresh clickable_elements from this crawl
             # (description stays add-only). Every route in `discovered` was just
@@ -1251,6 +1314,10 @@ def merge_routes(discovered: list[dict], descriptions: dict[str, str], link_type
                 entry["clickable_elements"] = clickable
             else:
                 entry.pop("clickable_elements", None)
+            if input_fields:
+                entry["input_fields"] = input_fields
+            else:
+                entry.pop("input_fields", None)
             continue
 
         description = (
@@ -1262,6 +1329,8 @@ def merge_routes(discovered: list[dict], descriptions: dict[str, str], link_type
         entry = {"link_type": normalized_link_type, "path": path, "description": description}
         if clickable:
             entry["clickable_elements"] = clickable
+        if input_fields:
+            entry["input_fields"] = input_fields
         existing.append(entry)
         existing_by_key[route_key] = entry
         added.append(entry)

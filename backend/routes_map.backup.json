@@ -1,0 +1,3480 @@
+[
+  {
+    "path": "/",
+    "description": "Main chat workspace — chat input area with the assistant, also has 'history' and 'last activity' buttons that open a sidebar (URL stays the same)",
+    "clickable_elements": [
+      {
+        "variants": [
+          "GPT 5.1 - Azure OpenAI"
+        ]
+      },
+      {
+        "variants": [
+          "Brain",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "כלים\nלא נבחרו"
+            ]
+          },
+          {
+            "variants": [
+              "חיבורים\nאפליקציות צד שלישי"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "JD"
+        ]
+      },
+      {
+        "variants": [
+          "Open search"
+        ]
+      },
+      {
+        "variants": [
+          "Upload Files"
+        ]
+      },
+      {
+        "variants": [
+          "Voice input"
+        ]
+      },
+      {
+        "variants": [
+          "Submit"
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/chat",
+    "description": "Active conversation thread with the AI assistant — message bubbles and input box",
+    "clickable_elements": [
+      {
+        "variants": [
+          "GPT 5.1 - Azure OpenAI"
+        ]
+      },
+      {
+        "variants": [
+          "Brain",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "כלים\nלא נבחרו"
+            ]
+          },
+          {
+            "variants": [
+              "חיבורים\nאפליקציות צד שלישי"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "JD"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "Upload Files"
+        ]
+      },
+      {
+        "variants": [
+          "Voice input"
+        ]
+      },
+      {
+        "variants": [
+          "Submit"
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/agents",
+    "description": "Agents main page — list of all user agents with a 'צור סוכן' (create agent) button that opens 3 agent type options (NOT a single agent's edit page)",
+    "clickable_elements": [
+      {
+        "variants": [
+          "הסוכנים שלי"
+        ]
+      },
+      {
+        "variants": [
+          "שותף איתי"
+        ]
+      },
+      {
+        "variants": [
+          "משותף על ידי הארגון"
+        ]
+      },
+      {
+        "variants": [
+          "צור סוכן"
+        ]
+      },
+      {
+        "variants": [
+          "צור תיקייה"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "Open search"
+        ]
+      },
+      {
+        "variants": [
+          "Select all rows"
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/agent-configuration/b6f06945-ba74-4c86-8950-be90547055cb",
+    "language": "he",
+    "description": "Edit a Spark agent — configuration and settings page for a Spark-type agent",
+    "clickable_elements": [
+      {
+        "variants": [
+          "פעיל"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "מושבת"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "Brain",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "כלים\nלא נבחרו"
+            ]
+          },
+          {
+            "variants": [
+              "חיבורים\nאפליקציות צד שלישי"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "בחר מודל"
+        ]
+      },
+      {
+        "variants": [
+          "העתקת מזהה"
+        ]
+      },
+      {
+        "variants": [
+          "שמור"
+        ]
+      },
+      {
+        "variants": [
+          "תוכל לעזור לי לבנות תרחישי בדיקה?"
+        ]
+      },
+      {
+        "variants": [
+          "איך לנסח באג בצורה מדויקת?"
+        ]
+      },
+      {
+        "variants": [
+          "מהם סוגי הבדיקות שכדאי לבצע למוצר חדש?"
+        ]
+      },
+      {
+        "variants": [
+          "האם תוכל לנתח עבורי בדיקות קיימות?"
+        ]
+      },
+      {
+        "variants": [
+          "העלאת תמונה"
+        ]
+      },
+      {
+        "variants": [
+          "הסרה"
+        ]
+      },
+      {
+        "variants": [
+          "בחר תהליכים"
+        ]
+      },
+      {
+        "variants": [
+          "ערוך פתיחי שיחה"
+        ]
+      },
+      {
+        "variants": [
+          "0 קבצים"
+        ]
+      },
+      {
+        "variants": [
+          "העלאת קובץ"
+        ]
+      },
+      {
+        "variants": [
+          "ערוך"
+        ]
+      },
+      {
+        "variants": [
+          "הגדר טבלת המרה"
+        ]
+      },
+      {
+        "variants": [
+          "הוסף Skills"
+        ]
+      },
+      {
+        "variants": [
+          "הוספת חיבורים"
+        ]
+      },
+      {
+        "variants": [
+          "בחר"
+        ]
+      },
+      {
+        "variants": [
+          "JD"
+        ]
+      },
+      {
+        "variants": [
+          "Reset-context-button"
+        ]
+      },
+      {
+        "variants": [
+          "Upload Files"
+        ]
+      },
+      {
+        "variants": [
+          "Submit"
+        ]
+      },
+      {
+        "variants": [
+          "Increment"
+        ]
+      },
+      {
+        "variants": [
+          "Decrement"
+        ]
+      },
+      {
+        "variants": [
+          "Copy"
+        ]
+      },
+      {
+        "variants": [
+          "Like"
+        ]
+      },
+      {
+        "variants": [
+          "Dislike"
+        ]
+      },
+      {
+        "variants": [
+          "Feedback"
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/agent-configuration/d66e45bd-85de-40cf-a81a-ed8466d09c50",
+    "language": "he",
+    "description": "Edit a Cortex agent — configuration and settings page for a Cortex-type agent",
+    "clickable_elements": [
+      {
+        "variants": [
+          "פעיל"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "מושבת"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "Brain",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "כלים\nלא נבחרו"
+            ]
+          },
+          {
+            "variants": [
+              "חיבורים\nאפליקציות צד שלישי"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "GPT 5.1 - Azure OpenAI\nמומלץ"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "מושבת"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "העתקת מזהה"
+        ]
+      },
+      {
+        "variants": [
+          "שמור"
+        ]
+      },
+      {
+        "variants": [
+          "העלאת תמונה"
+        ]
+      },
+      {
+        "variants": [
+          "הסרה"
+        ]
+      },
+      {
+        "variants": [
+          "בחר תהליכים"
+        ]
+      },
+      {
+        "variants": [
+          "הוסף"
+        ]
+      },
+      {
+        "variants": [
+          "1 קבצים"
+        ]
+      },
+      {
+        "variants": [
+          "העלאת קובץ"
+        ]
+      },
+      {
+        "variants": [
+          "ערוך"
+        ]
+      },
+      {
+        "variants": [
+          "הגדר טבלת המרה"
+        ]
+      },
+      {
+        "variants": [
+          "הוסף Skills"
+        ]
+      },
+      {
+        "variants": [
+          "הוספת חיבורים"
+        ]
+      },
+      {
+        "variants": [
+          "בחר"
+        ]
+      },
+      {
+        "variants": [
+          "JD"
+        ]
+      },
+      {
+        "variants": [
+          "Reset-context-button"
+        ]
+      },
+      {
+        "variants": [
+          "Upload Files"
+        ]
+      },
+      {
+        "variants": [
+          "Submit"
+        ]
+      },
+      {
+        "variants": [
+          "Increment"
+        ]
+      },
+      {
+        "variants": [
+          "Decrement"
+        ]
+      },
+      {
+        "variants": [
+          "Copy"
+        ]
+      },
+      {
+        "variants": [
+          "Like"
+        ]
+      },
+      {
+        "variants": [
+          "Dislike"
+        ]
+      },
+      {
+        "variants": [
+          "Feedback"
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/workflow/flow/05e7f241-7528-4417-a5c6-4a2774ea0d9e",
+    "language": "he",
+    "description": "Edit a Workflow agent — visual flow builder for a workflow-type agent",
+    "clickable_elements": [
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/agent-configuration/338b8275-4edf-41af-a846-baa2d08e1019",
+    "language": "en",
+    "description": "Edit a Spark agent — configuration and settings page for a Spark-type agent",
+    "clickable_elements": [
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/agent-configuration/c40c8d50-2a04-4a1b-8932-bc0afbef7675",
+    "language": "en",
+    "description": "Edit a Cortex agent — configuration and settings page for a Cortex-type agent",
+    "clickable_elements": [
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/workflow/flow/5625b3d8-3355-464c-b539-f7f1b1feb58e",
+    "language": "en",
+    "description": "Edit a Workflow agent — visual flow builder for a workflow-type agent",
+    "clickable_elements": [
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/agent-configuration/new",
+    "description": "Create a new Spark agent via chat — interactive chat-based agent creation flow",
+    "clickable_elements": [
+      {
+        "variants": [
+          "פעיל"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "מושבת"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "Brain",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "כלים\nלא נבחרו"
+            ]
+          },
+          {
+            "variants": [
+              "חיבורים\nאפליקציות צד שלישי"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "GPT 5.1 - Azure OpenAI\nמומלץ"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "מושבת"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "יצירה"
+        ]
+      },
+      {
+        "variants": [
+          "העלאת תמונה"
+        ]
+      },
+      {
+        "variants": [
+          "הסרה"
+        ]
+      },
+      {
+        "variants": [
+          "בחר תהליכים"
+        ]
+      },
+      {
+        "variants": [
+          "הוסף"
+        ]
+      },
+      {
+        "variants": [
+          "1 קבצים"
+        ]
+      },
+      {
+        "variants": [
+          "העלאת קובץ"
+        ]
+      },
+      {
+        "variants": [
+          "ערוך"
+        ]
+      },
+      {
+        "variants": [
+          "הגדר טבלת המרה"
+        ]
+      },
+      {
+        "variants": [
+          "הוסף Skills"
+        ]
+      },
+      {
+        "variants": [
+          "הוספת חיבורים"
+        ]
+      },
+      {
+        "variants": [
+          "בחר"
+        ]
+      },
+      {
+        "variants": [
+          "JD"
+        ]
+      },
+      {
+        "variants": [
+          "Reset-context-button"
+        ]
+      },
+      {
+        "variants": [
+          "Upload Files"
+        ]
+      },
+      {
+        "variants": [
+          "Submit"
+        ]
+      },
+      {
+        "variants": [
+          "Increment"
+        ]
+      },
+      {
+        "variants": [
+          "Decrement"
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/skills",
+    "description": "Skills library page — list of available skills/tools the assistant can use",
+    "clickable_elements": [
+      {
+        "variants": [
+          "הSkills שלי"
+        ]
+      },
+      {
+        "variants": [
+          "שותפו איתי"
+        ]
+      },
+      {
+        "variants": [
+          "Skills של הארגון"
+        ]
+      },
+      {
+        "variants": [
+          "צור Skill"
+        ]
+      },
+      {
+        "variants": [
+          "ייבא Skill"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Close modal"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "Open search"
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/triggers",
+    "description": "Triggers configuration page — automations that start flows based on events",
+    "clickable_elements": [
+      {
+        "variants": [
+          "התזמונים שלי"
+        ]
+      },
+      {
+        "variants": [
+          "צור תזמון"
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "Open search"
+        ]
+      },
+      {
+        "variants": [
+          "Select all rows"
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/knowledge",
+    "description": "Knowledge base page — ingested documents and folders, upload and management UI",
+    "clickable_elements": [
+      {
+        "variants": [
+          "הקבצים שלי"
+        ]
+      },
+      {
+        "variants": [
+          "שותף איתי"
+        ]
+      },
+      {
+        "variants": [
+          "העלה או גרור"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Close modal"
+            ]
+          },
+          {
+            "variants": [
+              "העלאה"
+            ]
+          },
+          {
+            "variants": [
+              "הוספת מסמך"
+            ]
+          },
+          {
+            "variants": [
+              "הוספה ממערכת שיתוף קבצים"
+            ]
+          },
+          {
+            "variants": [
+              "אפשרויות מתקדמות"
+            ]
+          },
+          {
+            "variants": [
+              "Increment"
+            ]
+          },
+          {
+            "variants": [
+              "Decrement"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "צור תיקייה"
+        ]
+      },
+      {
+        "variants": [
+          "סנכרן"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ]
+      },
+      {
+        "variants": [
+          "Open search"
+        ]
+      },
+      {
+        "variants": [
+          "Select all rows"
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/history",
+    "description": "Conversation history list — past conversations with timestamps",
+    "clickable_elements": [
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "סוכנים"
+            ]
+          },
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/analytics",
+    "description": "Usage analytics dashboard — charts and metrics about platform usage",
+    "clickable_elements": [
+      {
+        "variants": [
+          "סקירה כללית"
+        ]
+      },
+      {
+        "variants": [
+          "שיחות"
+        ]
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ]
+      },
+      {
+        "variants": [
+          "מודלים"
+        ]
+      },
+      {
+        "variants": [
+          "כלים"
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "תצוגה מלאה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הגדרות"
+            ]
+          },
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "טוקנים\n1% Usage"
+            ]
+          },
+          {
+            "variants": [
+              "התנתק"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "מקורות מידע"
+            ]
+          },
+          {
+            "variants": [
+              "ניהול"
+            ]
+          },
+          {
+            "variants": [
+              "סביבת עבודה"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen Talk"
+            ]
+          },
+          {
+            "variants": [
+              "FinOps"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/support",
+    "description": "Support / help center home page"
+  },
+  {
+    "path": "/integrations/connect",
+    "description": "Integrations and connectors page — MCPs, external services, API connections",
+    "clickable_elements": [
+      {
+        "variants": [
+          "GPT 5.1 - Azure OpenAI"
+        ]
+      },
+      {
+        "variants": [
+          "Brain",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "כלים\nלא נבחרו"
+            ]
+          },
+          {
+            "variants": [
+              "חיבורים\nאפליקציות צד שלישי"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "JD"
+        ]
+      },
+      {
+        "variants": [
+          "Open search"
+        ]
+      },
+      {
+        "variants": [
+          "Upload Files"
+        ]
+      },
+      {
+        "variants": [
+          "Voice input"
+        ]
+      },
+      {
+        "variants": [
+          "Submit"
+        ]
+      },
+      {
+        "variants": [
+          "התראות"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      },
+      {
+        "variants": [
+          "User interface controls menu"
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/support/workspace/introduction",
+    "description": "Product documentation article — introduction to the Workspace structure, core tools, and chat interaction basics. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/workspace/user-profile",
+    "description": "Product documentation article — explains the User Profile area, including language settings, support options, and profile preferences. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/workspace/side-menu",
+    "description": "Product documentation article — describes the Side Menu and its quick links to new chat, knowledge, agents, skills, schedules, activity, history, and support. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/workspace/basic-chat-usage",
+    "description": "Product documentation article — covers basic chat usage, prompts, language models, and core AI interaction concepts. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/workspace/chat-workspace-overview",
+    "description": "Product documentation article — overview of the main chat workspace and actions such as selecting agents, using models, and creating Spark agents. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/workspace/agent-in-workspace",
+    "description": "Product documentation article — explains what agents are, how they appear in the workspace, and how users activate or use shared/built-in agents. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/workspace/scheduler-and-notifications",
+    "description": "Product documentation article — explains automated scheduled tasks, recurring agent runs, and in-app completion notifications. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/agent/introduction",
+    "description": "Product documentation article — introduction to Jeen AI agents, their purpose, types, creation, configuration, and operation. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/agent/workflow-components",
+    "description": "Product documentation article — explains workflow components as modular no-code blocks for building process flows. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/agent/spark-agent",
+    "description": "Product documentation article — describes Spark Agents for fast prompt-based text tasks and document attachment options. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/agent/cortex-agent",
+    "description": "Product documentation article — explains Cortex Agent creation and advanced structured settings for detailed agent behavior control. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/agent/workflow-agent",
+    "description": "Product documentation article — describes Workflow Agents and how visual connected components define structured automation logic. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/agent/workflow-testing",
+    "description": "Product documentation article — explains testing workflow flows in the Playground and monitoring sessions for validation and debugging. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/skills/skills-tab",
+    "description": "Product documentation article — overview of Skills as reusable packaged capabilities for consistent instructions, logic, and domain behavior. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/knowledge-and-sources/uploading-and-processing",
+    "description": "Product documentation article — guide for uploading documents and controlling processing/conversion options for knowledge sources. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/knowledge-and-sources/rag-mechanism",
+    "description": "Product documentation article — explains the RAG mechanism used to retrieve information from uploaded organizational documents for AI responses. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/knowledge-and-sources/excel-files",
+    "description": "Product documentation article — explains uploading Excel/CSV files with chunking so large datasets can be processed efficiently. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/apis-and-platform-interfaces/connectors",
+    "description": "Product documentation article — explains connectors and MCP for connecting the chat to external organizational systems like Outlook, Jira, and Monday. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/apis-and-platform-interfaces/mcps-and-connectors",
+    "description": "Product documentation article — overview of MCP apps/connectors that let agents perform external tool actions directly from chat. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/initial-setup-guidelines",
+    "description": "Product documentation article — admin setup checklist covering resource allocation, token limits, user permissions, and initial platform configuration. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/roles-management",
+    "description": "Product documentation article — explains admin role management, hierarchical permissions, and access control for features and modules. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/design",
+    "description": "Product documentation article — describes design management for organization branding, themes, and default visual appearance. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/organization-system-prompt",
+    "description": "Product documentation article — explains viewing and editing the organization-wide system prompt that defines the assistant’s base behavior. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/analytics",
+    "description": "Product documentation article — describes the admin analytics dashboard with activity metrics, KPIs, graphs, filters, and engagement trends. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/guardrails",
+    "description": "Product documentation article — explains input and output guardrails for enforcing ethical and organizational AI usage policies. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/organization-settings",
+    "description": "Product documentation article — covers organization settings for defaults such as name, language, available agents, models, templates, and platform behavior. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/users-groups-tokens",
+    "description": "Product documentation article — explains managing users, groups, identity provider sync, and token limits across the organization. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/admin-and-control/audit-logs",
+    "description": "Product documentation article — describes audit logs for tracking administrative actions, system changes, filtering, searching, and exporting logs. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "path": "/support/finops/finops-overview",
+    "description": "Product documentation article — overview of Jeen.ai FinOps for AI cost governance, budget management, and usage oversight across users, agents, workflows, and vendors. Includes the docs side navigation and header controls for home/menu, notifications, and the user/profile menu."
+  },
+  {
+    "link_type": "admin",
+    "path": "/login",
+    "description": "Jeen Admin login page — email-based sign-in screen with an email field and Continue button, plus a top Menu button and Language selector."
+  },
+  {
+    "link_type": "admin",
+    "path": "/roles-management",
+    "description": "Admin roles management page — shows default and custom account roles, default role settings, and a permissions editor. Includes role cards such as Company Admin, Unit Admin and Builder plus an \"Edit role\" button and collapsible admin sidebar.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Builder (רמה 4)"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Company Admin (רמה 2)"
+            ]
+          },
+          {
+            "variants": [
+              "Unit Admin (רמה 3)"
+            ]
+          },
+          {
+            "variants": [
+              "test_1 (רמה 5)"
+            ]
+          },
+          {
+            "variants": [
+              "Member (רמה 5)"
+            ]
+          },
+          {
+            "variants": [
+              "IAI Builder (רמה 6)"
+            ]
+          },
+          {
+            "variants": [
+              "test_2 (רמה 7)"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "0\nשינויי הרשאות"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "Company Admin\nרמה 2"
+        ]
+      },
+      {
+        "variants": [
+          "Unit Admin\nרמה 3"
+        ]
+      },
+      {
+        "variants": [
+          "Builder\nרמה 4"
+        ]
+      },
+      {
+        "variants": [
+          "רמה 5\n2 תפקידים"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "IAI Builder\nרמה 6"
+        ]
+      },
+      {
+        "variants": [
+          "test_2\nרמה 7"
+        ]
+      },
+      {
+        "variants": [
+          "תפקיד חדש"
+        ]
+      },
+      {
+        "variants": [
+          "Platform (Global)"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "Workspace"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "Knowledge"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "Agents"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "Admin APP"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "בטל"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים"
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "Edit role"
+        ]
+      },
+      {
+        "variants": [
+          "Delete role"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "admin",
+    "path": "/design-management",
+    "description": "Admin design management page — create and manage UI themes with theme list, active/default status, color and logo settings, and a live preview. Includes actions like create theme, rename, delete theme, remove logo, and logo upload drop zone without changing the URL.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "קובץ לוגו\nאו גרור ושחרר כאן"
+        ]
+      },
+      {
+        "variants": [
+          "בהיר"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "בטל"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים"
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "מחק ערכת נושא"
+        ]
+      },
+      {
+        "variants": [
+          "שנה שם"
+        ]
+      },
+      {
+        "variants": [
+          "הסר לוגו"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "admin",
+    "path": "/system-prompts",
+    "description": "Admin system prompts page — configure the main system instruction used for AI interactions and assign or edit prompt content. Includes cancel/save controls and a close action within the editor area.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "בטל"
+        ]
+      },
+      {
+        "variants": [
+          "שמור"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים"
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "סגור"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "admin",
+    "path": "/skills",
+    "description": "Admin skills library page — manage organization skill packages, showing an empty-state when no skills are found. Includes upload, create skill, status filter, cancel and save changes controls.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "כל הסטטוסים"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "מופעל"
+            ]
+          },
+          {
+            "variants": [
+              "מושבת"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "פעולות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "ערוך"
+            ]
+          },
+          {
+            "variants": [
+              "השתמש כהנחיית מערכת"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "העלאה"
+        ]
+      },
+      {
+        "variants": [
+          "צור כישור"
+        ]
+      },
+      {
+        "variants": [
+          "שם הכישור",
+          "Sort by שם הכישור"
+        ]
+      },
+      {
+        "variants": [
+          "נוצר",
+          "Sort by נוצר"
+        ]
+      },
+      {
+        "variants": [
+          "בטל"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים"
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "admin",
+    "path": "/audit-logs",
+    "description": "Admin audit logs page — table of administrative and system changes with timestamp, category, action, entity, scope and actor columns. Includes CSV export plus date range, category and action type filters.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "ייצוא (CSV)"
+        ]
+      },
+      {
+        "variants": [
+          "טווח תאריכים"
+        ]
+      },
+      {
+        "variants": [
+          "קטגוריה"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "סוג פעולה"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "היקף"
+        ]
+      },
+      {
+        "variants": [
+          "חותמת זמן",
+          "Sort by חותמת זמן"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "פעולה",
+          "Sort by פעולה"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "ישות",
+          "Sort by ישות"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "בוצע על ידי",
+          "Sort by בוצע על ידי"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "הקודם"
+        ]
+      },
+      {
+        "variants": [
+          "הבא"
+        ]
+      },
+      {
+        "variants": [
+          "בטל"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים"
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "admin",
+    "path": "/analytics",
+    "description": "Admin analytics dashboard — tracks platform usage, engagement, performance and agent metrics with charts and KPI cards. Includes in-page tabs for reports, user activity, performance/errors and agents, plus filters for date range, users and model.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "כל המשתמשים"
+        ]
+      },
+      {
+        "variants": [
+          "כל המודלים"
+        ]
+      },
+      {
+        "variants": [
+          "דוחות"
+        ]
+      },
+      {
+        "variants": [
+          "פעילות משתמשים"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "ביצועים ושגיאות"
+        ]
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ]
+      },
+      {
+        "variants": [
+          "מעקב"
+        ]
+      },
+      {
+        "variants": [
+          "5/31/2026 – 6/29/2026"
+        ]
+      },
+      {
+        "variants": [
+          "שמור פילטרים מותאמים"
+        ]
+      },
+      {
+        "variants": [
+          "שעות"
+        ]
+      },
+      {
+        "variants": [
+          "ימים"
+        ]
+      },
+      {
+        "variants": [
+          "שבועות"
+        ]
+      },
+      {
+        "variants": [
+          "חודשים"
+        ]
+      },
+      {
+        "variants": [
+          "רבעונים"
+        ]
+      },
+      {
+        "variants": [
+          "ייצוא CSV"
+        ]
+      },
+      {
+        "variants": [
+          "Previous"
+        ]
+      },
+      {
+        "variants": [
+          "Next"
+        ]
+      },
+      {
+        "variants": [
+          "בטל"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים"
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "Close panel"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "admin",
+    "path": "/organization-assets",
+    "description": "Admin organization assets page — lists user-created agents, skills and triggers across the organization with owner, visibility and status details. Includes in-page tabs for agents, skills and triggers plus filters such as owner, group and status.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "בעלים"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "bengarusi2"
+            ]
+          },
+          {
+            "variants": [
+              "Demo"
+            ]
+          },
+          {
+            "variants": [
+              "Dvir"
+            ]
+          },
+          {
+            "variants": [
+              "Jeen D"
+            ]
+          },
+          {
+            "variants": [
+              "Maccabi Demo"
+            ]
+          },
+          {
+            "variants": [
+              "Manhar Manhar"
+            ]
+          },
+          {
+            "variants": [
+              "Margalit"
+            ]
+          },
+          {
+            "variants": [
+              "Ministry Of Welfare"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "קבוצה"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Customers POC"
+            ]
+          },
+          {
+            "variants": [
+              "Existing Users"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "כל הסטטוסים"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "פעיל"
+            ]
+          },
+          {
+            "variants": [
+              "לא פעיל"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "פעולות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "פרטים"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ]
+      },
+      {
+        "variants": [
+          "כישורים"
+        ]
+      },
+      {
+        "variants": [
+          "טריגרים"
+        ]
+      },
+      {
+        "variants": [
+          "שם",
+          "Sort by שם"
+        ]
+      },
+      {
+        "variants": [
+          "סוג",
+          "Sort by סוג"
+        ]
+      },
+      {
+        "variants": [
+          "חשיפה",
+          "Sort by חשיפה"
+        ]
+      },
+      {
+        "variants": [
+          "סטטוס בעלים",
+          "Sort by סטטוס בעלים"
+        ]
+      },
+      {
+        "variants": [
+          "שליטה",
+          "Sort by שליטה"
+        ]
+      },
+      {
+        "variants": [
+          "בטל"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים"
+        ]
+      },
+      {
+        "variants": [
+          "הפעלה"
+        ]
+      },
+      {
+        "variants": [
+          "השבתה"
+        ]
+      },
+      {
+        "variants": [
+          "Share"
+        ]
+      },
+      {
+        "variants": [
+          "Promote to organization"
+        ]
+      },
+      {
+        "variants": [
+          "נקה"
+        ]
+      },
+      {
+        "variants": [
+          "Select all"
+        ]
+      },
+      {
+        "variants": [
+          "Select  מש\"ת מטרות רדואן"
+        ]
+      },
+      {
+        "variants": [
+          "Select Air Evac Analyst"
+        ]
+      },
+      {
+        "variants": [
+          "Select Ask Manhar Agent"
+        ]
+      },
+      {
+        "variants": [
+          "Select Bot with character"
+        ]
+      },
+      {
+        "variants": [
+          "Select Bot with emojis"
+        ]
+      },
+      {
+        "variants": [
+          "Select Cortex Agent Screenshot"
+        ]
+      },
+      {
+        "variants": [
+          "Select Demo Copy"
+        ]
+      },
+      {
+        "variants": [
+          "Select DEMO CORTEX"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "admin",
+    "path": "/organization-settings",
+    "description": "Admin organization settings page — configure organization defaults such as profile, memory, help center, languages, default role and token limits. Includes in-page tabs for general, agents, templates and models, with cancel/save changes controls for unsaved settings.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Builder"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Organization Admin"
+            ]
+          },
+          {
+            "variants": [
+              "Company Admin"
+            ]
+          },
+          {
+            "variants": [
+              "Unit Admin"
+            ]
+          },
+          {
+            "variants": [
+              "test_1"
+            ]
+          },
+          {
+            "variants": [
+              "Member"
+            ]
+          },
+          {
+            "variants": [
+              "IAI Builder"
+            ]
+          },
+          {
+            "variants": [
+              "test_2"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "Hebrew"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "2\nשינויים"
+            ],
+            "default_expanded": true
+          }
+        ]
+      },
+      {
+        "variants": [
+          "Select..."
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Organization Admin"
+            ]
+          },
+          {
+            "variants": [
+              "Company Admin"
+            ]
+          },
+          {
+            "variants": [
+              "Unit Admin"
+            ]
+          },
+          {
+            "variants": [
+              "test_1"
+            ]
+          },
+          {
+            "variants": [
+              "Member"
+            ]
+          },
+          {
+            "variants": [
+              "IAI Builder"
+            ]
+          },
+          {
+            "variants": [
+              "test_2"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "0\nשינויים"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "כללי"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "סוכנים"
+        ]
+      },
+      {
+        "variants": [
+          "תבניות"
+        ]
+      },
+      {
+        "variants": [
+          "מודלים"
+        ]
+      },
+      {
+        "variants": [
+          "הטמעה וניתוח"
+        ]
+      },
+      {
+        "variants": [
+          "English"
+        ]
+      },
+      {
+        "variants": [
+          "דחה"
+        ]
+      },
+      {
+        "variants": [
+          "אשר"
+        ]
+      },
+      {
+        "variants": [
+          "הוספת תבנית"
+        ]
+      },
+      {
+        "variants": [
+          "בטל"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים"
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "admin",
+    "path": "/guardrails",
+    "description": "Admin guardrails settings page — configure safety limits for input and output, including blocked keywords/topics, guard prompts, blocked-message response, validation rules, validation prompt, and safe fallback response. Includes the admin navigation sidebar with a collapse control.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Off"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Monitor only"
+            ]
+          },
+          {
+            "variants": [
+              "Redact sensitive data"
+            ]
+          },
+          {
+            "variants": [
+              "Strict compliance"
+            ]
+          },
+          {
+            "variants": [
+              "Custom"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "13 selected"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Credit cards\nPayment card numbers"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "הרץ בדיקה"
+        ]
+      },
+      {
+        "variants": [
+          "בטל"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים"
+        ]
+      },
+      {
+        "variants": [
+          "JD",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "Add tag"
+        ]
+      },
+      {
+        "variants": [
+          "Clear selection"
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "admin",
+    "path": "/users-and-groups",
+    "description": "Admin users and groups page — manage organization users, groups, role-change requests, and the SaaS group hierarchy. Includes links/add actions, role and override filters, and cancel/save changes buttons without changing the URL.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "הוסף",
+          "Menu"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "הוסף יחידה"
+            ]
+          },
+          {
+            "variants": [
+              "הוסף משתמש"
+            ]
+          },
+          {
+            "variants": [
+              "רישום משתמש"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "תפקיד:\nכל התפקידים"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Builder"
+            ]
+          },
+          {
+            "variants": [
+              "Company Admin"
+            ]
+          },
+          {
+            "variants": [
+              "IAI Builder"
+            ]
+          },
+          {
+            "variants": [
+              "Organization Admin"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "דריסה:\nהכל"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "Builder"
+            ]
+          },
+          {
+            "variants": [
+              "Company Admin"
+            ]
+          },
+          {
+            "variants": [
+              "IAI Builder"
+            ]
+          },
+          {
+            "variants": [
+              "Organization Admin"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "פעולות"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "ערוך"
+            ]
+          },
+          {
+            "variants": [
+              "העברה"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "קישורים"
+        ]
+      },
+      {
+        "variants": [
+          "בטל"
+        ]
+      },
+      {
+        "variants": [
+          "שמור שינויים"
+        ]
+      },
+      {
+        "variants": [
+          "JD"
+        ],
+        "opens": [
+          {
+            "variants": [
+              "שפות"
+            ]
+          },
+          {
+            "variants": [
+              "התנתקות"
+            ]
+          }
+        ]
+      },
+      {
+        "variants": [
+          "avatar"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234/project/7713c0c0-d831-4097-8ca2-1fb2ac712495/wallets",
+    "description": "Wallets page — view and manage entity wallets for the Default Project, with summary counters and an empty-state message when no wallets exist. Includes Export Entities plus status and entity-type filters that update the list without changing the URL.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Export Entities",
+          "ייצא ישויות"
+        ]
+      },
+      {
+        "variants": [
+          "Refresh",
+          "רענן"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234/project/7713c0c0-d831-4097-8ca2-1fb2ac712495/usage",
+    "description": "Usage analytics page — spend and activity dashboards with metric cards, charts, and no-data states for the selected period. Includes tabs for Budget Items Cost & Usage, Vendors & Models, Cursor, Copilot Studio, Report Builder, and Usage Resolver, plus date/vendor/model/budget/entity filters and Daily/Weekly/Monthly toggles.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Budget Items Cost & Usage",
+          "עלות ושימוש לפי סעיפי תקציב"
+        ]
+      },
+      {
+        "variants": [
+          "Vendors & Models",
+          "ספקים ומודלים"
+        ]
+      },
+      {
+        "variants": [
+          "Cursor"
+        ]
+      },
+      {
+        "variants": [
+          "OpenAI"
+        ]
+      },
+      {
+        "variants": [
+          "Copilot Studio"
+        ]
+      },
+      {
+        "variants": [
+          "Report Builder",
+          "מחולל דוחות"
+        ]
+      },
+      {
+        "variants": [
+          "Usage Resolver",
+          "מפענח שימוש"
+        ]
+      },
+      {
+        "variants": [
+          "30/05/2026 – 29/06/2026"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "All Vendors",
+          "כל הספקים"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "All Models",
+          "כל המודלים"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "All Budget Items",
+          "כל סעיפי התקציב"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "All Entities",
+          "כל הישויות"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "All Entity Types",
+          "כל סוגי הישויות"
+        ]
+      },
+      {
+        "variants": [
+          "Daily",
+          "יומי"
+        ]
+      },
+      {
+        "variants": [
+          "Weekly",
+          "שבועי"
+        ]
+      },
+      {
+        "variants": [
+          "Monthly",
+          "חודשי"
+        ]
+      },
+      {
+        "variants": [
+          "Budget item",
+          "סעיף תקציב"
+        ]
+      },
+      {
+        "variants": [
+          "Active entities",
+          "ישויות פעילות"
+        ]
+      },
+      {
+        "variants": [
+          "Actual consumption",
+          "צריכה בפועל"
+        ]
+      },
+      {
+        "variants": [
+          "Monthly rate",
+          "תעריף חודשי"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234/project/7713c0c0-d831-4097-8ca2-1fb2ac712495",
+    "description": "Project Home — FinOps command center for the Default Project with spend, budget, model, wallet summary cards and compact cost charts. Includes Open Usage and Build Report actions from the dashboard."
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234",
+    "description": "Organization Home — FinOps command center for Jeen Prod showing Default Project spend, budget, model, wallet summaries, and cost snapshot charts. Includes Open Usage and Build Report actions from the dashboard."
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234/project/7713c0c0-d831-4097-8ca2-1fb2ac712495/settings",
+    "description": "Project Settings page — manage Default Project configuration, showing project name, project ID, creation dates, and usage ingestion settings. Includes an Accept anonymous usage toggle and a Danger Zone with a Delete Project action.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Delete Project",
+          "מחק פרויקט"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234/settings",
+    "description": "Organization Settings page — manage Jeen Prod members and roles, with a members table showing names, emails, roles, and status. Includes Members and Role permissions tabs plus an Invite Member button that opens member-invite controls without changing the URL.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Members",
+          "חברים"
+        ]
+      },
+      {
+        "variants": [
+          "Role permissions",
+          "הרשאות תפקיד"
+        ]
+      },
+      {
+        "variants": [
+          "Invite Member",
+          "הזמן חבר"
+        ]
+      },
+      {
+        "variants": [
+          "Name",
+          "שם"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "Email",
+          "אימייל"
+        ],
+        "default_expanded": true
+      },
+      {
+        "variants": [
+          "Viewer",
+          "צופה"
+        ]
+      },
+      {
+        "variants": [
+          "Admin",
+          "מנהל מערכת"
+        ]
+      },
+      {
+        "variants": [
+          "Previous",
+          "הקודם"
+        ]
+      },
+      {
+        "variants": [
+          "Next",
+          "הבא"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234/project/7713c0c0-d831-4097-8ca2-1fb2ac712495/model-pricing",
+    "description": "Model Pricing page — configure pricing tiers for AI models in the Default Project, with model/vendor summary counters and an empty vendor list state. Includes Sync Prices, Add, Refresh, vendor filter, Expand All, and Add Vendor controls.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Sync Prices",
+          "סנכרן מחירים"
+        ]
+      },
+      {
+        "variants": [
+          "Add",
+          "הוסף"
+        ]
+      },
+      {
+        "variants": [
+          "Add Vendor",
+          "הוסף ספק"
+        ]
+      },
+      {
+        "variants": [
+          "Add Model",
+          "הוסף מודל"
+        ]
+      },
+      {
+        "variants": [
+          "Refresh",
+          "רענן"
+        ]
+      },
+      {
+        "variants": [
+          "Expand All",
+          "הרחב הכל"
+        ],
+        "default_expanded": true
+      }
+    ]
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234/connectors",
+    "description": "Connectors page — organization integrations list with cards for Anthropic, Copilot Studio, Cursor, and OpenAI showing connection status. Each connector has a Configure button for setup or editing without changing the route.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Configure Anthropic",
+          "הגדר את Anthropic"
+        ]
+      },
+      {
+        "variants": [
+          "Configure",
+          "הגדר"
+        ]
+      },
+      {
+        "variants": [
+          "Configure Copilot Studio",
+          "הגדר את Copilot Studio"
+        ]
+      },
+      {
+        "variants": [
+          "Configure Cursor",
+          "הגדר את Cursor"
+        ]
+      },
+      {
+        "variants": [
+          "Configure OpenAI",
+          "הגדר את OpenAI"
+        ]
+      }
+    ]
+  },
+  {
+    "link_type": "finops",
+    "path": "/organization/93acf83a-6e2b-49a5-b5bd-02207f1be234/project/7713c0c0-d831-4097-8ca2-1fb2ac712495/budgets",
+    "description": "Budgets page — plan and track budget allocations for the Default Project with annual summary metrics, variance, and budget item count. Includes year tabs, Create Budget, Planned/Actuals toggles, Reset, Copy from 2025, and Create First Budget actions.",
+    "clickable_elements": [
+      {
+        "variants": [
+          "Create Budget",
+          "צור תקציב"
+        ]
+      },
+      {
+        "variants": [
+          "Planned",
+          "מתוכנן"
+        ]
+      },
+      {
+        "variants": [
+          "Actuals",
+          "בפועל"
+        ]
+      },
+      {
+        "variants": [
+          "Reset",
+          "אפס"
+        ]
+      },
+      {
+        "variants": [
+          "Copy from 2025",
+          "העתק מ-2025"
+        ]
+      },
+      {
+        "variants": [
+          "Create First Budget",
+          "צור תקציב ראשון"
+        ]
+      },
+      {
+        "variants": [
+          "Refresh",
+          "רענן"
+        ]
+      }
+    ]
+  }
+]

@@ -12,6 +12,7 @@ page becomes visible in the recording.
 
 from __future__ import annotations
 
+import difflib
 import logging
 import time
 from pathlib import Path
@@ -20,16 +21,19 @@ from urllib.parse import urlparse
 from playwright.async_api import async_playwright, Page, BrowserContext
 
 from backend.config import VIDEO_DIR
+from backend.services import llm
 from backend.services.screenshots import (
     _login,
     _enter_admin_app,
     _load_clickable_groups,
     _looks_like_error_page,
+    _wait_for_loader_gone,
     _expand_variants,
     _find_clickable,
     _find_input,
     _resolve_clickable_with_retry,
     DESTRUCTIVE_TEXT,
+    LOADER_SELECTORS,
     PAGE_LOAD_WAIT_MS,
     RENDER_SETTLE_MS,
 )
@@ -39,12 +43,13 @@ logger = logging.getLogger(__name__)
 VIEWPORT = {"width": 1920, "height": 1080}
 MIN_SETTLE_MS = 1200  # minimum dwell time per step regardless of script value
 
-# Selectors that indicate the page is still loading / not painted yet.
-_SPINNER_SELECTORS = [
-    '[class*="spinner"]',
-    '[class*="loading"]',
-    '[class*="skeleton"]',
-    '[aria-busy="true"]',
+# Selectors that indicate the page is still loading / not painted yet. Combines
+# the screenshot pipeline's vetted LOADER_SELECTORS (loader/spinner/progressbar/
+# aria-busy, case-insensitive) with skeleton placeholders so the recorder never
+# starts a step's segment while the app's loading screen is still on display.
+_SPINNER_SELECTORS = list(LOADER_SELECTORS) + [
+    '[class*="skeleton" i]',
+    '[class*="placeholder" i]',
 ]
 _SPINNER_COMBINED = ", ".join(_SPINNER_SELECTORS)
 _SPINNER_POLL_TIMEOUT_MS = 4000
@@ -78,13 +83,13 @@ async def wait_until_no_spinner(page: Page, timeout_ms: int = _SPINNER_POLL_TIME
 
 def _first_interaction_selector(interactions: list[dict]) -> str | None:
     """
-    Return a CSS-ish selector for the first click/fill target in the
+    Return a CSS-ish selector for the first click/hover/fill target in the
     interaction list, so we can wait for it before stamping cue time.
     Returns None if nothing usable is found.
     """
     for step in interactions:
         kind = (step.get("type") or "click").lower()
-        if kind == "click":
+        if kind in ("click", "hover"):
             text = (step.get("text") or "").strip()
             if text:
                 return text
@@ -104,7 +109,10 @@ async def _wait_for_page_ready(
     Wait for a real "page is ready" signal after goto+networkidle.
 
     Strategy (tried in order):
-    1. If the step has interactions, wait for the first click/fill target
+    0. ALWAYS first wait for any known loader/spinner overlay to disappear, so
+       the app's loading screen is never the first frame of the step's recorded
+       segment (the user explicitly does not want the loader in the video).
+    1. If the step has interactions, wait for the first click/hover/fill target
        element to become visible — that proves the SPA has finished painting
        the relevant UI.
     2. Fall back to wait_until_no_spinner: poll until no visible spinner /
@@ -112,13 +120,21 @@ async def _wait_for_page_ready(
     3. If neither signal arrives, log a warning and proceed (fall back to
        current behaviour, which already waited for networkidle + RENDER_SETTLE_MS).
     """
+    # Step 0: block on the app loader/spinner clearing before we judge readiness
+    # or stamp any cue time. This runs on every step, including those with an
+    # interaction target (whose DOM node can exist behind a loading overlay).
+    try:
+        await _wait_for_loader_gone(page)
+    except Exception as exc:
+        logger.debug("loader-gone wait failed (%s) — continuing", exc)
+
     target = _first_interaction_selector(interactions)
 
     if target:
         try:
-            # For clicks, search using the same resolution chain as _find_clickable
+            # For clicks/hovers, search using the same resolution chain as _find_clickable
             first_kind = (interactions[0].get("type") or "click").lower()
-            if first_kind == "click":
+            if first_kind in ("click", "hover"):
                 candidates = _expand_variants(target, variant_groups or [])
                 for candidate in candidates:
                     el = await _find_clickable(page, candidate)
@@ -206,27 +222,6 @@ _CURSOR_INIT_JS = r"""
 })();
 """
 
-_JS_HIGHLIGHT_SHOW = """(bbox) => {
-  const old = document.getElementById('__jeen_hl__');
-  if (old) old.remove();
-  const hl = document.createElement('div');
-  hl.id = '__jeen_hl__';
-  hl.style.cssText =
-    'position:fixed;pointer-events:none;z-index:2147483645;border-radius:6px;' +
-    'border:2px solid #6C5CE7;' +
-    'box-shadow:0 0 0 3px rgba(108,92,231,0.25),0 0 18px rgba(108,92,231,0.55);' +
-    'left:'  + (bbox.x - 5)            + 'px;' +
-    'top:'   + (bbox.y - 5)            + 'px;' +
-    'width:' + (bbox.width  + 10)      + 'px;' +
-    'height:'+ (bbox.height + 10)      + 'px;';
-  document.body.appendChild(hl);
-}"""
-
-_JS_HIGHLIGHT_HIDE = """() => {
-  const hl = document.getElementById('__jeen_hl__');
-  if (hl) hl.remove();
-}"""
-
 # Minimum on-screen size (px) for a target to be worth highlighting/clicking.
 # Anything smaller is almost certainly a zero-size / collapsed / stale node.
 _MIN_TARGET_PX = 6
@@ -309,35 +304,50 @@ async def _genuine_target_bbox(page: Page, element, require_interactive: bool = 
 
 
 async def _glide_and_highlight(page: Page, bbox: dict) -> None:
-    """Glide the visible cursor to the box centre and draw the highlight ring.
+    """Glide the visible cursor to the box centre and dwell briefly before the
+    click so the target the narration is about is clearly pointed at.
 
-    Leaves the ring on screen — the caller hides it after the click/hold so the
-    press is visible. The injected click-ripple fires automatically on the
-    real mousedown dispatched by element.click().
+    The purple highlight ring/box that used to be drawn here was removed at the
+    user's request (it read as an intrusive purple square over the UI). The
+    cursor glide and the injected click-ripple — which fires automatically on
+    the real mousedown dispatched by element.click() — remain as the click cues.
     """
     cx = bbox["x"] + bbox["width"] / 2
     cy = bbox["y"] + bbox["height"] / 2
     await page.mouse.move(cx, cy, steps=18)
-    await page.wait_for_timeout(200)
-    await page.evaluate(_JS_HIGHLIGHT_SHOW, bbox)
-    await page.wait_for_timeout(350)
+    await page.wait_for_timeout(550)
 
 
 async def _run_interactions_visible(
     page: Page,
     interactions: list[dict],
     variant_groups: list[list[str]] | None = None,
-) -> None:
+    action_hint: str = "",
+    language: str = "he",
+) -> dict:
     """
     Execute interactions with visual feedback: the mouse glides to each target
-    (driving the injected cursor), a purple highlight ring appears before each
-    click, and a ripple fires on mousedown.
+    (driving the injected cursor) and a ripple fires on mousedown.
 
     Mirrors screenshots._run_interactions in behaviour (same destructive-action
-    guard, same fill/click/wait types) but adds the visual layer needed for
-    video recording. Raises on failure so the caller can fall back to plain page.
+    guard, same fill/click/hover/wait types) but adds the visual layer needed for
+    video recording.
+
+    Unlike the old version, this no longer raises when a planned click target is
+    missing. Instead it attempts a live recovery (re-pick a real on-screen
+    control) and reports the outcome to the caller, which decides whether to keep
+    the step, mark it adapted, or degrade it to a scroll-tour. Returns a summary:
+
+      {"any_success": bool, "any_adapted": bool, "any_failed": bool,
+       "clicked_labels": list[str]}
     """
     variant_groups = variant_groups or []
+    summary = {
+        "any_success": False,
+        "any_adapted": False,
+        "any_failed": False,
+        "clicked_labels": [],
+    }
 
     for step in interactions:
         kind = (step.get("type") or "click").lower()
@@ -346,22 +356,36 @@ async def _run_interactions_visible(
             await page.wait_for_timeout(int(step.get("ms", 1000)))
             continue
 
+        if kind == "close":
+            # Explicitly dismiss an open pop-up/modal so a following scroll (or the
+            # rest of the step) acts on the PAGE behind it, not inside the pop-up.
+            # Non-destructive close ladder (Escape, then a close/cancel control).
+            if await _dialog_open(page):
+                await _close_open_dialog(page)
+                await page.wait_for_timeout(RENDER_SETTLE_MS)
+            summary["any_success"] = True
+            continue
+
         if kind == "scroll":
             target = (step.get("target") or "").strip()
-            await page.evaluate("""(target) => {
-                if (!target || target === 'bottom') {
-                    window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
-                } else {
-                    const headings = [...document.querySelectorAll('h1,h2,h3,h4,h5,h6,[class*="title"],[class*="header"]')];
-                    const match = headings.find(e => e.textContent.trim().includes(target));
-                    if (match) {
-                        match.scrollIntoView({behavior: 'smooth', block: 'center'});
-                    } else {
-                        window.scrollBy({top: 500, behavior: 'smooth'});
-                    }
-                }
-            }""", target)
+            # Prefer scrolling a named section into view (searching inside an open
+            # modal first); otherwise scroll the active container down one step.
+            # This reveals content inside scrollable pop-ups, not just the window.
+            revealed = False
+            if target and target.lower() != "bottom":
+                try:
+                    revealed = bool(await page.evaluate(_JS_SCROLL_TO_TEXT, target))
+                except Exception:
+                    revealed = False
+            if not revealed:
+                try:
+                    await page.evaluate(_JS_SCROLL_STEP, 0.7)
+                except Exception:
+                    await page.evaluate(
+                        "() => window.scrollBy({top: 500, behavior: 'smooth'})"
+                    )
             await page.wait_for_timeout(int(step.get("ms", 1200)))
+            summary["any_success"] = True
             continue
 
         if kind == "fill":
@@ -373,19 +397,19 @@ async def _run_interactions_visible(
 
             element = await _find_input(page, label)
             if element is None:
-                raise RuntimeError(f"no visible input for label {label!r}")
+                logger.info("fill target %r not found — marking step interaction failed", label)
+                summary["any_failed"] = True
+                continue
 
-            # Glide the cursor to the field and draw the highlight ring BEFORE
-            # the click, so the click into the input is always shown (cursor +
-            # ring + ripple), never an invisible press. Inputs need no
-            # interactivity probe — they are inherently fillable controls.
+            # Glide the cursor to the field BEFORE the click so the click into
+            # the input is always shown (cursor + ripple), never an invisible
+            # press. Inputs need no interactivity probe — they are inherently
+            # fillable controls.
             bbox = await _genuine_target_bbox(page, element, require_interactive=False)
             if bbox:
                 await _glide_and_highlight(page, bbox)
 
             await element.click(timeout=5000)
-            if bbox:
-                await page.evaluate(_JS_HIGHLIGHT_HIDE)
             await element.fill(value)
 
             actual = await element.input_value()
@@ -395,6 +419,31 @@ async def _run_interactions_visible(
                 await element.press_sequentially(value, delay=50)
 
             await page.wait_for_timeout(500)
+            summary["any_success"] = True
+            continue
+
+        if kind == "hover":
+            text = (step.get("text") or "").strip()
+            if not text:
+                logger.warning("Skipping hover step with no text: %s", step)
+                continue
+
+            candidates = _expand_variants(text, variant_groups)
+            element = await _resolve_clickable_with_retry(page, candidates)
+            if element is None:
+                logger.info("hover %r unresolved — marking failed", text)
+                summary["any_failed"] = True
+                continue
+
+            bbox = await _genuine_target_bbox(page, element)
+            if bbox is None:
+                logger.info("hover %r has no genuine visible target — marking failed", text)
+                summary["any_failed"] = True
+                continue
+
+            await _glide_and_highlight(page, bbox)
+            await page.wait_for_timeout(RENDER_SETTLE_MS)
+            summary["any_success"] = True
             continue
 
         if kind == "click":
@@ -403,29 +452,36 @@ async def _run_interactions_visible(
                 logger.warning("Skipping click step with no text: %s", step)
                 continue
             if DESTRUCTIVE_TEXT.search(text):
-                raise RuntimeError(f"refusing destructive interaction: {text!r}")
+                logger.info("refusing destructive planned click %r — marking failed", text)
+                summary["any_failed"] = True
+                continue
 
             candidates = _expand_variants(text, variant_groups)
             element = await _resolve_clickable_with_retry(page, candidates)
-            if element is None:
-                raise RuntimeError(f"no visible clickable element for {candidates!r}")
 
-            # Validate this is a genuine, on-screen, hit-testable interactive
-            # target BEFORE drawing anything. This single check fixes both:
-            #  • the phantom frame — a stale/hidden/zero-size/off-screen or
-            #    non-interactive match (e.g. a paragraph containing the label)
-            #    no longer gets a highlight ring drawn around empty space; and
-            #  • the invisible press — when bounding_box() was falsy the old
-            #    code skipped the visuals but still clicked. Now an unverifiable
-            #    target fails the step (plain page captured, narration realigned)
-            #    instead of producing a silent, unseen click.
-            bbox = await _genuine_target_bbox(page, element)
+            adapted_this = False
+            chosen_label = text
+            bbox = None
+            if element is not None:
+                bbox = await _genuine_target_bbox(page, element)
+
+            # Live recovery: if the planned label could not be resolved to a
+            # genuine on-screen control, re-pick a real one from the page.
+            if element is None or bbox is None:
+                recovered = await _recover_click_target(page, text, action_hint, language)
+                if recovered is not None:
+                    element, bbox, chosen_label = recovered
+                    adapted_this = True
+                elif element is None:
+                    logger.info("click %r unresolved and no recovery target", text)
+                    summary["any_failed"] = True
+                    continue
 
             # Toggle-aware: if the target is already expanded (e.g. a menu the
             # page opened by default, or one opened by a previous interaction),
-            # clicking it would CLOSE it. Don't click — but still glide + ring
-            # (no ripple, no click) so the viewer sees the element the narration
-            # is about, then leave it open.
+            # clicking it would CLOSE it. Don't click — but still glide the
+            # cursor (no ripple, no click) so the viewer sees the element the
+            # narration is about, then leave it open.
             try:
                 already_expanded = await element.evaluate("""(el) => {
                     if (el.getAttribute('aria-expanded') === 'true') return true;
@@ -460,27 +516,35 @@ async def _run_interactions_visible(
             if already_expanded:
                 logger.info(
                     "Element %r already expanded — showing without clicking to avoid closing it",
-                    text,
+                    chosen_label,
                 )
                 if bbox:
                     await _glide_and_highlight(page, bbox)
-                    await page.evaluate(_JS_HIGHLIGHT_HIDE)
                 await page.wait_for_timeout(RENDER_SETTLE_MS)
+                summary["any_success"] = True
+                if adapted_this:
+                    summary["any_adapted"] = True
+                summary["clicked_labels"].append(chosen_label)
                 continue
 
             if bbox is None:
-                raise RuntimeError(
-                    f"resolved element for {candidates!r} is not a genuine visible target"
-                )
+                logger.info("click %r has no genuine visible target — marking failed", text)
+                summary["any_failed"] = True
+                continue
 
-            # Glide → highlight ring → real click (fires the ripple) → hide ring.
+            # Glide the cursor to the target → real click (fires the ripple).
             await _glide_and_highlight(page, bbox)
             await element.click(timeout=5000)
-            await page.evaluate(_JS_HIGHLIGHT_HIDE)
             await page.wait_for_timeout(RENDER_SETTLE_MS)
+            summary["any_success"] = True
+            if adapted_this:
+                summary["any_adapted"] = True
+            summary["clicked_labels"].append(chosen_label)
             continue
 
         logger.warning("Unknown interaction type %r — skipping: %s", kind, step)
+
+    return summary
 
 
 def _url_key(url: str) -> str:
@@ -490,11 +554,348 @@ def _url_key(url: str) -> str:
 
 
 def _has_screen_changing_interactions(interactions: list[dict]) -> bool:
-    """True only if at least one interaction is a click, fill, or scroll (not just waits)."""
+    """True only if at least one interaction visibly changes the recorded step."""
     return any(
-        (step.get("type") or "click").lower() in ("click", "fill", "scroll")
+        (step.get("type") or "click").lower() in ("click", "hover", "fill", "scroll")
         for step in interactions
     )
+
+
+# ── Live recovery + verification helpers (Groups C & D) ───────────────────────
+
+# Enumerate the genuinely visible, on-screen, named interactive controls so we
+# can re-pick a real target when the planned label cannot be resolved.
+_JS_LIST_CONTROLS = r"""() => {
+  const sel = 'button, a, [role="button"], [role="tab"], [role="menuitem"],' +
+    ' [role="option"], [role="link"], [role="radio"], [role="checkbox"],' +
+    ' input, select, textarea';
+  const out = [];
+  const seen = new Set();
+  for (const el of document.querySelectorAll(sel)) {
+    const r = el.getBoundingClientRect();
+    if (r.width < 6 || r.height < 6) continue;
+    if (r.bottom < 0 || r.top > window.innerHeight) continue;
+    const name = (el.getAttribute('aria-label') || el.innerText || el.value || '')
+      .trim().replace(/\s+/g, ' ').slice(0, 80);
+    if (!name) continue;
+    const key = name.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(name);
+    if (out.length >= 40) break;
+  }
+  return out;
+}"""
+
+
+def _fuzzy_pick(intended: str, names: list[str], cutoff: float = 0.82) -> str | None:
+    """Cheap, deterministic match of *intended* against live control *names*.
+
+    Accepts only confident matches (exact, containment, or a high-ratio close
+    match) so a weak guess never triggers a wrong click — the LLM tiebreak and
+    the scroll-tour fallback handle the uncertain cases.
+    """
+    norm = " ".join((intended or "").split()).lower()
+    if not norm or not names:
+        return None
+    lowered = {" ".join(n.split()).lower(): n for n in names}
+    if norm in lowered:
+        return lowered[norm]
+    for low, original in lowered.items():
+        if norm in low or low in norm:
+            return original
+    match = difflib.get_close_matches(norm, list(lowered.keys()), n=1, cutoff=cutoff)
+    return lowered[match[0]] if match else None
+
+
+async def _recover_click_target(
+    page: Page, intended_text: str, action_hint: str, language: str,
+):
+    """Re-pick a real, clickable target when the planned label is missing.
+
+    Scans the page's visible controls, fuzzy-matches the intended label, and
+    falls back to an LLM tiebreak (which may decline). Returns (element, bbox,
+    chosen_label) for a genuine on-screen interactive target, or None.
+    """
+    try:
+        names = await page.evaluate(_JS_LIST_CONTROLS)
+    except Exception:
+        names = []
+    if not names:
+        return None
+
+    choice = _fuzzy_pick(intended_text, names)
+    if choice is None:
+        try:
+            choice = await llm.pick_live_target(
+                goal=action_hint or intended_text,
+                intended_label=intended_text,
+                candidates=names,
+                language=language,
+            )
+        except Exception as exc:
+            logger.debug("pick_live_target failed: %s", exc)
+            choice = None
+    if not choice or DESTRUCTIVE_TEXT.search(choice):
+        return None
+
+    element = await _find_clickable(page, choice)
+    if element is None:
+        return None
+    bbox = await _genuine_target_bbox(page, element)
+    if bbox is None:
+        return None
+    logger.info("Recovered click target: planned %r -> live %r", intended_text, choice)
+    return element, bbox, choice
+
+
+async def _page_signature(page: Page) -> str:
+    """A cheap fingerprint of the visible page state, used to verify that a click
+    actually changed the screen (URL, DOM size, text volume, open dialogs)."""
+    try:
+        return await page.evaluate(
+            r"""() => {
+                const nodes = document.querySelectorAll('*').length;
+                const txt = document.body ? document.body.innerText.length : 0;
+                const dialogs = document.querySelectorAll(
+                    '[role="dialog"], [aria-modal="true"]'
+                ).length;
+                return location.href + '|' + nodes + '|' + txt + '|' + dialogs;
+            }"""
+        )
+    except Exception:
+        return ""
+
+
+# ── Scroll helpers (Issue #3) ────────────────────────────────────────────────
+# The narration often describes content that is below the fold OR inside a
+# scrollable pop-up/modal (e.g. the file-upload dialog after "Advanced options").
+# Plain window scrolling does not move a modal's inner scroll area, so the screen
+# never shows what the narration is talking about. These helpers find the ACTIVE
+# scroll container — the largest scrollable element inside an open dialog, else
+# the largest scrollable element on the page, else the window — and scroll THAT.
+
+# Picks the active scroll container and scrolls it by a fraction of its height.
+# Returns {scrolled, atBottom, inDialog} so the caller knows whether more remains.
+_JS_SCROLL_STEP = r"""(ratio) => {
+  function scrollableInside(root) {
+    const cands = [root, ...root.querySelectorAll('*')];
+    let best = null, bestArea = 0;
+    for (const el of cands) {
+      if (el.scrollHeight - el.clientHeight <= 16) continue;
+      const st = getComputedStyle(el);
+      if (st.overflowY !== 'auto' && st.overflowY !== 'scroll') continue;
+      const r = el.getBoundingClientRect();
+      if (r.width < 40 || r.height < 40) continue;
+      const area = r.width * r.height;
+      if (area > bestArea) { bestArea = area; best = el; }
+    }
+    return best;
+  }
+  const dlgs = [...document.querySelectorAll('[role="dialog"],[aria-modal="true"],dialog')]
+    .filter(d => { const r = d.getBoundingClientRect(); return r.width > 40 && r.height > 40; });
+  let container = null, inDialog = false;
+  if (dlgs.length) { container = scrollableInside(dlgs[dlgs.length - 1]); inDialog = !!container; }
+  if (!container) container = scrollableInside(document.body);
+  if (container) {
+    container.scrollBy({top: Math.round(container.clientHeight * ratio), behavior: 'smooth'});
+    const atBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 4;
+    return {scrolled: true, atBottom, inDialog};
+  }
+  window.scrollBy({top: Math.round(window.innerHeight * ratio), behavior: 'smooth'});
+  const atBottom = window.scrollY + window.innerHeight >= document.body.scrollHeight - 4;
+  return {scrolled: true, atBottom, inDialog: false};
+}"""
+
+# Resets the active scroll container (modal body or window) back to the top.
+_JS_SCROLL_RESET = r"""() => {
+  const dlgs = [...document.querySelectorAll('[role="dialog"],[aria-modal="true"],dialog')]
+    .filter(d => { const r = d.getBoundingClientRect(); return r.width > 40 && r.height > 40; });
+  function scrollableInside(root) {
+    for (const el of [root, ...root.querySelectorAll('*')]) {
+      if (el.scrollHeight - el.clientHeight <= 16) continue;
+      const st = getComputedStyle(el);
+      if (st.overflowY === 'auto' || st.overflowY === 'scroll') {
+        const r = el.getBoundingClientRect();
+        if (r.width >= 40 && r.height >= 40) return el;
+      }
+    }
+    return null;
+  }
+  let c = dlgs.length ? scrollableInside(dlgs[dlgs.length - 1]) : null;
+  if (!c) c = scrollableInside(document.body);
+  if (c) c.scrollTo({top: 0, behavior: 'smooth'});
+  else window.scrollTo({top: 0, behavior: 'smooth'});
+}"""
+
+# Jumps the active scroll container (modal body or window) to the top INSTANTLY
+# (no animation). Used as a per-step baseline so each step begins at the top and
+# narration about top-of-page content is never shown over a leftover scrolled-down
+# view inherited from the previous step.
+_JS_SCROLL_TOP_INSTANT = r"""() => {
+  const dlgs = [...document.querySelectorAll('[role="dialog"],[aria-modal="true"],dialog')]
+    .filter(d => { const r = d.getBoundingClientRect(); return r.width > 40 && r.height > 40; });
+  function scrollableInside(root) {
+    for (const el of [root, ...root.querySelectorAll('*')]) {
+      if (el.scrollHeight - el.clientHeight <= 16) continue;
+      const st = getComputedStyle(el);
+      if (st.overflowY === 'auto' || st.overflowY === 'scroll') {
+        const r = el.getBoundingClientRect();
+        if (r.width >= 40 && r.height >= 40) return el;
+      }
+    }
+    return null;
+  }
+  let c = dlgs.length ? scrollableInside(dlgs[dlgs.length - 1]) : null;
+  if (!c) c = scrollableInside(document.body);
+  if (c) c.scrollTo({top: 0, behavior: 'auto'});
+  else window.scrollTo({top: 0, behavior: 'auto'});
+}"""
+
+# Scrolls a heading/label/text matching *target* into view, searching inside an
+# open dialog first (so a modal's inner content is revealed). Returns true on hit.
+_JS_SCROLL_TO_TEXT = r"""(target) => {
+  if (!target) return false;
+  const dlgs = [...document.querySelectorAll('[role="dialog"],[aria-modal="true"],dialog')]
+    .filter(d => { const r = d.getBoundingClientRect(); return r.width > 40 && r.height > 40; });
+  const scope = dlgs.length ? dlgs[dlgs.length - 1] : document;
+  const sel = 'h1,h2,h3,h4,h5,h6,[class*="title"],[class*="header"],label,legend,p,span,div,a,button';
+  const nodes = [...scope.querySelectorAll(sel)];
+  const match = nodes.find(e => e.textContent && e.textContent.trim().includes(target));
+  if (match) { match.scrollIntoView({behavior: 'smooth', block: 'center'}); return true; }
+  return false;
+}"""
+
+
+# ── Dialog / pop-up awareness + cleanup (Issue #1) ───────────────────────────
+# When a click opens a modal/dialog, it must be closed before moving on to a
+# step that does not use it — otherwise the pop-up lingers over later content.
+
+# True when a real, sizeable modal dialog is currently open on the page.
+_JS_DIALOG_OPEN = r"""() => {
+  const dlgs = document.querySelectorAll(
+    '[role="dialog"],[aria-modal="true"],dialog[open]'
+  );
+  for (const d of dlgs) {
+    const r = d.getBoundingClientRect();
+    if (r.width > 80 && r.height > 80) {
+      const st = getComputedStyle(d);
+      if (st.visibility !== 'hidden' && st.display !== 'none') return true;
+    }
+  }
+  return false;
+}"""
+
+# Clicks an explicit close/cancel control inside the topmost open dialog.
+# Conservative matching (no bare "x") so we never click an unrelated control.
+_JS_CLOSE_DIALOG_BTN = r"""() => {
+  const dlgs = [...document.querySelectorAll('[role="dialog"],[aria-modal="true"],dialog[open]')]
+    .filter(d => { const r = d.getBoundingClientRect(); return r.width > 80 && r.height > 80; });
+  if (!dlgs.length) return false;
+  const dlg = dlgs[dlgs.length - 1];
+  const closeRe = /(^|\s)(close|cancel|dismiss)(\s|$)|סגור|סגירה|ביטול|בטל|^[×✕⨯✖]$/i;
+  const btns = dlg.querySelectorAll('button,[role="button"],[aria-label]');
+  for (const b of btns) {
+    const r = b.getBoundingClientRect();
+    if (r.width < 6 || r.height < 6) continue;
+    const label = (b.getAttribute('aria-label') || b.innerText || b.title || '').trim();
+    if (label && closeRe.test(label)) { b.click(); return true; }
+  }
+  return false;
+}"""
+
+
+async def _dialog_open(page: Page) -> bool:
+    try:
+        return bool(await page.evaluate(_JS_DIALOG_OPEN))
+    except Exception:
+        return False
+
+
+async def _close_open_dialog(page: Page) -> bool:
+    """Close a lingering dialog using a non-destructive ladder: Escape, then an
+    explicit close/cancel control inside the dialog. Returns True once no dialog
+    remains. Never clicks a save/submit/delete control (close labels only)."""
+    for _ in range(2):
+        try:
+            await page.keyboard.press("Escape")
+        except Exception:
+            pass
+        await page.wait_for_timeout(350)
+        if not await _dialog_open(page):
+            return True
+    try:
+        await page.evaluate(_JS_CLOSE_DIALOG_BTN)
+    except Exception:
+        pass
+    await page.wait_for_timeout(400)
+    return not await _dialog_open(page)
+
+
+async def _step_uses_open_dialog(
+    page: Page, interactions: list[dict], variant_groups: list[list[str]],
+) -> bool:
+    """True when the step's first actionable interaction targets an element that
+    lives INSIDE the currently-open dialog — i.e. the step still needs the dialog,
+    so it must not be closed. Resolves the target against the current page state."""
+    for step in interactions:
+        kind = (step.get("type") or "click").lower()
+        if kind == "close":
+            # The step explicitly wants to dismiss the pop-up (e.g. to then scroll
+            # the page behind it), so it does NOT need the dialog kept open.
+            return False
+        if kind == "scroll":
+            # A scroll step explores the CURRENT view. When a dialog is open, the
+            # scroll is meant to move within that pop-up (container-aware scrolling
+            # targets the open dialog), so the dialog must stay open. Deciding on
+            # the first actionable interaction: a scroll-first step keeps the popup.
+            return True
+        if kind == "click":
+            text = (step.get("text") or "").strip()
+            if not text:
+                continue
+            candidates = _expand_variants(text, variant_groups)
+            element = None
+            for cand in candidates:
+                element = await _find_clickable(page, cand)
+                if element is not None:
+                    break
+        elif kind == "fill":
+            label = (step.get("label") or "").strip()
+            if not label:
+                continue
+            element = await _find_input(page, label)
+        else:
+            continue
+        if element is None:
+            return False
+        try:
+            return bool(await element.evaluate(
+                "(el) => !!el.closest('[role=\"dialog\"],[aria-modal=\"true\"],dialog')"
+            ))
+        except Exception:
+            return False
+    return False
+
+
+async def _run_scroll_tour(page: Page) -> None:
+    """Smoothly scroll through the page (or an open scrollable modal) so the
+    viewer sees real content when no interaction could be performed (the graceful
+    fallback that keeps a step from becoming a dead, static frame).
+
+    Scrolls the ACTIVE scroll container — a scrollable modal body when a dialog is
+    open, otherwise the window — so a tour inside a pop-up reveals its content
+    instead of leaving it static while the page behind it does not move."""
+    try:
+        for _ in range(2):
+            result = await page.evaluate(_JS_SCROLL_STEP, 0.7)
+            await page.wait_for_timeout(1200)
+            if isinstance(result, dict) and result.get("atBottom"):
+                break
+        await page.evaluate(_JS_SCROLL_RESET)
+        await page.wait_for_timeout(600)
+    except Exception as exc:
+        logger.debug("scroll tour failed: %s", exc)
 
 
 async def record_product_video(
@@ -504,6 +905,7 @@ async def record_product_video(
     session_id: str = "default",
     audio_results: list[dict | None] | None = None,
     language: str = "he",
+    on_step_status: "callable | None" = None,
 ) -> dict:
     """
     Record a real browser session following the video_script steps.
@@ -539,6 +941,8 @@ async def record_product_video(
     step_leads: list[float] = []  # interaction-animation lead (seconds) before content settles
     recorded_steps: list[dict] = []
     recorded_audio: list[dict | None] = []
+    recorded_url_keys: list[str] = []
+    outcomes: list[str] = []  # per recorded step: planned | adapted | toured
     failed_steps: list[dict] = []
     seen_urls: set[str] = set()
     webm_path: str | None = None
@@ -595,7 +999,12 @@ async def record_product_video(
             # Skip only pure duplicates: same URL already shown, no interactions,
             # and we'd have to navigate there (nothing new to show).
             if url_key in seen_urls and not _has_screen_changing_interactions(interactions) and needs_navigation:
-                logger.info("Step %d skipped — duplicate screen: %s", i + 1, url)
+                logger.info(
+                    "📋 Step %d/%d [SKIPPED] %s — duplicate screen",
+                    i + 1, len(video_script), action,
+                )
+                if on_step_status:
+                    on_step_status(i + 1, len(video_script), "skipped", action, url)
                 continue
 
             logger.info(
@@ -603,11 +1012,23 @@ async def record_product_video(
             )
 
             try:
+                # Resolve variant groups once (used by the dialog-cleanup check,
+                # the ready-wait, and the interactions runner).
+                route_path = urlparse(url).path.rstrip("/") or "/"
+                variant_groups = _load_clickable_groups(route_path, link_type)
+
                 if needs_navigation:
+                    # Navigating to a new URL discards any open dialog from the
+                    # previous step, so no explicit close is needed here.
                     response = await page.goto(url, wait_until="domcontentloaded", timeout=30000)
                     status = response.status if response else None
                     if status and status >= 400:
-                        logger.warning("Step %d failed — HTTP %d: %s", i + 1, status, url)
+                        logger.warning(
+                            "📋 Step %d/%d [FAILED] %s — HTTP %d",
+                            i + 1, len(video_script), action, status,
+                        )
+                        if on_step_status:
+                            on_step_status(i + 1, len(video_script), "failed", action, url)
                         failed_steps.append(step)
                         continue
 
@@ -620,50 +1041,130 @@ async def record_product_video(
                     final_url = page.url
                     if final_url.rstrip("/") != url.rstrip("/"):
                         logger.warning(
-                            "Step %d failed — redirected to %s", i + 1, final_url
+                            "📋 Step %d/%d [FAILED] %s — redirected to %s",
+                            i + 1, len(video_script), action, final_url,
                         )
+                        if on_step_status:
+                            on_step_status(i + 1, len(video_script), "failed", action, url)
                         failed_steps.append(step)
                         continue
 
                     # Detect 404 / blank / error pages
                     error_reason = await _looks_like_error_page(page)
                     if error_reason:
-                        logger.warning("Step %d failed — %s", i + 1, error_reason)
+                        logger.warning(
+                            "📋 Step %d/%d [FAILED] %s — %s",
+                            i + 1, len(video_script), action, error_reason,
+                        )
+                        if on_step_status:
+                            on_step_status(i + 1, len(video_script), "failed", action, url)
                         failed_steps.append(step)
                         continue
                 else:
                     logger.info("Step %d — same URL, continuing from current state", i + 1)
+                    # Pop-up awareness: a dialog opened by a previous step lingers
+                    # on the same screen. If THIS step does not act inside that
+                    # dialog, close it so it doesn't sit over unrelated content.
+                    if await _dialog_open(page):
+                        if await _step_uses_open_dialog(page, interactions, variant_groups):
+                            logger.info("Step %d — keeping open dialog (step acts inside it)", i + 1)
+                        else:
+                            logger.info("Step %d — closing leftover dialog before continuing", i + 1)
+                            await _close_open_dialog(page)
 
                 # ── Wait for the SPA to finish painting ──
-                # Resolve variant groups once (used by both ready-wait and interactions)
-                route_path = urlparse(url).path.rstrip("/") or "/"
-                variant_groups = _load_clickable_groups(route_path, link_type)
-
                 await _wait_for_page_ready(page, interactions, variant_groups)
 
-                # Run interactions with visible cursor, highlight ring, and ripple.
-                # If they fail we still record the plain page, but flag the step so
-                # the pipeline can rewrite its narration to match what is actually
-                # shown (the base page, not the tab/panel that never opened).
-                # Mark when the (painted) page is ready so the jump-cut editor can
-                # keep the interaction animation that plays between now and the
-                # post-interaction settle stamp below.
+                # Baseline scroll position: start the step at the TOP of the page
+                # so a step that scrolled down does not leave the next same-URL
+                # step's narration playing over a scrolled-down view (e.g. scrolling
+                # down, then talking about top-of-page content). Scroll interactions
+                # in THIS step then move down from a known top. Done instantly (no
+                # animation) so it never appears as motion in the recording.
+                # IMPORTANT: skip this when a pop-up/modal is open — a button was
+                # just clicked to open it and the step will scroll WITHIN it; force-
+                # resetting would fight the popup's own scroll position.
+                try:
+                    if not await _dialog_open(page):
+                        await page.evaluate(_JS_SCROLL_TOP_INSTANT)
+                except Exception:
+                    pass
+
+                # Run interactions with visible cursor and click ripple.
+                # The runner no longer fails the step on a missing target: it
+                # tries a live recovery (re-pick a real on-screen control). The
+                # fallback ladder is planned -> adapted -> guided scroll-tour, so
+                # a step is never a dead, static frame. We verify the screen
+                # actually changed and degrade to a scroll-tour when nothing
+                # effective happened. Mark when the (painted) page is ready so the
+                # jump-cut editor can keep the interaction animation.
                 lead_start = time.time()
                 ran_interactions = False
+                outcome = "planned"
                 if interactions:
                     ran_interactions = True
+                    sig_before = await _page_signature(page)
                     try:
-                        await _run_interactions_visible(page, interactions, variant_groups)
-                        await page.wait_for_timeout(RENDER_SETTLE_MS)
-                    except Exception as exc:
-                        logger.warning(
-                            "Step %d interactions failed (%s) — capturing plain page", i + 1, exc
+                        summary = await _run_interactions_visible(
+                            page, interactions, variant_groups,
+                            action_hint=action, language=language,
                         )
-                        step = {**step, "interaction_failed": True}
+                    except Exception as exc:
+                        logger.warning("Step %d interactions errored (%s)", i + 1, exc)
+                        summary = {
+                            "any_success": False, "any_adapted": False,
+                            "any_failed": True, "clicked_labels": [],
+                        }
+                    await page.wait_for_timeout(RENDER_SETTLE_MS)
+                    sig_after = await _page_signature(page)
+                    screen_changed = bool(sig_before) and sig_before != sig_after
+
+                    landed = summary["any_success"] or summary["any_adapted"]
+                    expected_change = _has_screen_changing_interactions(interactions)
+
+                    if not landed or (
+                        expected_change and not screen_changed
+                        and not summary["any_success"]
+                    ):
+                        logger.info(
+                            "Step %d — no effective interaction; showing a guided scroll-tour",
+                            i + 1,
+                        )
+                        await _run_scroll_tour(page)
+                        outcome = "toured"
+                        step = {**step, "interaction_failed": True, "outcome": "toured"}
+                    elif summary["any_adapted"]:
+                        outcome = "adapted"
+                        step = {
+                            **step,
+                            "interaction_failed": True,
+                            "outcome": "adapted",
+                            "adapted_labels": summary["clicked_labels"],
+                        }
+                    else:
+                        outcome = "planned"
+                        step = {**step, "outcome": "planned"}
+                else:
+                    step = {**step, "outcome": "planned"}
 
                 # One final spinner check after interactions (clicks may trigger
                 # new loading states, e.g. opening a modal with a skeleton).
                 await wait_until_no_spinner(page)
+
+                # Dedup: drop a step that adds nothing new — an already-seen
+                # screen where no planned/adapted action landed (e.g. a degraded
+                # scroll-tour of a page we already showed). This prevents the
+                # "same static page three times" failure mode.
+                is_new_url = url_key not in seen_urls
+                showed_new = is_new_url or outcome in ("planned", "adapted")
+                if not showed_new:
+                    logger.info(
+                        "📋 Step %d/%d [SKIPPED] %s — already-seen screen with no new content",
+                        i + 1, len(video_script), action,
+                    )
+                    if on_step_status:
+                        on_step_status(i + 1, len(video_script), "skipped", action, url)
+                    continue
 
                 # Mark the moment the content is fully visible — this is the subtitle cue start
                 content_visible_time = time.time()
@@ -676,12 +1177,35 @@ async def record_product_video(
                 step_leads.append(content_visible_time - lead_start if ran_interactions else 0.0)
                 recorded_steps.append(step)
                 recorded_audio.append(audio)
+                recorded_url_keys.append(url_key)
+                outcomes.append(outcome)
+
+                _status_labels = {
+                    "planned": "PLANNED",
+                    "adapted": "ADAPTED",
+                    "toured": "TOURED",
+                }
+                status_label = _status_labels.get(outcome, outcome.upper())
+                adapted_detail = ""
+                if outcome == "adapted" and step.get("adapted_labels"):
+                    adapted_detail = f" (live targets: {step['adapted_labels']})"
+                logger.info(
+                    "📋 Step %d/%d [%s] %s%s",
+                    i + 1, len(video_script), status_label, action, adapted_detail,
+                )
+                if on_step_status:
+                    on_step_status(i + 1, len(video_script), outcome, action, url)
 
                 # Linger on the page so the viewer can read the subtitle
                 await page.wait_for_timeout(settle_ms)
 
             except Exception as exc:
-                logger.error("Step %d failed unexpectedly (%s): %s", i + 1, url, exc)
+                logger.error(
+                    "📋 Step %d/%d [FAILED] %s — %s",
+                    i + 1, len(video_script), action, exc,
+                )
+                if on_step_status:
+                    on_step_status(i + 1, len(video_script), "failed", action, url)
                 failed_steps.append(step)
                 continue
 
@@ -695,10 +1219,29 @@ async def record_product_video(
         await context.close()
         await browser.close()
 
+    # ── Per-run recording report: how each planned step actually resolved ──
+    n_planned = outcomes.count("planned")
+    n_adapted = outcomes.count("adapted")
+    n_toured = outcomes.count("toured")
+    n_skipped = len(video_script) - len(recorded_steps) - len(failed_steps)
     logger.info(
         "Recording complete: %d/%d steps captured, %d failed, %.1f s, file: %s",
         len(recorded_steps), len(video_script), len(failed_steps), total_seconds, webm_path,
     )
+    logger.info(
+        "── Recording report ──\n"
+        "  planned (clicked as scripted): %d\n"
+        "  adapted (re-picked live target): %d\n"
+        "  toured  (scroll-tour fallback):  %d\n"
+        "  skipped (duplicate/empty):       %d\n"
+        "  failed  (nav/error -> slide):    %d",
+        n_planned, n_adapted, n_toured, n_skipped, len(failed_steps),
+    )
+    for idx, (st, oc) in enumerate(zip(recorded_steps, outcomes)):
+        detail = ""
+        if oc == "adapted" and st.get("adapted_labels"):
+            detail = f" -> live: {st['adapted_labels']}"
+        logger.info("  step %d: %s [%s]%s", idx + 1, st.get("action", "?"), oc, detail)
 
     return {
         "webm_path": str(webm_path),
@@ -708,5 +1251,13 @@ async def record_product_video(
         "total_seconds": total_seconds,
         "recorded_steps": recorded_steps,
         "recorded_audio": recorded_audio,
+        "outcomes": outcomes,
         "failed_steps": failed_steps,
+        "report": {
+            "planned": n_planned,
+            "adapted": n_adapted,
+            "toured": n_toured,
+            "skipped": n_skipped,
+            "failed": len(failed_steps),
+        },
     }

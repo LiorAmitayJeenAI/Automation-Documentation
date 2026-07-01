@@ -61,6 +61,11 @@ function isFolderVideoExcluded(folder) {
   return VIDEO_EXCLUDED_FOLDERS.includes(folder.name.toLowerCase());
 }
 
+function isPageVideoDisabled(folder, pageIndex) {
+  const page = folder.pages[pageIndex];
+  return page && page.videoDisabled;
+}
+
 function getAllPageKeys() {
   const keys = [];
   for (const folder of foldersData.folders) {
@@ -73,7 +78,9 @@ function getVideoEligiblePageKeys() {
   const keys = [];
   for (const folder of foldersData.folders) {
     if (isFolderVideoExcluded(folder)) continue;
-    folder.pages.forEach((_, i) => keys.push(pageKey(folder.id, i)));
+    folder.pages.forEach((_, i) => {
+      if (!isPageVideoDisabled(folder, i)) keys.push(pageKey(folder.id, i));
+    });
   }
   return keys;
 }
@@ -736,7 +743,11 @@ function disableSessionStop(row) {
 async function runVideoSelected() {
   const toRun = getSelectedItems().filter(item => {
     const folder = foldersData.folders.find(f => f.id === item.folderId);
-    return !folder || !isFolderVideoExcluded(folder);
+    if (!folder) return true;
+    if (isFolderVideoExcluded(folder)) return false;
+    const pageIndex = folder.pages.findIndex(p => p.url === item.url);
+    if (pageIndex >= 0 && isPageVideoDisabled(folder, pageIndex)) return false;
+    return true;
   });
   if (!toRun.length || isVideoRunning) return;
 

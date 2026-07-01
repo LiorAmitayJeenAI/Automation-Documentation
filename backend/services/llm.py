@@ -67,7 +67,6 @@ def _load_allowed_routes(link_type: str = "regular", language: str = "he") -> li
                     and r.get("path")
                     and _route_link_type(r) == normalized_link_type
                     and not r["path"].startswith("/support/")
-                    and r["path"] != "/chat"
                     and (r.get("language") is None or r.get("language") == language)
                 )
             ]
@@ -101,6 +100,24 @@ def _element_variants(el) -> list[str]:
     return variants
 
 
+_DIALOG_ONLY_LABELS = re.compile(
+    r"^(cancel|close|back|dismiss|ok|בטל|ביטול|סגור|חזור|אישור)$",
+    re.IGNORECASE,
+)
+
+
+def _is_top_level_noise(variants: list[str]) -> bool:
+    """True when a TOP-LEVEL button is a modal/dialog control the model should
+    never pick as a feature action (e.g. Cancel/Close/Back). Such buttons only
+    make sense inside a dialog, so offering them at the page level leads the LLM
+    to pick contradictory actions (e.g. clicking "Cancel" to "add a user").
+    """
+    for v in variants:
+        if _DIALOG_ONLY_LABELS.match(" ".join(v.split())):
+            return True
+    return False
+
+
 def _format_clickable_elements(route: dict) -> str:
     """Render a route's verified clickable buttons for the prompt.
 
@@ -112,16 +129,24 @@ def _format_clickable_elements(route: dict) -> str:
     child buttons inline as "(opens -> ...)", so the LLM knows it must click the
     parent first to reach them. Returns an empty string when the route has no
     recorded clickable elements.
+
+    Modal/dialog-only controls (Cancel/Close/Back) and buttons explicitly tagged
+    ``modal_only`` are dropped from the TOP-LEVEL menu so the model cannot pick a
+    button whose meaning contradicts the step (they remain available nested under
+    their opener when reached through a real flow).
     """
     buttons: list[str] = []
     for el in route.get("clickable_elements") or []:
         variants = _element_variants(el)
         if not variants:
             continue
+        children = el.get("opens") if isinstance(el, dict) else None
+        modal_only = bool(el.get("modal_only")) if isinstance(el, dict) else False
+        if not children and (modal_only or _is_top_level_noise(variants)):
+            continue
         label = " / ".join(f'"{v}"' for v in variants)
         if isinstance(el, dict) and el.get("default_expanded"):
             label += " [already open on page load]"
-        children = el.get("opens") if isinstance(el, dict) else None
         if children:
             child_labels = [
                 " / ".join(f'"{v}"' for v in _element_variants(c))
@@ -148,6 +173,11 @@ def _format_allowed_routes(routes: list[dict], base_url: str) -> str:
         clickable = _format_clickable_elements(r)
         if clickable:
             lines.append(f"    clickable buttons: {clickable}")
+        input_fields = r.get("input_fields")
+        if input_fields:
+            labels = ", ".join(f'"{f["label"]}"' for f in input_fields if f.get("label"))
+            if labels:
+                lines.append(f"    fillable inputs: {labels}")
     return "\n".join(lines)
 
 
@@ -271,6 +301,70 @@ async def generate_video_script(
     return steps
 
 
+async def pick_live_target(
+    goal: str,
+    intended_label: str,
+    candidates: list[str],
+    language: str = "he",
+) -> str | None:
+    """
+    Live-recovery tiebreak: the planned button could not be found on the page.
+    Given the step's goal and the buttons ACTUALLY visible right now, pick the
+    single button that best advances the goal — or decline.
+
+    Returns the chosen label (guaranteed to be an exact, whitespace-insensitive
+    member of *candidates*) or None when nothing fits. Never invents a label.
+    """
+    if not candidates:
+        return None
+
+    system = (
+        "You are operating a live web app to record a product tutorial. The "
+        "planned button could not be found on the current screen. From the list "
+        "of buttons that are ACTUALLY visible on the page right now, choose the "
+        "single button that best performs the step's goal. Respond with ONLY the "
+        "exact button text copied verbatim from the list, or the single word "
+        "NONE if no button genuinely fits. Never invent or translate a label. "
+        "Never choose a destructive/irreversible button (delete, save, submit, "
+        "publish, confirm) or a dismiss button (cancel, close, back)."
+    )
+    user = json.dumps(
+        {
+            "goal": goal,
+            "planned_label": intended_label,
+            "visible_buttons": candidates,
+        },
+        ensure_ascii=False,
+    )
+
+    try:
+        response = await _client.chat.completions.create(
+            model=AZURE_OPENAI_DEPLOYMENT,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            max_completion_tokens=60,
+        )
+    except Exception as exc:
+        logger.debug("pick_live_target LLM error: %s", exc)
+        return None
+
+    choice = _strip_code_fences((response.choices[0].message.content or "").strip())
+    choice = choice.strip().strip('"').strip()
+    if not choice or choice.upper() == "NONE":
+        return None
+
+    # Accept only an exact (whitespace-insensitive) member of the candidate list.
+    norm = " ".join(choice.split()).lower()
+    for c in candidates:
+        if " ".join(c.split()).lower() == norm:
+            logger.info("pick_live_target chose %r for goal %r", c, goal)
+            return c
+    logger.debug("pick_live_target returned non-candidate %r — ignoring", choice)
+    return None
+
+
 async def generate_narration(
     screenshot_results: list[dict],
     presentation_content: str = "",
@@ -346,18 +440,35 @@ def _describe_failed_interaction(step: dict) -> str:
     return step.get("action", "")
 
 
+def _describe_actual_state(step: dict) -> tuple[str, str]:
+    """Return (outcome, performed_action) describing what really happened on a
+    flagged step, so narration can be rewritten to match the screen.
+
+    - "adapted": a different real control was clicked (the recovered label).
+    - "toured":  the page was scroll-toured as an overview.
+    - "failed":  nothing landed; the plain base page is shown.
+    """
+    outcome = step.get("outcome")
+    if outcome == "adapted" and step.get("adapted_labels"):
+        return "adapted", ", ".join(str(x) for x in step["adapted_labels"])
+    if outcome == "toured":
+        return "toured", ""
+    return "failed", ""
+
+
 async def regenerate_narrations(
     recorded_steps: list[dict],
     language: str = "he",
 ) -> list[dict]:
     """
-    Rewrite narration for steps whose interactions failed during recording.
+    Rewrite narration for steps whose on-screen result diverged from the plan.
 
-    When Playwright cannot open a planned tab/panel/modal, the recorder flags the
-    step with ``interaction_failed: True``. The original narration still describes
-    the un-opened state, so the voiceover no longer matches the screen. This pass
-    asks the LLM to rewrite ONLY those flagged steps to describe the plain base
-    page instead. Steps that recorded correctly are returned unchanged.
+    The recorder flags a step with ``interaction_failed: True`` and an ``outcome``
+    of ``adapted`` (a different real control was clicked), ``toured`` (the page was
+    scroll-toured as an overview), or ``failed`` (plain base page). In every case
+    the original narration no longer matches the screen, so this pass asks the LLM
+    to rewrite ONLY those flagged steps to match what actually happened. Steps that
+    recorded as planned are returned unchanged.
 
     Returns the same list with the ``narration`` field replaced on flagged steps.
     Falls back to the original narration on any error.
@@ -369,20 +480,23 @@ async def regenerate_narrations(
         return recorded_steps
 
     logger.info(
-        "Regenerating narration for %d step(s) whose interactions failed",
+        "Regenerating narration for %d step(s) whose on-screen result changed",
         len(failed_indices),
     )
 
-    input_data = [
-        {
-            "url": recorded_steps[i].get("url", ""),
-            "action": recorded_steps[i].get("action", ""),
-            "failed_interaction": _describe_failed_interaction(recorded_steps[i]),
-            "original_narration": recorded_steps[i].get("narration", ""),
+    input_data = []
+    for i in failed_indices:
+        s = recorded_steps[i]
+        outcome, performed = _describe_actual_state(s)
+        input_data.append({
+            "url": s.get("url", ""),
+            "action": s.get("action", ""),
+            "outcome": outcome,
+            "planned_interaction": _describe_failed_interaction(s),
+            "performed_action": performed,
+            "original_narration": s.get("narration", ""),
             "language": language,
-        }
-        for i in failed_indices
-    ]
+        })
 
     try:
         response = await _client.chat.completions.create(
